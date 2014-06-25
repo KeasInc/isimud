@@ -4,20 +4,27 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'isimud/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "isimud"
+  spec.name          = 'isimud'
   spec.version       = Isimud::VERSION
-  spec.authors       = ["Brian Jenkins"]
-  spec.email         = ["bonkydog@bonkydog.com"]
+  spec.authors       = ['Brian Jenkins']
+  spec.email         = ['bonkydog@bonkydog.com']
   spec.summary       = %q{AMQP update logging for ActiveRecord models.}
   spec.description   = %q{}
-  spec.homepage      = ""
-  spec.license       = "Copyright Keas -- All rights reserved"
+  spec.homepage      = ''
+  spec.license       = 'Copyright Keas -- All rights reserved'
 
   spec.files         = `git ls-files -z`.split("\x0")
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
-  spec.require_paths = ["lib"]
+  spec.require_paths = ['lib']
 
-  spec.add_development_dependency "bundler", "~> 1.6"
-  spec.add_development_dependency "rake"
+
+  spec.add_runtime_dependency 'activerecord', '3.2.17'
+
+  spec.add_development_dependency 'bundler', '~> 1.6'
+  spec.add_development_dependency 'rake'
+  spec.add_development_dependency 'rspec-core', '~> 2.14.7'
+  spec.add_development_dependency 'rspec-rails', '~> 2.12'
+  spec.add_development_dependency 'combustion', '~> 0.5.1'
+  spec.add_development_dependency 'database_cleaner'
 end
