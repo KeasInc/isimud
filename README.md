@@ -1,6 +1,6 @@
 # Isimud
 
-TODO: Write a gem description
+ActiveRecord change logging via AMQP
 
 ## Installation
 
