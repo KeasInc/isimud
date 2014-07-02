@@ -30,7 +30,6 @@ describe ModelWatcher do
     let!(:user) { User.create!(email: 'bob@example.com') }
 
     it "sends messages about model creation" do
-      user
       expect(result).to eq(user.to_json)
     end
   end
