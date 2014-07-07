@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Isimud::BunnyClient do
   let(:url) { 'amqp://guest:guest@localhost' }
   let(:client) { Isimud::BunnyClient.new(url) }
-  let!(:connection) { client.connect }
+  let!(:connection) { client.connection }
 
   after(:each) do
     client.close
@@ -15,18 +15,34 @@ describe Isimud::BunnyClient do
     end
   end
 
-  describe '#connect' do
+  describe '#bind' do
+    let(:channel) { client.channel }
+    let(:proc) { Proc.new { puts('hello') } }
+    let(:keys) { %w(foo.bar baz.*) }
+
+    it 'creates a new queue' do
+      queue = client.bind('my_queue', 'events', keys, &proc)
+      expect(queue).to be_a Bunny::Queue
+      expect(queue.name).to eq('my_queue')
+    end
+
+    it 'binds specified routing keys and subscribes to the specified exchange' do
+      queue = double('queue', bind: 'ok')
+      channel.stub(:queue).and_return(queue)
+      expect(queue).to receive(:subscribe).with(ack: true)
+      keys.each { |key| expect(queue).to receive(:bind).with('events', routing_key: key, nowait: false).once }
+      client.bind('my_queue', 'events', *keys, proc)
+    end
+  end
+
+  describe '#connection' do
     it 'returns a Bunny session' do
       expect(connection).to be_a Bunny::Session
     end
 
-    it 'sets the connection' do
-      expect(client.connection).to eql(connection)
-    end
-
-    it 'reuses an existing connection' do
+    it 'sets and reuses the connection' do
       connection = client.connection
-      expect(client.connect).to eql(connection)
+      expect(client.connection).to eql(connection)
     end
 
     it 'opens a connection to the broker' do
@@ -51,7 +67,7 @@ describe Isimud::BunnyClient do
 
     it 'keeps the channel thread local' do
       channel = client.channel
-      t = Thread.new do
+      t       = Thread.new do
         expect(client.channel).not_to eql(channel)
       end
       t.join
@@ -62,6 +78,17 @@ describe Isimud::BunnyClient do
     it 'closes the session' do
       client.close
       expect(client.connection).not_to be_open
+    end
+  end
+
+  describe '#publish' do
+    let(:channel) { client.channel }
+    it 'sends the data with the appropriate routing key to the exchange' do
+      payload = {a: '123', b: 'this is b'}
+      topic   = double(:topic)
+      expect(channel).to receive(:topic).with('events', durable: true).and_return(topic)
+      expect(topic).to receive(:publish).with(payload, routing_key: 'foo.bar.baz', persistent: true)
+      client.publish('events', 'foo.bar.baz', payload)
     end
   end
 
