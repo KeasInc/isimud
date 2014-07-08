@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.summary       = %q{ActiveRecord change logging via AMQP}
   spec.description   = %q{}
   spec.homepage      = ''
-  spec.license       = "Copyright (C) #{Date.today.year} Keas -- All rights reserved"
+  spec.license       = "Copyright (C) 2014 Keas -- All rights reserved"
 
   spec.files         = `git ls-files -z`.split("\x0")
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
