@@ -4,7 +4,7 @@ module Isimud
   class BunnyClient
     DEFAULT_URL = 'amqp://guest:guest@localhost'
 
-    attr_reader :url, :connection
+    attr_reader :url
 
     def initialize(_url = nil)
       @url = _url || DEFAULT_URL
@@ -25,12 +25,15 @@ module Isimud
     def connection
       @connection ||= Bunny.new(url).tap(&:start)
     end
+    alias connect connection
+
+    CHANNEL_KEY = :'isimud.bunny_client.channel'
 
     def channel
-      if (channel = Thread.current[:'isimud.bunny_client.channel']).try(:open?)
+      if (channel = Thread.current[CHANNEL_KEY]).try(:open?)
         channel
       else
-        Thread.current[:'isimud.bunny_client.channel'] = connection.channel
+        Thread.current[CHANNEL_KEY] = connection.channel
       end
     end
 
@@ -40,6 +43,16 @@ module Isimud
 
     def publish(exchange, routing_key, payload)
       channel.topic(exchange, durable: true).publish(payload, routing_key: routing_key, persistent: true)
+    end
+
+    def reconnect
+      close
+      @connection = nil
+      connect
+    end
+
+    def logger
+      Isimud.logger
     end
   end
 end

@@ -36,7 +36,7 @@ module Isimud
     end
 
     def bind(name, *keys, &method)
-      Rails.logger.info "Synchronous: Binding event #{name} for keys #{keys}"
+      logger.info "Synchronous: Binding event #{name} for keys #{keys}"
       @queues[name] ||= Queue.new(name, method)
       keys.each do |k|
         @queues[name].add_routing_key(k)
@@ -44,10 +44,14 @@ module Isimud
     end
 
     def publish(data, routing_key)
-      Rails.logger.debug "Delivering synchronous event #{data}"
+      logger.debug "Delivering synchronous event #{data}"
       @queues.each do |name, queue|
         queue.publish(data) if queue.matches(routing_key)
       end
+    end
+
+    def reconnect
+      self
     end
   end
 end
