@@ -53,5 +53,9 @@ module Isimud
     def reconnect
       self
     end
+
+    def logger
+      Isimud.logger
+    end
   end
 end

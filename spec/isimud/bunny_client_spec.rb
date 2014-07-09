@@ -19,6 +19,9 @@ describe Isimud::BunnyClient do
     let(:channel) { client.channel }
     let(:proc) { Proc.new { puts('hello') } }
     let(:keys) { %w(foo.bar baz.*) }
+    before do
+      Isimud.logger = Logger.new(STDOUT)
+    end
 
     it 'creates a new queue' do
       queue = client.bind('my_queue', 'events', keys, &proc)

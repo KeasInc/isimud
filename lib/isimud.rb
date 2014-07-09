@@ -21,6 +21,10 @@ module Isimud
     @@client ||= client_class.new(server)
   end
 
+  def self.connect
+    client.connect
+  end
+
   def self.reconnect
     @@client.try(:reconnect)
   end
