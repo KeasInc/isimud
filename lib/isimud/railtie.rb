@@ -4,14 +4,17 @@ module Isimud
   class Railtie < Rails::Railtie
     initializer 'isimud.configure' do |app|
       require 'erb'
-      configs = YAML::load(ERB.new(IO.read(Rails.root.join('config/isimud.yml'))).result).stringify_keys
-      config = configs[Rails.env].stringify_keys
-      app.config.isimud = case config['client']
-      when 'bunny'
-        Isimud::BunnyClient.new(config['broker_url'])
-      when 'test'
-        Isimud::TestClient.new
-      end
+      configs           = load_config
+      config            = configs[Rails.env] || configs
+    end
+
+    private
+
+    def load_config
+      path = Rails.root.join('config', 'isimud.yml')
+      YAML::load(ERB.new(IO.read(path)).result).stringify_keys
+    rescue
+      {}
     end
   end
 end
