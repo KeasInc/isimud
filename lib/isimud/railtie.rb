@@ -32,7 +32,6 @@ module Isimud
       require 'erb'
       path = Rails.root.join('config', 'isimud.yml')
       YAML::load(ERB.new(IO.read(path)).result)
-      Rails.logger.debug("Isimud: configuration loaded from #{path}")
     rescue
       Rails.logger.warn("Isimud: configuration could not be loaded at: #{path}")
       nil
