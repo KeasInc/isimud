@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = Isimud::VERSION
   spec.authors       = ['Brian Jenkins', 'George Feil']
   spec.email         = %w{bonkydog@bonkydog.com george.feil@keas.com}
-  spec.summary       = %q{ActiveRecord change logging via AMQP}
+  spec.summary       = %q{AMQP Messaging for Events and ActiveRecord changes}
   spec.description   = %q{}
   spec.homepage      = ''
   spec.license       = "Copyright (C) 2014 Keas -- All rights reserved"

@@ -1,0 +1,21 @@
+# Isimud configuration
+# Server may be specified as a URL string, or a hash of connection options accepted by Bunny::Session
+defaults: &defaults
+  client_type: :bunny
+  server: 'amqp://guest:guest@localhost'
+
+development:
+  server: 'amqp://guest:guest@localhost'
+
+test:
+  client_type: :test
+
+develop:
+  <<: *defaults
+
+staging:
+  <<: *defaults
+
+production:
+  <<: *defaults
+

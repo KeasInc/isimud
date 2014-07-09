@@ -20,8 +20,8 @@ module Isimud
       end
     end
 
-    def initialize
-      @queues = Hash.new
+    def initialize(_queues = Hash.new)
+      @queues = _queues
     end
 
     def connect
