@@ -1,3 +1,4 @@
+require 'bunny'
 require 'logger'
 
 module Isimud
@@ -23,7 +24,7 @@ module Isimud
     end
 
     def connection
-      @connection ||= Bunny.new(url).tap(&:start)
+      @connection ||= ::Bunny.new(url).tap(&:start)
     end
     alias connect connection
 
