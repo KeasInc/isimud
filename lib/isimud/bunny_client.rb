@@ -39,6 +39,8 @@ module Isimud
 
     def close
       connection.close
+    ensure
+      @connection = nil
     end
 
     def publish(exchange, routing_key, payload)
@@ -47,7 +49,6 @@ module Isimud
 
     def reconnect
       close
-      @connection = nil
       connect
     end
 

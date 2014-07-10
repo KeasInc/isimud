@@ -6,9 +6,13 @@ gemspec
 gem 'activesupport', '~> 3.2.17'
 gem 'bundler', '~> 1.6'
 gem 'rake'
-gem 'rspec-core', '~> 2.99'
-gem 'rspec-rails', '~> 2.99'
-gem 'combustion', '~> 0.5.1'
-gem 'database_cleaner'
+
+group :development, :test do
+  gem 'rspec-core', '~> 2.99'
+  gem 'rspec-rails', '~> 2.99'
+  gem 'combustion', '~> 0.5.1'
+  gem 'database_cleaner'
+  gem 'codeclimate-test-reporter', require: false
+end
 
 

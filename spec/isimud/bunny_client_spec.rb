@@ -79,8 +79,9 @@ describe Isimud::BunnyClient do
 
   describe '#close' do
     it 'closes the session' do
+      connection = client.connection
       client.close
-      expect(client.connection).not_to be_open
+      expect(connection).not_to be_open
     end
   end
 
