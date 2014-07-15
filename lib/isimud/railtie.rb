@@ -12,14 +12,15 @@ module Isimud
   class Railtie < Rails::Railtie
     initializer 'isimud.configure' do |app|
       config = if (configs = load_config)
-                 configs[Rails.env] || configs[:defaults]
+                 configs[Rails.env] || configs['defaults']
                else
                  {}
                end
       config.reverse_merge!(DEFAULT_CONFIG)
-      Isimud.client_type = config[:client_type]
+      Rails.logger.info("Isimud configuration: #{config.inspect}")
+      Isimud.client_type = config['client_type']
       Isimud.logger      = Rails.logger
-      Isimud.server      = config[:server]
+      Isimud.server      = config['server']
     end
 
     generators do

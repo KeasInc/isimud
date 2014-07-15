@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Isimud do
   before(:each) do
-    Isimud.client = nil
+    Isimud.default_client = nil
   end
 
   describe '#client' do

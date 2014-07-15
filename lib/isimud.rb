@@ -9,16 +9,15 @@ require 'isimud/railtie' if defined?(Rails)
 module Isimud
   include ::ActiveSupport::Configurable
 
-  config_accessor :client_type, :logger, :server
+  config_accessor :client_type, :logger, :server, :default_client
 
   def self.client_class
     type = "#{client_type}_client".classify
     "Isimud::#{type}".constantize
   end
 
-  mattr_writer :client
   def self.client
-    @@client ||= client_class.new(server)
+    self.default_client ||= client_class.new(server)
   end
 
   def self.connect
@@ -26,6 +25,6 @@ module Isimud
   end
 
   def self.reconnect
-    @@client.try(:reconnect)
+    client.reconnect
   end
 end
