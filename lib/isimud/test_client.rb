@@ -51,6 +51,7 @@ module Isimud
     end
 
     def reconnect
+      initialize
       self
     end
 
