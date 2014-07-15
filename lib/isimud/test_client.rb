@@ -35,16 +35,16 @@ module Isimud
     def close
     end
 
-    def bind(name, *keys, &method)
-      logger.info "Synchronous: Binding event #{name} for keys #{keys}"
-      @queues[name] ||= Queue.new(name, method)
+    def bind(queue_name, exchange_name, *keys, &method)
+      logger.info "Synchronous: Binding queue #{queue_name} for keys #{keys}"
+      @queues[name] ||= Queue.new(queue_name, method)
       keys.each do |k|
         @queues[name].add_routing_key(k)
       end
     end
 
-    def publish(data, routing_key)
-      logger.debug "Delivering synchronous event #{data}"
+    def publish(exchange, routing_key, payload)
+      logger.debug "Delivering message key: #{routing_key} payload: #{payload}"
       @queues.each do |name, queue|
         queue.publish(data) if queue.matches(routing_key)
       end
