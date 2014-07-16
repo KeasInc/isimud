@@ -36,7 +36,7 @@ module Isimud
     end
 
     def bind(queue_name, exchange_name, *keys, &method)
-      logger.info "Synchronous: Binding queue #{queue_name} for keys #{keys}"
+      logger.info "Isimud::TestClient: Binding queue #{queue_name} for keys #{keys.inspect}"
       @queues[queue_name] ||= Queue.new(queue_name, method)
       keys.each do |k|
         @queues[queue_name].add_routing_key(k)
@@ -44,15 +44,16 @@ module Isimud
     end
 
     def publish(exchange, routing_key, payload)
-      logger.debug "Delivering message key: #{routing_key} payload: #{payload}"
+      logger.debug "Isimud::TestClient: Delivering message key: #{routing_key} payload: #{payload}"
       @queues.each do |name, queue|
-        logger.debug "Queue #{name} matches routing key #{routing_key}"
-        queue.publish(payload) if queue.matches(routing_key)
+        if queue.matches(routing_key)
+          logger.debug "Isimud::TestClient: Queue #{name} matches routing key #{routing_key}"
+          queue.publish(payload)
+        end
       end
     end
 
     def reconnect
-      initialize
       self
     end
 
