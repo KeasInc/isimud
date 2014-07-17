@@ -1,6 +1,4 @@
-require "spec_helper"
-require_relative "../../lib/isimud/model_watcher"
-
+require 'spec_helper'
 
 describe ModelWatcher do
 
