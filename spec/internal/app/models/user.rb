@@ -1,9 +1,14 @@
-require_relative "../../../../lib/isimud/model_watcher"
+require_relative "../../../../lib/isimud"
 
 class User < ActiveRecord::Base
+  belongs_to :company
 
-  include ModelWatcher
+  include Isimud::ModelWatcher
 
-  watch_attributes
+  watch_attributes :key, :login_count
+
+  def key
+    Base64.encode64("user-#{id}")
+  end
 
 end

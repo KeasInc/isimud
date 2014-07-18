@@ -1,7 +1,3 @@
 test:
-  adapter: mysql2
-  encoding: utf8
-  host: localhost
-  database: isimud
-  username: root
-  password:
+  adapter:  sqlite3
+  database: db/combustion_test.sqlite

@@ -1,10 +1,11 @@
 require 'active_support'
 require 'active_support/core_ext/module/attribute_accessors'
-require 'isimud/version'
-require 'isimud/bunny_client'
-require 'isimud/test_client'
-require 'isimud/railtie' if defined?(Rails)
 require 'isimud/model_watcher'
+require 'isimud/bunny_client'
+require 'isimud/railtie' if defined?(Rails)
+require 'isimud/test_client'
+require 'isimud/version'
+
 
 module Isimud
   include ::ActiveSupport::Configurable

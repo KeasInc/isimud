@@ -44,7 +44,7 @@ module Isimud
     end
 
     def publish(exchange, routing_key, payload)
-      logger.debug "Isimud::TestClient: Delivering message key: #{routing_key} payload: #{payload}"
+      logger.debug "Isimud::TestClient: Delivering message exchange: #{exchange} key: #{routing_key} payload: #{payload}"
       @queues.each do |name, queue|
         if queue.matches(routing_key)
           logger.debug "Isimud::TestClient: Queue #{name} matches routing key #{routing_key}"
