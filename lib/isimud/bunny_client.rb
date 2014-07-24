@@ -34,7 +34,9 @@ module Isimud
       if (channel = Thread.current[CHANNEL_KEY]).try(:open?)
         channel
       else
-        Thread.current[CHANNEL_KEY] = connection.channel
+        new_channel = connection.channel
+        new_channel.confirm_select
+        Thread.current[CHANNEL_KEY] = new_channel
       end
     end
 

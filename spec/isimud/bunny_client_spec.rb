@@ -68,6 +68,11 @@ describe Isimud::BunnyClient do
       expect(client.channel).not_to eql(closed_channel)
     end
 
+    it 'enables confirmations' do
+      channel = client.channel
+      expect(channel.next_publish_seq_no).to eq(1)
+    end
+
     it 'keeps the channel thread local' do
       channel = client.channel
       t       = Thread.new do
