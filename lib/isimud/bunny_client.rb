@@ -16,9 +16,17 @@ module Isimud
       queue = channel.queue(queue_name, durable: true)
       routing_keys.each { |key| queue.bind(exchange_name, routing_key: key, nowait: false) }
       queue.subscribe(ack: true) do |delivery_info, properties, payload|
-        logger.debug "Isimud: received #{payload} properties: #{properties.inspect}"
-        block.call(payload)
-        channel.ack(delivery_info.delivery_tag)
+        begin
+          logger.debug "Isimud: queue #{queue_name} received #{payload} properties: #{properties.inspect}"
+          Thread.current['isimud_queue_name'] = queue_name
+          Thread.current['isimud_delivery_info'] = delivery_info
+          Thread.current['isimud_properties'] = properties
+          block.call(payload)
+          channel.ack(delivery_info.delivery_tag)
+        rescue => e
+          logger.warn("Isimud#bind: exception #{e.message}\n  #{e.backtrace.join("\n  ")}")
+          channel.reject(delivery_info.delivery_tag, true)
+        end
       end
       queue
     end
@@ -26,6 +34,7 @@ module Isimud
     def connection
       @connection ||= ::Bunny.new(url).tap(&:start)
     end
+
     alias connect connection
 
     CHANNEL_KEY = :'isimud.bunny_client.channel'

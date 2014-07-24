@@ -1,6 +1,6 @@
 # Isimud
 
-ActiveRecord change logging via AMQP
+Messaging abstraction layer for AMQP and testing.
 
 ## Installation
 
@@ -15,10 +15,47 @@ And then execute:
 Or install it yourself as:
 
     $ gem install isimud
+    
+For Rails applications, use the following generators to create config and initializer files, respectively:
+
+    $ rails g isimud:config
+    $ rails g isimud:initializer
+    
+Customize the AMQP broker settings in the config/isimud.yml
 
 ## Usage
 
-TODO: Write usage instructions here
+### Connecting to an AMQP server
+
+TBD
+
+### Message publication
+
+TBD
+
+### Message binding and consumption
+
+TBD
+
+## Changes
+
+### 0.1.2
+
+* Reject message with requeue when an exception is raised during processing
+
+### 0.1.1
+
+* Enable channel confirmations for message publication
+
+### 0.1.0
+
+* ModelWatcher mix-in for ActiveRecord, sends events on instance changes
+* Initializer generator for Rails
+
+### 0.0.8 (first working version)
+
+* Don't clear the queues when reconnecting TestClient
+
 
 ## Contributing
 
