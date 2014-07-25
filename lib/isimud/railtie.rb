@@ -17,9 +17,10 @@ module Isimud
                  {}
                end
       config.reverse_merge!(DEFAULT_CONFIG)
-      Isimud.client_type = config['client_type']
-      Isimud.logger      = Rails.logger
-      Isimud.server      = config['server']
+      Isimud.client_type    = config['client_type']
+      Isimud.client_options = config['client_options']
+      Isimud.logger         = Rails.logger
+      Isimud.server         = config['server']
     end
 
     generators do
