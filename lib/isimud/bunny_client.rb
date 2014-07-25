@@ -19,17 +19,20 @@ module Isimud
       routing_keys.each { |key| queue.bind(exchange_name, routing_key: key, nowait: false) }
       queue.subscribe(ack: true) do |delivery_info, properties, payload|
         begin
-          logger.info "Isimud: queue #{queue_name} received: #{delivery_info.delivery_tag} routing_key: #{delivery_info.routing_key}"
+          logger.info "Isimud: queue #{queue_name} received #{delivery_info.delivery_tag} routing_key: #{delivery_info.routing_key}"
           Thread.current['isimud_queue_name'] = queue_name
           Thread.current['isimud_delivery_info'] = delivery_info
           Thread.current['isimud_properties'] = properties
           block.call(payload)
-          logger.info "Isimud: finished with #{delivery_info.delivery_tag}, acknowledging"
+          logger.info "Isimud: queue #{queue_name} finished with #{delivery_info.delivery_tag}, acknowledging"
           channel.ack(delivery_info.delivery_tag)
+        rescue Bunny::Exception
+          raise
         rescue => e
-          logger.warn("Isimud: error on #{delivery_info.delivery_tag}: #{e.message}\n  #{e.backtrace.join("\n  ")}")
+          logger.warn("Isimud: queue #{queue_name} error on #{delivery_info.delivery_tag}: #{e.message}\n  #{e.backtrace.join("\n  ")}")
           channel.reject(delivery_info.delivery_tag, true)
         end
+        logger.info "Isimud: queue #{queue_name} done with #{delivery_info.delivery_tag}"
       end
       queue
     end
