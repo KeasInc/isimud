@@ -10,7 +10,7 @@ require 'isimud/version'
 module Isimud
   include ::ActiveSupport::Configurable
 
-  config_accessor :client_type, :logger, :server, :default_client, :model_watcher_schema, :model_watcher_exchange
+  config_accessor :client_type, :client_options, :logger, :server, :default_client, :model_watcher_schema, :model_watcher_exchange
 
   def self.client_class
     type = "#{client_type}_client".classify
@@ -18,7 +18,7 @@ module Isimud
   end
 
   def self.client
-    self.default_client ||= client_class.new(server)
+    self.default_client ||= client_class.new(server, client_options || {})
   end
 
   def self.connect

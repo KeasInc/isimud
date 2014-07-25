@@ -7,8 +7,10 @@ module Isimud
 
     attr_reader :url
 
-    def initialize(_url = nil)
+    def initialize(_url = nil, _bunny_options = {})
+      logger.info "Isimud::BunnyClient.initialize: options = #{_bunny_options.inspect}"
       @url = _url || DEFAULT_URL
+      @bunny_options = _bunny_options
     end
 
     def bind(queue_name, exchange_name, *routing_keys, &block)
@@ -33,7 +35,7 @@ module Isimud
     end
 
     def connection
-      @connection ||= ::Bunny.new(url).tap(&:start)
+      @connection ||= ::Bunny.new(url, @bunny_options).tap(&:start)
     end
 
     alias connect connection
