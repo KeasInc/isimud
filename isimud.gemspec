@@ -20,5 +20,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'activerecord', '>= 3.2.17'
   spec.add_dependency 'activesupport', '>= 3.2.17'
-  spec.add_dependency 'bunny', '0.9.0'
+  spec.add_dependency 'bunny', '>= 1.3.0'
 end

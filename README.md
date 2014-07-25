@@ -39,6 +39,10 @@ TBD
 
 ## Changes
 
+### 0.1.3
+
+* Upgrade bunny gem requirement to 1.3.x
+
 ### 0.1.2
 
 * Reject message with requeue when an exception is raised during processing
