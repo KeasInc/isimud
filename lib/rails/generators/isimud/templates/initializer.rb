@@ -11,6 +11,7 @@ end
 config = configs[Rails.env]
 
 Rails.logger.info("Isimud configuration: #{config.inspect}")
-Isimud.client_type = config['client_type']
-Isimud.logger      = Rails.logger
-Isimud.server      = config['server']
+Isimud.client_type    = config['client_type']
+Isimud.client_options = config['client_options']
+Isimud.logger         = Rails.logger
+Isimud.server         = config['server']
