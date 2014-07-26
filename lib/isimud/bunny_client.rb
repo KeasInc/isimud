@@ -26,7 +26,7 @@ module Isimud
           block.call(payload)
           logger.info "Isimud: queue #{queue_name} finished with #{delivery_info.delivery_tag}, acknowledging"
           channel.ack(delivery_info.delivery_tag, true)
-        rescue Bunny::Exception => e
+        rescue Bunny::Exception, Timeout::Error => e
           logger.warn("Isimud: queue #{queue_name} error on #{delivery_info.delivery_tag}: #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}")
           raise
         rescue => e
@@ -55,6 +55,14 @@ module Isimud
         new_channel.prefetch(Isimud.prefetch_count) if Isimud.prefetch_count
         Thread.current[CHANNEL_KEY] = new_channel
       end
+    end
+
+    def reset
+      if (channel = Thread.current[CHANNEL_KEY]).try(:open?)
+        channel.recover
+        channel.close
+      end
+      Thread.current[CHANNEL_KEY] = nil
     end
 
     def close

@@ -53,6 +53,10 @@ module Isimud
       end
     end
 
+    def reset
+      @queues.clear
+    end
+
     def reconnect
       self
     end
