@@ -51,6 +51,7 @@ module Isimud
       else
         new_channel = connection.channel
         new_channel.confirm_select
+        new_channel.prefetch(Isimud.prefetch_count) if Isimud.prefetch_count
         Thread.current[CHANNEL_KEY] = new_channel
       end
     end
