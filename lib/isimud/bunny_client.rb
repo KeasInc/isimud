@@ -58,7 +58,7 @@ module Isimud
     end
 
     def reset
-      if (channel = Thread.current[CHANNEL_KEY]).try(:open?)
+      if connection.open? && (channel = Thread.current[CHANNEL_KEY]).try(:open?)
         channel.recover
         channel.close
       end
