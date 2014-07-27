@@ -25,7 +25,7 @@ module Isimud
           Thread.current['isimud_properties'] = properties
           block.call(payload)
           logger.info "Isimud: queue #{queue_name} finished with #{delivery_info.delivery_tag}, acknowledging"
-          channel.ack(delivery_info.delivery_tag, true)
+          channel.ack(delivery_info.delivery_tag)
         rescue Bunny::Exception, Timeout::Error => e
           logger.warn("Isimud: queue #{queue_name} error on #{delivery_info.delivery_tag}: #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}")
           raise
