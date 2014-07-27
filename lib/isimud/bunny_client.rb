@@ -15,7 +15,8 @@ module Isimud
 
     def bind(queue_name, exchange_name, *routing_keys, &block)
       logger.info "Isimud: bind to #{queue_name}: keys #{routing_keys.join(',')}"
-      queue = channel.queue(queue_name, durable: true)
+      current_channel = channel
+      queue = current_channel.queue(queue_name, durable: true)
       routing_keys.each { |key| queue.bind(exchange_name, routing_key: key, nowait: false) }
       queue.subscribe(ack: true) do |delivery_info, properties, payload|
         begin
@@ -25,13 +26,13 @@ module Isimud
           Thread.current['isimud_properties'] = properties
           block.call(payload)
           logger.info "Isimud: queue #{queue_name} finished with #{delivery_info.delivery_tag}, acknowledging"
-          channel.ack(delivery_info.delivery_tag)
+          current_channel.ack(delivery_info.delivery_tag)
         rescue Bunny::Exception, Timeout::Error => e
           logger.warn("Isimud: queue #{queue_name} error on #{delivery_info.delivery_tag}: #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}")
           raise
         rescue => e
           logger.warn("Isimud: queue #{queue_name} rejecting #{delivery_info.delivery_tag}: #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}")
-          channel.reject(delivery_info.delivery_tag, true)
+          current_channel.reject(delivery_info.delivery_tag, true)
         end
         logger.info "Isimud: queue #{queue_name} done with #{delivery_info.delivery_tag}"
       end
@@ -58,11 +59,7 @@ module Isimud
     end
 
     def reset
-      if connection.open? && (channel = Thread.current[CHANNEL_KEY]).try(:open?)
-        channel.recover
-        channel.close
-      end
-      Thread.current[CHANNEL_KEY] = nil
+      connection.close_all_channels
     end
 
     def close
