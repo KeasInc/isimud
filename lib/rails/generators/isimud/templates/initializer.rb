@@ -13,6 +13,6 @@ config = configs[Rails.env]
 Isimud.client_type    = config['client_type']
 Isimud.client_options = config['client_options']
 Isimud.logger         = config['logger'] || Rails.logger
-Isimud.log_level      = config['log_level'] || Rails.configuration.log_level
+Isimud.log_level      = config['log_level'] || :debug
 Isimud.prefetch_count = config['prefetch_count']
 Isimud.server         = config['server']
