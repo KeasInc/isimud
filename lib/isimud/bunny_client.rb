@@ -2,39 +2,39 @@ require 'bunny'
 require 'logger'
 
 module Isimud
-  class BunnyClient
+  class BunnyClient < Isimud::Client
     DEFAULT_URL = 'amqp://guest:guest@localhost'
 
     attr_reader :url
 
     def initialize(_url = nil, _bunny_options = {})
-      logger.info "Isimud::BunnyClient.initialize: options = #{_bunny_options.inspect}"
+      log "Isimud::BunnyClient.initialize: options = #{_bunny_options.inspect}"
       @url = _url || DEFAULT_URL
       @bunny_options = _bunny_options
     end
 
     def bind(queue_name, exchange_name, *routing_keys, &block)
-      logger.info "Isimud: bind to #{queue_name}: keys #{routing_keys.join(',')}"
+      log "Isimud: bind to #{queue_name}: keys #{routing_keys.join(',')}"
       current_channel = channel
       queue = current_channel.queue(queue_name, durable: true)
       routing_keys.each { |key| queue.bind(exchange_name, routing_key: key, nowait: false) }
       queue.subscribe(ack: true) do |delivery_info, properties, payload|
         begin
-          logger.info "Isimud: queue #{queue_name} received #{delivery_info.delivery_tag} routing_key: #{delivery_info.routing_key}"
+          log "Isimud: queue #{queue_name} received #{delivery_info.delivery_tag} routing_key: #{delivery_info.routing_key}"
           Thread.current['isimud_queue_name'] = queue_name
           Thread.current['isimud_delivery_info'] = delivery_info
           Thread.current['isimud_properties'] = properties
           block.call(payload)
-          logger.info "Isimud: queue #{queue_name} finished with #{delivery_info.delivery_tag}, acknowledging"
+          log "Isimud: queue #{queue_name} finished with #{delivery_info.delivery_tag}, acknowledging"
           current_channel.ack(delivery_info.delivery_tag)
         rescue Bunny::Exception, Timeout::Error => e
-          logger.warn("Isimud: queue #{queue_name} error on #{delivery_info.delivery_tag}: #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}")
+          log("Isimud: queue #{queue_name} error on #{delivery_info.delivery_tag}: #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}", :warn)
           raise
         rescue => e
-          logger.warn("Isimud: queue #{queue_name} rejecting #{delivery_info.delivery_tag}: #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}")
+          log("Isimud: queue #{queue_name} rejecting #{delivery_info.delivery_tag}: #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}", :warn)
           current_channel.reject(delivery_info.delivery_tag, true)
         end
-        logger.info "Isimud: queue #{queue_name} done with #{delivery_info.delivery_tag}"
+        log "Isimud: queue #{queue_name} done with #{delivery_info.delivery_tag}"
       end
       queue
     end
@@ -75,10 +75,6 @@ module Isimud
     def reconnect
       close
       connect
-    end
-
-    def logger
-      Isimud.logger
     end
   end
 end

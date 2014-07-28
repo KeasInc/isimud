@@ -19,7 +19,8 @@ module Isimud
       config.reverse_merge!(DEFAULT_CONFIG)
       Isimud.client_type    = config['client_type']
       Isimud.client_options = config['client_options']
-      Isimud.logger         = Rails.logger
+      Isimud.logger         = config['logger'] || Rails.logger
+      Isimud.log_level      = config['log_level'] || Rails.configuration.log_level
       Isimud.prefetch_count = config['prefetch_count']
       Isimud.server         = config['server']
     end
