@@ -42,6 +42,8 @@ TBD
 ### 0.1.3
 
 * Upgrade bunny gem requirement to 1.3.x
+* Fixed message acknowledgements
+* Added log_level configuration parameter (default is :debug)
 
 ### 0.1.2
 
