@@ -39,6 +39,10 @@ TBD
 
 ## Changes
 
+### 0.1.4
+
+* Don't reject messages when exception is raised in bind block
+
 ### 0.1.3
 
 * Upgrade bunny gem requirement to 1.3.x
