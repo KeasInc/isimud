@@ -36,6 +36,16 @@ describe Isimud::BunnyClient do
       keys.each { |key| expect(queue).to receive(:bind).with('events', routing_key: key, nowait: false).once }
       client.bind('my_queue', 'events', *keys, proc)
     end
+
+    it 'calls block when a message is received' do
+      @block_called = Array.new
+      queue_name = 'test queue'
+      client.bind("#{queue_name}", 'events', 'my.test.key') do |payload|
+        @block_called << payload
+      end
+      client.publish('events', 'my.test.key', "Hi there")
+      expect(@block_called).to eq ['Hi there']
+    end
   end
 
   describe '#connection' do

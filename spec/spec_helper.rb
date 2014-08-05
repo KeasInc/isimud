@@ -12,7 +12,9 @@ Combustion.initialize! :active_record
 require 'rspec/rails'
 
 Isimud.client_type = :test
-Isimud.logger = Rails.logger
+Isimud.logger = Logger.new(STDERR)
+Isimud.logger.level = Logger::WARN
+Isimud.log_level = :debug
 
 RSpec.configure do |config|
   config.use_transactional_fixtures = true

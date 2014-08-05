@@ -33,7 +33,11 @@ module Isimud
           log("Isimud: queue #{queue_name} rejecting #{delivery_info.delivery_tag}: #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}", :warn)
           current_channel.reject(delivery_info.delivery_tag, true)
         end
-        current_channel.ack(delivery_info.delivery_tag)
+        begin
+          current_channel.ack(delivery_info.delivery_tag)
+        rescue => e
+          log("Isimud: error acknowledging #{delivery_info.delivery_tag}: #{e.message}")
+        end
         log "Isimud: queue #{queue_name} done with #{delivery_info.delivery_tag}"
       end
       queue

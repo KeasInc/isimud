@@ -39,6 +39,11 @@ TBD
 
 ## Changes
 
+### 0.1.5
+
+* Added Isimud::Event
+* Extracted Isimud::Client#log into Isimud::Logging module
+
 ### 0.1.4
 
 * Don't reject messages when exception is raised in bind block
