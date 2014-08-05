@@ -6,6 +6,7 @@ module Isimud
     attr_accessor :type, :action, :user_id, :occurred_at, :eventful_type, :eventful_id, :parameters
 
     EXCHANGE_NAME = 'events'
+    DEFAULT_TYPE = :model
 
     # Initialize a new Event
     # @overload Event.new(user, eventful, parameters)
@@ -23,35 +24,35 @@ module Isimud
     def initialize(*args)
       options = args.extract_options!.with_indifferent_access
 
-      if args.length > 0
-        self.parameters = options
-        if (user = args.shift)
-          options[:user_id] = user.id
-        end
-        options[:eventful] = args.shift
-        self.parameters    = options.delete(:parameters) || options
-      else
-        self.parameters = options.delete(:parameters)
-      end
-
-      self.type    = options.delete(:type).try(:to_sym)
+      self.type    = options.delete(:type).try(:to_sym) || DEFAULT_TYPE
       self.action  = options.delete(:action).try(:to_sym)
       self.user_id = options.delete(:user_id)
-
       self.occurred_at = if (occurred = options.delete(:occurred_at))
                            occurred.kind_of?(String) ? Time.parse(occurred) : occurred
                          else
                            Time.now.utc
                          end
-      self.type        ||= :model
 
-      if (eventful_object = options.delete(:eventful))
+      eventful_object = options.delete(:eventful)
+
+      if args.length > 0
+        self.parameters = options
+        if (user = args.shift)
+          self.user_id = user.id
+        end
+        eventful_object ||= args.shift
+      end
+
+      if eventful_object
         self.eventful_type = eventful_object.class.base_class.name
         self.eventful_id   = eventful_object.id
       else
         self.eventful_type = options.delete(:eventful_type)
         self.eventful_id   = options.delete(:eventful_id)
       end
+
+      self.parameters    = options.delete(:parameters) || options
+
     end
 
     def routing_key

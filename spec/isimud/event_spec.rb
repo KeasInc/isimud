@@ -33,6 +33,12 @@ describe Isimud::Event do
       expect(event.parameters).to eq(params)
     end
 
+    it 'sets parameters to remaining options' do
+      event = Isimud::Event.new(user_id: user.id, eventful: eventful, action: :create, occurred_at: time,
+                                a: 'foo', b: 123)
+      expect(event.parameters).to eq({'a' => 'foo', 'b' => 123})
+    end
+
     it 'parses time strings' do
       now = Time.now
       time = now.to_s
