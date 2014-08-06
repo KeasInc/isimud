@@ -76,8 +76,8 @@ module Isimud
         Event.new(JSON.parse(data))
       end
 
-      def dispatch(user, eventful_object = nil, parameters = {})
-        Event.new(user_id: user.id, eventful: eventful_object, parameters: parameters).fire
+      def dispatch(*args)
+        Event.new(*args).fire
       end
     end
 
