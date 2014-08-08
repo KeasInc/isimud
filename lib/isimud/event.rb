@@ -16,7 +16,9 @@ module Isimud
     # @overload Event.new(attributes)
     #   @param[Hash] attributes event attributes
     #   @option attributes [Integer] :user_id ID of User associated with event
-    #   @option attributes [ActiveRecord::Base] :eventful object associated with event
+    #   @option attributes [String] :eventful_type class of object associated with event
+    #   @option attributes [Integer] :eventful_id id of object associated with event
+    #   @option attributes [ActiveRecord::Base] :eventful object associated with event (sets :eventful_type and :eventful_id)
     #   @option attributes [String] :type event type
     #   @option attributes [String] :action event action
     #   @option attributes [Time] :occurred_at date and time event occurred (defaults to now)
