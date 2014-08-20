@@ -12,7 +12,6 @@ module Isimud
 
     included do
       cattr_accessor :isimud_watch_attributes
-      watch_attributes (column_names - IGNORED_COLUMNS)
 
       after_commit :isimud_notify_created, on: :create
       after_commit :isimud_notify_updated, on: :update
@@ -21,7 +20,8 @@ module Isimud
 
     module ClassMethods
       def watch_attributes(*attributes)
-        self.isimud_watch_attributes = attributes.flatten.map { |attr| attr.to_sym }
+        attributes = column_names - IGNORED_COLUMNS if attributes.empty?
+        self.isimud_watch_attributes = attributes.flatten.map(&:to_sym)
       end
 
       def isimud_model_watcher_type
