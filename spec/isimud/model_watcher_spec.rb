@@ -47,6 +47,28 @@ describe Isimud::ModelWatcher do
     end
   end
 
+  describe 'when disabled' do
+    before do
+      Isimud.enable_model_watcher = false
+    end
+    after do
+      Isimud.enable_model_watcher = nil
+    end
+
+    it 'does not send a message' do
+      messages = Array.new
+      Isimud.client.bind('model_watcher_spec_create', Isimud::ModelWatcher::DEFAULT_EXCHANGE, '*') do |payload|
+        messages << payload
+      end
+      User.create!(first_name:         'Geo',
+                   last_name:          'Feil',
+                   encrypted_password: "itsasecret",
+                   email:              'george.feil@keas.com')
+      expect(messages).to be_empty
+    end
+
+  end
+
   describe 'when updating an instance' do
     before(:all) do
       @messages = Array.new

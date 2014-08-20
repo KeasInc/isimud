@@ -39,6 +39,10 @@ TBD
 
 ## Changes
 
+### 0.2.2
+
+* Add enable_model_watcher configuration parameter (default is true)
+
 ### 0.2.0
 
 * Added Isimud::Event
