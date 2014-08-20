@@ -29,6 +29,11 @@ module Isimud
       end
     end
 
+    # override to set conditions on synchronizing record
+    def isimud_synchronize?
+      true
+    end
+
     protected
 
     def isimud_notify_created
@@ -67,7 +72,7 @@ module Isimud
     end
 
     def isimud_send_action_message(action)
-      return unless Isimud.model_watcher_enabled?
+      return unless Isimud.model_watcher_enabled? && isimud_synchronize?
       payload              = {
           schema:    isimud_model_watcher_schema,
           type:      isimud_model_watcher_type,

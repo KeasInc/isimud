@@ -39,6 +39,10 @@ TBD
 
 ## Changes
 
+### 0.2.4
+
+* Add Isimud::ModelWatcher#isimud_synchronize? to allow conditional synchronization. Override to activate.
+
 ### 0.2.2
 
 * Add enable_model_watcher configuration parameter (default is true)
