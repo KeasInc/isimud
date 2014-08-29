@@ -2,12 +2,11 @@ require 'spec_helper'
 
 describe Isimud::ModelWatcher do
   let(:client) { Isimud.client }
-  let(:company) { Company.create!(name: 'Keas Inc', url: 'http://keas.com') }
 
   describe '.watch_attributes' do
     context 'default' do
       it 'returns the data attributes, minus the id and timestamps' do
-        expect(Company.isimud_watch_attributes).to eq([:name, :description, :url])
+        expect(Company.isimud_watch_attributes).to be_nil
       end
     end
 
@@ -26,24 +25,43 @@ describe Isimud::ModelWatcher do
   end
 
   describe 'when creating an instance' do
-    it 'sends a create message' do
-      Timecop.freeze do
-        user = User.new(first_name:         'Geo',
-                        last_name:          'Feil',
-                        encrypted_password: "itsasecret",
-                        email:              'george.feil@keas.com')
+    context 'with explicit watched attributes' do
+      it 'sends a create message' do
+        Timecop.freeze do
+          user = User.new(first_name:         'Geo',
+                          last_name:          'Feil',
+                          encrypted_password: "itsasecret",
+                          email:              'george.feil@keas.com')
 
 
+          messages    = Array.new
+          exchange    = Isimud::ModelWatcher::DEFAULT_EXCHANGE
+          routing_key = 'db/combustion_test.sqlite.User.create'
+
+          Isimud.client.bind('model_watcher_spec_create', exchange, routing_key) do |payload|
+            messages << payload
+          end
+          user.save!
+          expect(messages).to include(expected_user_payload(user, :create))
+        end
+      end
+    end
+
+    context 'with default attributes' do
+      it 'sends a create message with default attributes' do
         messages    = Array.new
         exchange    = Isimud::ModelWatcher::DEFAULT_EXCHANGE
-        routing_key = 'db/combustion_test.sqlite.User.create'
+        routing_key = 'db/combustion_test.sqlite.Company.create'
 
-        Isimud.client.bind('model_watcher_spec_create', exchange, routing_key) do |payload|
+        Isimud.client.bind('model_watcher_spec_create_company', exchange, routing_key) do |payload|
           messages << payload
         end
-        user.save!
-        expect(messages).to include(expected_user_payload(user, :create))
+        company = Company.new(name: 'Google', url: 'http://google.com')
+        company.save!
+        message = JSON.parse(messages.first)
+        expect(message['attributes'].keys).to eql(%w(name description url))
       end
+
     end
   end
 
@@ -54,7 +72,7 @@ describe Isimud::ModelWatcher do
                       encrypted_password: "itsasecret",
                       email:              'george.feil@keas.com')
       user.stub(:isimud_synchronize?).and_return(false)
-      messages    = Array.new
+      messages = Array.new
       Isimud.client.bind('model_watcher_spec_create', Isimud::ModelWatcher::DEFAULT_EXCHANGE, '*') do |payload|
         messages << payload
       end
