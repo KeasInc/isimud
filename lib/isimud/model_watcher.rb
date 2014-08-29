@@ -6,6 +6,7 @@ require 'active_support/core_ext/module/attribute_accessors'
 module Isimud
   module ModelWatcher
     extend ::ActiveSupport::Concern
+    include Isimud::Logging
 
     DEFAULT_EXCHANGE = 'models'
     IGNORED_COLUMNS  = %w{id created_at updated_at}
@@ -50,7 +51,7 @@ module Isimud
     end
 
     def isimud_default_attributes
-      column_names - IGNORED_COLUMNS
+      self.class.column_names - IGNORED_COLUMNS
     end
 
     def isimud_attribute_data
@@ -86,7 +87,9 @@ module Isimud
           timestamp: updated_at.utc
       }
       payload[:attributes] = isimud_attribute_data unless action == :destroy
-      Isimud.client.publish(isimud_model_watcher_exchange, isimud_model_watcher_routing_key(action), payload.to_json)
+      routing_key = isimud_model_watcher_routing_key(action)
+      log "Isimud::ModelWatcher#publish: exchange #{isimud_model_watcher_exchange} routing_key #{routing_key} payload #{payload.inspect}"
+      Isimud.client.publish(isimud_model_watcher_exchange, routing_key, payload.to_json)
     end
   end
 end

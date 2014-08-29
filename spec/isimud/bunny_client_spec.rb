@@ -1,8 +1,23 @@
 require 'spec_helper'
 
 describe Isimud::BunnyClient do
-  let(:url) { 'amqp://guest:guest@localhost' }
-  let(:client) { Isimud::BunnyClient.new(url) }
+  before(:all) do
+    @exchange_name = 'isimud_test'
+    @url = 'amqp://guest:guest@localhost'
+    @_client = Bunny.new(@url).tap(&:start)
+    if (exchange = @_client.channel.find_exchange(@exchange_name))
+      exchange.delete
+    end
+    @_client.channel.topic(@exchange_name, durable: true)
+  end
+
+  after(:all) do
+    if (exchange = @_client.channel.find_exchange(@exchange_name))
+      exchange.delete
+    end
+  end
+
+  let(:client) { Isimud::BunnyClient.new(@url) }
   let!(:connection) { client.connection }
 
   after(:each) do
@@ -11,7 +26,7 @@ describe Isimud::BunnyClient do
 
   describe '#initialize' do
     it 'sets the broker URL' do
-      expect(client.url).to eq(url)
+      expect(client.url).to eq(@url)
     end
   end
 
@@ -24,7 +39,7 @@ describe Isimud::BunnyClient do
     end
 
     it 'creates a new queue' do
-      queue = client.bind('my_queue', 'events', keys, &proc)
+      queue = client.bind('my_queue', @exchange_name, keys, &proc)
       expect(queue).to be_a Bunny::Queue
       expect(queue.name).to eq('my_queue')
     end
@@ -33,17 +48,17 @@ describe Isimud::BunnyClient do
       queue = double('queue', bind: 'ok')
       channel.stub(:queue).and_return(queue)
       expect(queue).to receive(:subscribe).with(ack: true)
-      keys.each { |key| expect(queue).to receive(:bind).with('events', routing_key: key, nowait: false).once }
-      client.bind('my_queue', 'events', *keys, proc)
+      keys.each { |key| expect(queue).to receive(:bind).with(@exchange_name, routing_key: key, nowait: false).once }
+      client.bind('my_queue', @exchange_name, *keys, proc)
     end
 
     it 'calls block when a message is received' do
       @block_called = Array.new
-      queue_name = 'test queue'
-      client.bind("#{queue_name}", 'events', 'my.test.key') do |payload|
+      queue_name    = 'test queue'
+      client.bind("#{queue_name}", @exchange_name, 'my.test.key') do |payload|
         @block_called << payload
       end
-      client.publish('events', 'my.test.key', "Hi there")
+      client.publish(@exchange_name, 'my.test.key', "Hi there")
       expect(@block_called).to eq ['Hi there']
     end
   end
@@ -105,9 +120,9 @@ describe Isimud::BunnyClient do
     it 'sends the data with the appropriate routing key to the exchange' do
       payload = {a: '123', b: 'this is b'}
       topic   = double(:topic)
-      expect(channel).to receive(:topic).with('events', durable: true).and_return(topic)
+      expect(channel).to receive(:topic).with(@exchange_name, durable: true).and_return(topic)
       expect(topic).to receive(:publish).with(payload, routing_key: 'foo.bar.baz', persistent: true)
-      client.publish('events', 'foo.bar.baz', payload)
+      client.publish(@exchange_name, 'foo.bar.baz', payload)
     end
   end
 
