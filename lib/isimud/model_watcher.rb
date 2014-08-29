@@ -20,8 +20,7 @@ module Isimud
 
     module ClassMethods
       def watch_attributes(*attributes)
-        attributes = column_names - IGNORED_COLUMNS if attributes.empty?
-        self.isimud_watch_attributes = attributes.flatten.map(&:to_sym)
+        self.isimud_watch_attributes = attributes.flatten.map(&:to_sym) if attributes.present?
       end
 
       def isimud_model_watcher_type
@@ -42,15 +41,21 @@ module Isimud
 
     def isimud_notify_updated
       changed_attrs = previous_changes.symbolize_keys.keys
-      isimud_send_action_message(:update) if (changed_attrs & isimud_watch_attributes).any?
+      attributes = isimud_watch_attributes || isimud_default_attributes
+      isimud_send_action_message(:update) if (changed_attrs & attributes).any?
     end
 
     def isimud_notify_destroyed
       isimud_send_action_message(:destroy)
     end
 
+    def isimud_default_attributes
+      column_names - IGNORED_COLUMNS
+    end
+
     def isimud_attribute_data
-      isimud_watch_attributes.inject(Hash.new) { |hsh, attr| hsh[attr] = send(attr); hsh }
+      attributes = isimud_watch_attributes || isimud_default_attributes
+      attributes.inject(Hash.new) { |hsh, attr| hsh[attr] = send(attr); hsh }
     end
 
     def isimud_model_watcher_schema
