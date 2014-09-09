@@ -107,6 +107,17 @@ describe Isimud::BunnyClient do
     end
   end
 
+  describe '#connected?' do
+    it 'is true for an open session' do
+      expect(client).to be_connected
+    end
+
+    it 'is false for a closed session' do
+      client.close
+      expect(client).not_to be_connected
+    end
+  end
+
   describe '#close' do
     it 'closes the session' do
       connection = client.connection

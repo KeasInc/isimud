@@ -32,6 +32,10 @@ module Isimud
       self
     end
 
+    def connected?
+      true
+    end
+
     def close
     end
 

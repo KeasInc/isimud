@@ -66,6 +66,10 @@ module Isimud
       connection.close_all_channels
     end
 
+    def connected?
+      @connection && @connection.open?
+    end
+
     def close
       connection.close
     ensure
