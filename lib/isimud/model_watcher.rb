@@ -9,7 +9,7 @@ module Isimud
     include Isimud::Logging
 
     DEFAULT_EXCHANGE = 'models'
-    IGNORED_COLUMNS  = %w{id created_at updated_at}
+    IGNORED_COLUMNS  = %w{id}
 
     included do
       cattr_accessor :isimud_watch_attributes
