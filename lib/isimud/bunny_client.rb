@@ -30,7 +30,7 @@ module Isimud
           log("Isimud: queue #{queue_name} error on #{delivery_info.delivery_tag}: #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}", :warn)
           raise
         rescue => e
-          log("Isimud: queue #{queue_name} rejecting #{delivery_info.delivery_tag} payload #{payload.inspect}: #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}", :warn)
+          log("Isimud: queue #{queue_name} error processing #{delivery_info.delivery_tag} payload #{payload.inspect}: #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}", :warn)
         end
         begin
           current_channel.ack(delivery_info.delivery_tag)
