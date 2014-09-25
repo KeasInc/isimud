@@ -12,7 +12,7 @@ module Isimud
   include ::ActiveSupport::Configurable
 
   config_accessor :client_type, :client_options, :default_client, :enable_model_watcher, :logger, :log_level,
-                  :model_watcher_schema, :model_watcher_exchange, :prefetch_count, :server
+                  :model_watcher_schema, :model_watcher_exchange, :prefetch_count, :retry_failures, :server
 
                   def self.client_class
     type = "#{client_type}_client".classify

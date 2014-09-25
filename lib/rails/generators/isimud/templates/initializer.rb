@@ -15,4 +15,5 @@ Isimud.client_options = config['client_options']
 Isimud.logger         = config['logger'] || Rails.logger
 Isimud.log_level      = config['log_level'] || :debug
 Isimud.prefetch_count = config['prefetch_count']
+Isimud.retry_failures = config['retry_failures']
 Isimud.server         = config['server']
