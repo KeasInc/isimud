@@ -4,6 +4,7 @@ require 'active_support/concern'
 require 'active_support/core_ext/module/attribute_accessors'
 
 module Isimud
+  # ActiveModel mixin for sending model updates to a message server.
   module ModelWatcher
     extend ::ActiveSupport::Concern
     include Isimud::Logging
@@ -20,6 +21,9 @@ module Isimud
     end
 
     module ClassMethods
+      # Set attributes to observe and include in messages. Any property method with a return value may be included
+      # in the list of attributes.
+      # @param [Array<String,Symbol>] attributes list of attributes / properties
       def watch_attributes(*attributes)
         self.isimud_watch_attributes = attributes.flatten.map(&:to_sym) if attributes.present?
       end
@@ -29,7 +33,7 @@ module Isimud
       end
     end
 
-    # override to set conditions on synchronizing record
+    # Override to set conditions for synchronizing this instance with the server (default is always)
     def isimud_synchronize?
       true
     end
