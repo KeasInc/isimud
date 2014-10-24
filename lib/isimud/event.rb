@@ -61,7 +61,7 @@ module Isimud
       [type.to_s, eventful_type, eventful_id, action].compact.join('.')
     end
 
-    def as_json
+    def as_json(_ignored = nil)
       session_id = parameters.delete(:session_id) || Thread.current[:keas_session_id]
 
       {:type          => type, :action => action, :user_id => user_id, :occurred_at => occurred_at,
