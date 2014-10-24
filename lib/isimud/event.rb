@@ -18,7 +18,7 @@ module Isimud
     #   @option attributes [Integer] :user_id ID of User associated with event
     #   @option attributes [String] :eventful_type class of object associated with event
     #   @option attributes [Integer] :eventful_id id of object associated with event
-    #   @option attributes [ActiveRecord::Base] :eventful object associated with event (sets :eventful_type and :eventful_id)
+    #   @option attributes [ActiveRecord::Base] :eventful object associated with event. This sets :eventful_type and :eventful_id.
     #   @option attributes [String] :type event type
     #   @option attributes [String] :action event action
     #   @option attributes [Time] :occurred_at date and time event occurred (defaults to now)
@@ -61,7 +61,7 @@ module Isimud
       [type.to_s, eventful_type, eventful_id, action].compact.join('.')
     end
 
-    def as_json(options)
+    def as_json
       session_id = parameters.delete(:session_id) || Thread.current[:keas_session_id]
 
       {:type          => type, :action => action, :user_id => user_id, :occurred_at => occurred_at,
@@ -79,11 +79,11 @@ module Isimud
       end
 
       def dispatch(*args)
-        Event.new(*args).fire
+        Event.new(*args).send
       end
     end
 
-    def fire
+    def send
       data = self.serialize
       log "Event#fire: #{self.inspect}"
       Isimud.client.publish(EXCHANGE_NAME, routing_key, data)

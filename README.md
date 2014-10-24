@@ -1,6 +1,9 @@
-# Isimud
+# Isimud: Messaging abstraction layer for AMQP and testing.
 
-Messaging abstraction layer for AMQP and testing.
+>Isimud is a minor god, the messenger of the god Enki in Sumerian mythology.
+>He is readily identifiable by the fact that he possesses two faces looking in opposite directions.
+>
+>*Source: Wikipedia*
 
 ## Installation
 
@@ -27,17 +30,53 @@ Customize the AMQP broker settings in the config/isimud.yml
 
 ### Connecting to an AMQP server
 
-TBD
+There are two supported conventions for specifying a RabbitMQ server (broker) in the configuration file:
+
+#### Using a URL
+
+    server: amqp:port//user_name:password@host/vhost
+
+#### Using separate parameters:
+
+[Complete list of Bunny options available here](http://rubybunny.info/articles/connecting.html)
+
+    server:
+        host:  hostname
+        port:  15672
+        user:  user_name
+        pass:  password
+        vhost: vhost
+
+
+
+Isimud is designed to work with [RabbitMQ](http://www.rabbitmq.com).
+Besides the standard AMQP 0.9.1 protocol, Isimud relies on Publishing Confirms (Acknowledgements), which
+is a RabbitMQ specific extension to AMQP 0.9.1.
+
+Note that Isimud does not automatically create exchanges. Make sure the exchange has been declared on the
+message server, or you will get an exception. It is highly recommended to set the /durable/ parameter on the exchange
+in order to prevent loss of messages due to failures.
+
+Isimud uses [Bunny](http://rubybunny.info) to connect to RabbitMQ.
 
 ### Message publication
 
-TBD
+Isimud uses topic based exchanges publish messages. This allows for multiple listener
+workers to operate in parallel to process messages.
 
 ### Message binding and consumption
 
-TBD
+Isimud uses non-exclusive, durable queues to listen for and consume messages. Named queues are automatically created
+if they do not exist.
 
 ## Changes
+
+### 0.2.10
+
+* Added Isimud.retry_failures
+* Isimud::ModelWatcher now includes :created_at and :updated_at columns by default
+* Added Isimud::Client.connected?
+* Avoid connecting to database when Isimud::ModelWatcher.watch_attributes is called
 
 ### 0.2.4
 
