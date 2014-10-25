@@ -29,7 +29,7 @@ module Isimud
       end
 
       def isimud_model_watcher_type
-        respond_to?(:base_class) ? base_class.name : name
+        (respond_to?(:base_class) ? base_class.name : name).demodulize
       end
     end
 
