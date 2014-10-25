@@ -71,6 +71,10 @@ if they do not exist.
 
 ## Changes
 
+### 0.2.12
+
+* Demodulize ActiveRecord model name when setting ModelWatcher event type
+
 ### 0.2.10
 
 * Added Isimud.retry_failures
