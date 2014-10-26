@@ -68,8 +68,7 @@ module Isimud
       session_id = parameters.delete(:session_id) || Thread.current[:keas_session_id]
 
       data              = {type: type, action: action, user_id: user_id, occurred_at: occurred_at,
-                           eventful_type: eventful_type, eventful_id: eventful_id, parameters: parameters,
-                           session_id: session_id}
+                           eventful_type: eventful_type, eventful_id: eventful_id, session_id: session_id}
       data[:parameters] = parameters unless options[:omit_parameters]
       data
     end
