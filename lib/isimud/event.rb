@@ -6,7 +6,7 @@ module Isimud
     attr_accessor :type, :action, :user_id, :occurred_at, :eventful_type, :eventful_id, :parameters
 
     EXCHANGE_NAME = 'events'
-    DEFAULT_TYPE = :model
+    DEFAULT_TYPE  = :model
 
     # Initialize a new Event
     # @overload Event.new(user, eventful, parameters)
@@ -26,9 +26,9 @@ module Isimud
     def initialize(*args)
       options = args.extract_options!.with_indifferent_access
 
-      self.type    = options.delete(:type).try(:to_sym) || DEFAULT_TYPE
-      self.action  = options.delete(:action).try(:to_sym)
-      self.user_id = options.delete(:user_id)
+      self.type        = options.delete(:type).try(:to_sym) || DEFAULT_TYPE
+      self.action      = options.delete(:action).try(:to_sym)
+      self.user_id     = options.delete(:user_id)
       self.occurred_at = if (occurred = options.delete(:occurred_at))
                            occurred.kind_of?(String) ? Time.parse(occurred) : occurred
                          else
@@ -53,7 +53,7 @@ module Isimud
         self.eventful_id   = options.delete(:eventful_id)
       end
 
-      self.parameters    = options.delete(:parameters) || options
+      self.parameters = options.delete(:parameters) || options
 
     end
 
@@ -61,12 +61,17 @@ module Isimud
       [type.to_s, eventful_type, eventful_id, action].compact.join('.')
     end
 
-    def as_json(_ignored = nil)
+    # Return hash of data to be serialized to JSON
+    # @option options [Boolean] :omit_parameters when set, do not include parameters in data
+    # @return [Hash] data to serialize
+    def as_json(options = {})
       session_id = parameters.delete(:session_id) || Thread.current[:keas_session_id]
 
-      {:type          => type, :action => action, :user_id => user_id, :occurred_at => occurred_at,
-       :eventful_type => eventful_type, :eventful_id => eventful_id, :parameters => parameters,
-       :session_id    => session_id}
+      data              = {type: type, action: action, user_id: user_id, occurred_at: occurred_at,
+                           eventful_type: eventful_type, eventful_id: eventful_id, parameters: parameters,
+                           session_id: session_id}
+      data[:parameters] = parameters unless options[:omit_parameters]
+      data
     end
 
     def serialize

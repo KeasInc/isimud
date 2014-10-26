@@ -71,6 +71,10 @@ if they do not exist.
 
 ## Changes
 
+### 0.2.13
+
+* Add :omit_parameters option to Event#as_json
+
 ### 0.2.12
 
 * Demodulize ActiveRecord model name when setting ModelWatcher event type
