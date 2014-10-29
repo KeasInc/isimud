@@ -82,14 +82,15 @@ module Isimud
         Event.new(JSON.parse(data))
       end
 
-      def dispatch(*args)
-        Event.new(*args).send
+      def publish(*args)
+        Event.new(*args).publish
       end
+      alias_method :dispatch, :publish
     end
 
-    def send
+    def publish
       data = self.serialize
-      log "Event#fire: #{self.inspect}"
+      log "Event#publish: #{self.inspect}"
       Isimud.client.publish(EXCHANGE_NAME, routing_key, data)
     end
   end

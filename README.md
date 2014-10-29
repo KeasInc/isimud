@@ -71,6 +71,10 @@ if they do not exist.
 
 ## Changes
 
+### 0.2.15
+
+* Changed Event#send to Event#publish, to avoid overloading Ruby.
+
 ### 0.2.13
 
 * Add :omit_parameters option to Event#as_json
