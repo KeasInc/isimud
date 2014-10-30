@@ -38,6 +38,10 @@ module Isimud
       true
     end
 
+    def isimud_sync
+      isimud_send_action_message(:update)
+    end
+
     protected
 
     def isimud_notify_created
