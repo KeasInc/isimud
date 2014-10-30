@@ -71,6 +71,11 @@ if they do not exist.
 
 ## Changes
 
+### 0.2.17
+
+* Added guard on null #updated_at instances
+* Added ModelWatcher#isimud_sync for manual synchronization
+
 ### 0.2.15
 
 * Changed Event#send to Event#publish, to avoid overloading Ruby.

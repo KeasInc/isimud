@@ -50,7 +50,7 @@ module Isimud
 
     def isimud_notify_updated
       changed_attrs = previous_changes.symbolize_keys.keys
-      attributes = isimud_watch_attributes || isimud_default_attributes
+      attributes    = isimud_watch_attributes || isimud_default_attributes
       isimud_send_action_message(:update) if (changed_attrs & attributes).any?
     end
 
@@ -92,10 +92,10 @@ module Isimud
           type:      isimud_model_watcher_type,
           action:    action,
           id:        id,
-          timestamp: updated_at.utc
+          timestamp: (updated_at || Time.now).utc
       }
       payload[:attributes] = isimud_attribute_data unless action == :destroy
-      routing_key = isimud_model_watcher_routing_key(action)
+      routing_key          = isimud_model_watcher_routing_key(action)
       log "Isimud::ModelWatcher#publish: exchange #{isimud_model_watcher_exchange} routing_key #{routing_key} payload #{payload.inspect}"
       Isimud.client.publish(isimud_model_watcher_exchange, routing_key, payload.to_json)
     end
