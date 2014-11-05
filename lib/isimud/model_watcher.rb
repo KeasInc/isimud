@@ -42,7 +42,7 @@ module Isimud
         where_clause = options[:where] || {}
         output = options[:output] || nil
         count = 0
-        self.where(where_clause).find_each(batch_size: 100) do |m|
+        self.where(where_clause).find_each do |m|
           next unless m.isimud_synchronize?
           begin
             m.isimud_sync
@@ -54,7 +54,7 @@ module Isimud
           if (count += 1) % 100 == 0
             output && output.print('.')
           end
-          if (count % 500) == 0
+          if (count % 1000) == 0
             GC.start
           end
         end
