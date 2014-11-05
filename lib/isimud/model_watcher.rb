@@ -9,10 +9,14 @@ module Isimud
     extend ::ActiveSupport::Concern
     include Isimud::Logging
 
+    mattr_accessor :watched_models
+
     DEFAULT_EXCHANGE = 'models'
     IGNORED_COLUMNS  = %w{id}
 
     included do
+      ModelWatcher.watched_models ||= Array.new
+      ModelWatcher.watched_models << self
       cattr_accessor :isimud_watch_attributes
 
       after_commit :isimud_notify_created, on: :create
@@ -26,6 +30,32 @@ module Isimud
       # @param [Array<String,Symbol>] attributes list of attributes / properties
       def watch_attributes(*attributes)
         self.isimud_watch_attributes = attributes.flatten.map(&:to_sym) if attributes.present?
+      end
+
+      # Synchronize instances of this model with the data warehouse. This is accomplished by calling
+      # isimud_notify_updated() on each instance fetched from the database.
+      # @param [ActiveRecord::Relation] ({}) where_clause filter for limiting records to sync. By default, all records are synchronized.
+      # @param [IO] (nil) output optional stream for writing progress. A '.' is printed for every 100 records synchronized.
+      # @return [Integer] number of records synchronized
+      def synchronize(where_clause = {}, output = nil)
+        count = 0
+        self.where(where_clause).find_each(batch_size: 100) do |m|
+          next unless m.isimud_synchronize?
+          begin
+            m.isimud_sync
+          rescue Bunny::ClientTimeout
+            output && output.print("\ntimeout, sleeping for 60 seconds")
+            sleep(60)
+            m.isimud_sync
+          end
+          if (count += 1) % 100 == 0
+            output && output.print('.')
+          end
+          if (count % 500) == 0
+            GC.start
+          end
+        end
+        count
       end
 
       def isimud_model_watcher_type

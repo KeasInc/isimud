@@ -6,8 +6,8 @@ require 'isimud/version'
 Gem::Specification.new do |spec|
   spec.name          = 'isimud'
   spec.version       = Isimud::VERSION
-  spec.authors       = ['Brian Jenkins', 'George Feil']
-  spec.email         = %w{bonkydog@bonkydog.com george.feil@keas.com}
+  spec.authors       = ['George Feil', 'Brian Jenkins']
+  spec.email         = %w{george.feil@keas.com bonkydog@bonkydog.com}
   spec.summary       = %q{AMQP Messaging for Events and ActiveRecord changes}
   spec.description   = %q{}
   spec.homepage      = ''
@@ -20,5 +20,6 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'activerecord', '>= 3.2.17'
   spec.add_dependency 'activesupport', '>= 3.2.17'
-  spec.add_dependency 'bunny', '>= 1.3.0'
+  spec.add_dependency 'bunny', '>= 1.6.0'
+  spec.add_dependency 'chronic_duration', '>= 0.10.6'
 end
