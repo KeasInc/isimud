@@ -16,7 +16,7 @@ module Isimud
 
     included do
       ModelWatcher.watched_models ||= Array.new
-      ModelWatcher.watched_models << self
+      ModelWatcher.watched_models << self.name
       cattr_accessor :isimud_watch_attributes
 
       after_commit :isimud_notify_created, on: :create
@@ -34,10 +34,13 @@ module Isimud
 
       # Synchronize instances of this model with the data warehouse. This is accomplished by calling
       # isimud_notify_updated() on each instance fetched from the database.
-      # @param [ActiveRecord::Relation] ({}) where_clause filter for limiting records to sync. By default, all records are synchronized.
-      # @param [IO] (nil) output optional stream for writing progress. A '.' is printed for every 100 records synchronized.
+      # @param [Hash] options synchronize options
+      # @option options [ActiveRecord::Relation] :where where_clause filter for limiting records to sync. By default, all records are synchronized.
+      # @option options [IO] :output optional stream for writing progress. A '.' is printed for every 100 records synchronized.
       # @return [Integer] number of records synchronized
-      def synchronize(where_clause = {}, output = nil)
+      def synchronize(options = {})
+        where_clause = options[:where] || {}
+        output = options[:output] || nil
         count = 0
         self.where(where_clause).find_each(batch_size: 100) do |m|
           next unless m.isimud_synchronize?

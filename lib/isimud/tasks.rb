@@ -10,23 +10,9 @@ namespace :isimud do
     start_time = Time.now
     puts "Synchronizing models: #{models.join(', ')}"
     models.each do |model|
-      klass = model.classify.constantize
+      klass = model.constantize
       puts "\n#{klass.to_s}"
-      count = 0
-      klass.find_each do |m|
-        next unless m.isimud_synchronize?
-        begin
-          m.isimud_sync
-        rescue Bunny::ClientTimeout
-          puts "\ntimeout, sleeping for 60 seconds"
-          sleep(60)
-          m.isimud_sync
-        end
-        if (count += 1) % 100 == 0
-          print '.'
-        end
-      end
-      puts "\n#{count} records synchronized"
+      klass.synchronize(output: $stdout)
     end
     end_time = Time.now
     puts "Finished synchronization in #{ChronicDuration.output(end_time - start_time)}."

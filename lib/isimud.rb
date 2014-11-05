@@ -5,7 +5,6 @@ require 'isimud/client'
 require 'isimud/event'
 require 'isimud/model_watcher'
 require 'isimud/railtie' if defined?(Rails)
-require 'isimud/tasks'
 require 'isimud/version'
 
 
