@@ -71,6 +71,10 @@ if they do not exist.
 
 ## Changes
 
+### 0.3.0
+
+* Added rake task for manual synchronization using ModelWatcher
+
 ### 0.2.17
 
 * Added guard on null #updated_at instances
