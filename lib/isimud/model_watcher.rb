@@ -18,6 +18,7 @@ module Isimud
       ModelWatcher.watched_models ||= Array.new
       ModelWatcher.watched_models << self.name
       cattr_accessor :isimud_watch_attributes
+      cattr_accessor :sync_includes
 
       after_commit :isimud_notify_created, on: :create
       after_commit :isimud_notify_updated, on: :update
@@ -32,6 +33,11 @@ module Isimud
         self.isimud_watch_attributes = attributes.flatten.map(&:to_sym) if attributes.present?
       end
 
+      # Include the following tables when fetching records for synchronization
+      def sync_include(_sync_includes)
+        self.sync_includes = _sync_includes
+      end
+
       # Synchronize instances of this model with the data warehouse. This is accomplished by calling
       # isimud_notify_updated() on each instance fetched from the database.
       # @param [Hash] options synchronize options
@@ -42,7 +48,9 @@ module Isimud
         where_clause = options[:where] || {}
         output = options[:output] || nil
         count = 0
-        self.where(where_clause).find_each do |m|
+        query = self.where(where_clause)
+        query = query.includes(sync_includes) if sync_includes
+        query.find_each do |m|
           next unless m.isimud_synchronize?
           begin
             m.isimud_sync
