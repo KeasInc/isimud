@@ -54,9 +54,9 @@ module Isimud
           next unless m.isimud_synchronize?
           begin
             m.isimud_sync
-          rescue Bunny::ClientTimeout
-            output && output.print("\ntimeout, sleeping for 20 seconds")
-            sleep(20)
+          rescue Bunny::ClientTimeout, Timeout::Error => e
+            output && output.print("\n#{e}, sleeping for 10 seconds")
+            sleep(10)
             m.isimud_sync
           end
           if (count += 1) % 100 == 0
