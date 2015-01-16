@@ -71,6 +71,18 @@ if they do not exist.
 
 ## Changes
 
+### 0.3.5
+
+* Fixed deprecation on setting manual ack on Bunny queue subscriptions.
+
+### 0.3.4
+
+* Catch Timeout::Error in ModelWatcher.synchronize
+
+### 0.3.1
+
+* Tuning gargabe collector on ModelWatcher.synchronize
+
 ### 0.3.0
 
 * Added rake task for manual synchronization using ModelWatcher

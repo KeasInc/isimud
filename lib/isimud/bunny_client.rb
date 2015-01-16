@@ -18,7 +18,7 @@ module Isimud
       current_channel = channel
       queue = current_channel.queue(queue_name, durable: true)
       routing_keys.each { |key| queue.bind(exchange_name, routing_key: key, nowait: false) }
-      queue.subscribe(ack: true) do |delivery_info, properties, payload|
+      queue.subscribe(manual_ack: true) do |delivery_info, properties, payload|
         begin
           log "Isimud: queue #{queue_name} received #{delivery_info.delivery_tag} routing_key: #{delivery_info.routing_key}"
           Thread.current['isimud_queue_name'] = queue_name

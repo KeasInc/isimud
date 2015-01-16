@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Isimud::BunnyClient do
-  before(:all) do
+  before(:each) do
     @exchange_name = 'isimud_test'
     @url = 'amqp://guest:guest@localhost'
     @_client = Bunny.new(@url).tap(&:start)
@@ -11,7 +11,7 @@ describe Isimud::BunnyClient do
     @_client.channel.topic(@exchange_name, durable: true)
   end
 
-  after(:all) do
+  after(:each) do
     if (exchange = @_client.channel.find_exchange(@exchange_name))
       exchange.delete
     end
@@ -47,7 +47,7 @@ describe Isimud::BunnyClient do
     it 'binds specified routing keys and subscribes to the specified exchange' do
       queue = double('queue', bind: 'ok')
       channel.stub(:queue).and_return(queue)
-      expect(queue).to receive(:subscribe).with(ack: true)
+      expect(queue).to receive(:subscribe).with(manual_ack: true)
       keys.each { |key| expect(queue).to receive(:bind).with(@exchange_name, routing_key: key, nowait: false).once }
       client.bind('my_queue', @exchange_name, *keys, proc)
     end
@@ -74,7 +74,7 @@ describe Isimud::BunnyClient do
     end
 
     it 'opens a connection to the broker' do
-      connection.should be_open
+      expect(connection).to be_open
     end
 
   end
