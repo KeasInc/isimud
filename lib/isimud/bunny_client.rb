@@ -27,12 +27,10 @@ module Isimud
           block.call(payload)
           log "Isimud: queue #{queue_name} finished with #{delivery_info.delivery_tag}, acknowledging"
           current_channel.ack(delivery_info.delivery_tag)
-        rescue Bunny::Exception, Timeout::Error => e
-          log("Isimud: queue #{queue_name} error on #{delivery_info.delivery_tag}: #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}", :warn)
-          raise
         rescue => e
           log("Isimud: queue #{queue_name} error processing #{delivery_info.delivery_tag} payload #{payload.inspect}: #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}", :warn)
           current_channel.reject(delivery_info.delivery_tag, Isimud.retry_failures)
+          raise
         end
       end
       queue

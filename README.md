@@ -71,6 +71,10 @@ if they do not exist.
 
 ## Changes
 
+### 0.3.6
+
+* Reraise all exceptions in message processing block in BunnyClient#bind.
+
 ### 0.3.5
 
 * Fixed deprecation on setting manual ack on Bunny queue subscriptions.
