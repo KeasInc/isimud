@@ -4,20 +4,9 @@ describe Isimud::BunnyClient do
   before(:each) do
     @exchange_name = 'isimud_test'
     @url = 'amqp://guest:guest@localhost'
-    @_client = Bunny.new(@url).tap(&:start)
-    if (exchange = @_client.channel.find_exchange(@exchange_name))
-      exchange.delete
-    end
-    @_client.channel.topic(@exchange_name, durable: true)
   end
 
-  after(:each) do
-    if (exchange = @_client.channel.find_exchange(@exchange_name))
-      exchange.delete
-    end
-  end
-
-  let(:client) { Isimud::BunnyClient.new(@url) }
+  let!(:client) { Isimud::BunnyClient.new(@url) }
   let!(:connection) { client.connection }
 
   after(:each) do

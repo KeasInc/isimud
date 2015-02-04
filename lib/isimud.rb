@@ -3,6 +3,7 @@ require 'active_support/core_ext/module/attribute_accessors'
 require 'isimud/logging'
 require 'isimud/client'
 require 'isimud/event'
+require 'isimud/event_observer'
 require 'isimud/model_watcher'
 require 'isimud/railtie' if defined?(Rails)
 require 'isimud/version'
@@ -19,6 +20,8 @@ module Isimud
   #   @return [Isimud::Client] default client
   # @!attribute [rw] enable_model_watcher
   #   @return [Boolean] when set, send Isimud::ModelWatcher events
+  # @!attribute [rw] listener_error_limit
+  #   @return [Integer] maximum number of exceptions allowed per hour before listener shuts down (100)
   # @!attribute [rw] logger
   #   @return [Logger] logger for tracing messages (Rails.logger)
   # @!attribute [rw] log_level
@@ -31,10 +34,10 @@ module Isimud
   #   @return [Boolean] when set, if an exception occurs during message processing, requeue it
   # @!attribute [rw] server
   #   @return [<String, Hash>] server connection attributes
-  config_accessor :client_type, :client_options, :default_client, :enable_model_watcher, :logger, :log_level,
-                  :model_watcher_schema, :model_watcher_exchange, :prefetch_count, :retry_failures, :server
 
-                  def self.client_class
+  config_accessor :client_type, :client_options, :default_client, :enable_model_watcher, :listener_error_limit, :logger,
+                  :log_level, :model_watcher_schema, :model_watcher_exchange, :prefetch_count, :retry_failures, :server
+  def self.client_class
     type = "#{client_type}_client".classify
     "Isimud::#{type}".constantize
   end

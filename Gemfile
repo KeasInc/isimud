@@ -8,6 +8,7 @@ gem 'bundler', '~> 1.6'
 gem 'rake'
 
 group :development, :test do
+  gem 'awesome_print'
   gem 'rspec-core'
   gem 'rspec-expectations'
   gem 'rspec-mocks'

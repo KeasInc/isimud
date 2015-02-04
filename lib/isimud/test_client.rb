@@ -1,6 +1,10 @@
 module Isimud
   class TestClient < Isimud::Client
+    attr_accessor :queues
+
     class Queue
+      attr_reader :routing_keys
+
       def initialize(name, listener)
         @name         = name
         @listener     = listener
@@ -11,8 +15,8 @@ module Isimud
         @routing_keys << Regexp.new(key.gsub(/\./, "\\.").gsub(/\*/, ".*"))
       end
 
-      def matches(routing_key)
-        @routing_keys.any? { |k| routing_key =~ k }
+      def has_matching_key?(route)
+        @routing_keys.any? { |k| route =~ k }
       end
 
       def publish(data)
@@ -21,7 +25,7 @@ module Isimud
     end
 
     def initialize(connection = nil, options = nil)
-      @queues = Hash.new
+      self.queues = Hash.new
     end
 
     def connect
@@ -41,16 +45,16 @@ module Isimud
 
     def bind(queue_name, exchange_name, *keys, &method)
       log "Isimud::TestClient: Binding queue #{queue_name} for keys #{keys.inspect}"
-      @queues[queue_name] ||= Queue.new(queue_name, method)
+      self.queues[queue_name] ||= Queue.new(queue_name, method)
       keys.each do |k|
-        @queues[queue_name].add_routing_key(k)
+        self.queues[queue_name].add_routing_key(k)
       end
     end
 
     def publish(exchange, routing_key, payload)
       log "Isimud::TestClient: Delivering message exchange: #{exchange} key: #{routing_key} payload: #{payload}"
-      @queues.each do |name, queue|
-        if queue.matches(routing_key)
+      self.queues.each do |name, queue|
+        if queue.has_matching_key?(routing_key)
           log "Isimud::TestClient: Queue #{name} matches routing key #{routing_key}"
           queue.publish(payload)
         end
@@ -58,7 +62,7 @@ module Isimud
     end
 
     def reset
-      @queues.clear
+      self.queues.clear
     end
 
     def reconnect
