@@ -71,6 +71,11 @@ if they do not exist.
 
 ## Changes
 
+### 0.3.7
+
+* Added EventObserver mix-in
+* Added accessors for queues and routing_keys to TestClient
+
 ### 0.3.6
 
 * Reraise all exceptions in message processing block in BunnyClient#bind.
