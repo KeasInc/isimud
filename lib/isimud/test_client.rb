@@ -1,9 +1,10 @@
 module Isimud
   class TestClient < Isimud::Client
     attr_accessor :queues
+    attr_reader :exception_handler
 
     class Queue
-      attr_reader :routing_keys
+      attr_reader :name, :routing_keys
 
       def initialize(name, listener)
         @name         = name
@@ -11,7 +12,8 @@ module Isimud
         @routing_keys = Set.new
       end
 
-      def add_routing_key(key)
+      def bind(exchange, options = {})
+        key = options[:routing_key]
         @routing_keys << Regexp.new(key.gsub(/\./, "\\.").gsub(/\*/, ".*"))
       end
 
@@ -20,7 +22,12 @@ module Isimud
       end
 
       def publish(data)
-        @listener.call(data)
+        begin
+          @listener.call(data)
+        rescue => e
+          puts "TestClient: error delivering message: #{e.message}\n  #{e.backtrace.join("\n  ")}"
+          @listener.exception_handler.try(:call, e)
+        end
       end
     end
 
@@ -43,22 +50,35 @@ module Isimud
     def close
     end
 
+    def delete_queue(queue_name)
+      queues.delete(queue_name)
+    end
+
     def bind(queue_name, exchange_name, *keys, &method)
+      create_queue(queue_name, exchange_name, routing_keys: keys, &method)
+    end
+
+    def create_queue(queue_name, exchange_name, options = {}, &method)
+      keys = options[:routing_keys] || []
       log "Isimud::TestClient: Binding queue #{queue_name} for keys #{keys.inspect}"
-      self.queues[queue_name] ||= Queue.new(queue_name, method)
+      queue = queues[queue_name] ||= Queue.new(queue_name, method)
       keys.each do |k|
-        self.queues[queue_name].add_routing_key(k)
+        queue.bind(exchange_name, routing_key: k)
       end
+      queue
     end
 
     def publish(exchange, routing_key, payload)
-      log "Isimud::TestClient: Delivering message exchange: #{exchange} key: #{routing_key} payload: #{payload}"
-      self.queues.each do |name, queue|
-        if queue.has_matching_key?(routing_key)
-          log "Isimud::TestClient: Queue #{name} matches routing key #{routing_key}"
-          queue.publish(payload)
-        end
+      log "Isimud::TestClient: Delivering message key: #{routing_key} payload: #{payload}"
+      call_queues = queues.values.select { |queue| queue.has_matching_key?(routing_key) }
+      call_queues.each do |queue|
+        log "Isimud::TestClient: Queue #{queue.name} matches routing key #{routing_key}"
+        queue.publish(payload)
       end
+    end
+
+    def exception_handler(&block)
+      @exception_handler = block
     end
 
     def reset

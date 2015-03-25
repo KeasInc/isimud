@@ -59,7 +59,7 @@ describe Isimud::ModelWatcher do
         company = Company.new(name: 'Google', url: 'http://google.com')
         company.save!
         message = JSON.parse(messages.first)
-        expect(message['attributes'].keys).to eql(%w(name description url created_at updated_at))
+        expect(message['attributes'].keys).to eql(%w(name description url user_count active created_at updated_at))
       end
 
     end

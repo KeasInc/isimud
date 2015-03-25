@@ -3,9 +3,9 @@ require 'active_support/core_ext/module/attribute_accessors'
 require 'isimud/logging'
 require 'isimud/client'
 require 'isimud/event'
+require 'isimud/event_listener'
 require 'isimud/event_observer'
 require 'isimud/model_watcher'
-require 'isimud/railtie' if defined?(Rails)
 require 'isimud/version'
 
 

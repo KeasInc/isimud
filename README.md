@@ -71,6 +71,15 @@ if they do not exist.
 
 ## Changes
 
+### 0.4.0
+
+* Event logging of published message now set to debug level
+* Added EventListener and EventObserver
+* Added new Client methods: create_queue, delete_queue. It is now possible to create queues with
+  customized options (such as exclusive, non-durable queues).
+* Clients can now be configured with an exception handler. This is used by EventListener to intercept exceptions raised
+  during message handling by an observer.
+
 ### 0.3.7
 
 * Added EventObserver mix-in

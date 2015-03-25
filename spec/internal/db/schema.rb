@@ -3,6 +3,8 @@ ActiveRecord::Schema.define do
     t.string :name
     t.string :description
     t.string :url
+    t.integer :user_count, default: 0, null: false
+    t.boolean :active, default: true, null: false
     t.timestamps
   end
 
@@ -13,6 +15,7 @@ ActiveRecord::Schema.define do
     t.string :encrypted_password
     t.string :email
     t.boolean :is_admin
+    t.boolean :deactivated
     t.integer :login_count, default: 0, null: false
     t.timestamps
   end

@@ -6,6 +6,7 @@ require 'bundler/setup'
 require 'isimud'
 
 require 'combustion'
+require 'database_cleaner'
 
 Combustion.initialize! :active_record
 
@@ -37,6 +38,14 @@ RSpec.configure do |config|
     # a real object. This is generally recommended, and will default to
     # `true` in RSpec 4.
     mocks.verify_partial_doubles = true
+  end
+
+  config.before(:suite) do
+    DatabaseCleaner.strategy = :truncation
+  end
+
+  config.after(:each) do
+    DatabaseCleaner.clean
   end
 end
 

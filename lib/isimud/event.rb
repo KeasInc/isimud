@@ -5,7 +5,7 @@ module Isimud
     include Isimud::Logging
     attr_accessor :type, :action, :user_id, :occurred_at, :eventful_type, :eventful_id, :parameters
 
-    EXCHANGE_NAME = 'events'
+    DEFAULT_EXCHANGE = 'events'
     DEFAULT_TYPE  = :model
 
     # Initialize a new Event
@@ -90,8 +90,8 @@ module Isimud
 
     def publish
       data = self.serialize
-      log "Event#publish: #{self.inspect}"
-      Isimud.client.publish(EXCHANGE_NAME, routing_key, data)
+      log "Event#publish: #{self.inspect}", :debug
+      Isimud.client.publish(DEFAULT_EXCHANGE, routing_key, data)
     end
   end
 end

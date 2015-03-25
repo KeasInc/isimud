@@ -9,21 +9,31 @@ module Isimud
 
     def initialize(_url = nil, _bunny_options = {})
       log "Isimud::BunnyClient.initialize: options = #{_bunny_options.inspect}"
-      @url = _url || DEFAULT_URL
+      @url           = _url || DEFAULT_URL
       @bunny_options = _bunny_options
     end
 
     def bind(queue_name, exchange_name, *routing_keys, &block)
-      log "Isimud: bind to #{queue_name}: keys #{routing_keys.join(',')}"
+      create_queue(queue_name, exchange_name,
+                   queue_options:     {durable: true},
+                   routing_keys:      routing_keys,
+                   subscribe_options: {manual_ack: true}, &block)
+    end
+
+    def create_queue(queue_name, exchange_name, options = {}, &block)
+      queue_options     = options[:queue_options] || {}
+      routing_keys      = options[:routing_keys] || []
+      subscribe_options = options[:subscribe_options] || {}
+      log "Isimud: create_queue #{queue_name}: queue_options=#{queue_options.inspect} routing_keys=#{routing_keys.join(',')} subscribe_options=#{subscribe_options.inspect}"
       current_channel = channel
-      queue = current_channel.queue(queue_name, durable: true)
+      queue           = current_channel.queue(queue_name, queue_options)
       routing_keys.each { |key| queue.bind(exchange_name, routing_key: key, nowait: false) }
-      queue.subscribe(manual_ack: true) do |delivery_info, properties, payload|
+      queue.subscribe(subscribe_options) do |delivery_info, properties, payload|
         begin
           log "Isimud: queue #{queue_name} received #{delivery_info.delivery_tag} routing_key: #{delivery_info.routing_key}"
-          Thread.current['isimud_queue_name'] = queue_name
+          Thread.current['isimud_queue_name']    = queue_name
           Thread.current['isimud_delivery_info'] = delivery_info
-          Thread.current['isimud_properties'] = properties
+          Thread.current['isimud_properties']    = properties
           block.call(payload)
           log "Isimud: queue #{queue_name} finished with #{delivery_info.delivery_tag}, acknowledging"
           current_channel.ack(delivery_info.delivery_tag)
@@ -34,6 +44,10 @@ module Isimud
         end
       end
       queue
+    end
+
+    def delete_queue(queue_name)
+      channel.queue(queue_name).delete
     end
 
     def connection
@@ -57,6 +71,10 @@ module Isimud
 
     def reset
       connection.close_all_channels
+    end
+
+    def exception_handler(&block)
+      channel.on_uncaught_exception(block)
     end
 
     def connected?

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    isimud (0.3.6)
+    isimud (0.4.0)
       activerecord (>= 3.2.17)
       activesupport (>= 3.2.17)
       bunny (>= 1.6.0)
@@ -35,7 +35,7 @@ GEM
     arel (3.0.3)
     awesome_print (1.2.0)
     builder (3.0.4)
-    bunny (1.6.3)
+    bunny (1.7.0)
       amq-protocol (>= 1.9.2)
     chronic_duration (0.10.6)
       numerizer (~> 0.1.1)
@@ -72,6 +72,10 @@ GEM
     rake (10.4.2)
     rdoc (3.12.2)
       json (~> 1.4)
+    rspec (3.1.0)
+      rspec-core (~> 3.1.0)
+      rspec-expectations (~> 3.1.0)
+      rspec-mocks (~> 3.1.0)
     rspec-core (3.1.7)
       rspec-support (~> 3.1.0)
     rspec-expectations (3.1.2)
@@ -110,9 +114,7 @@ DEPENDENCIES
   database_cleaner
   isimud!
   rake
-  rspec-core
-  rspec-expectations
-  rspec-mocks
+  rspec
   sqlite3
   test_after_commit
   timecop

@@ -46,10 +46,10 @@ module Isimud
       # @return [Integer] number of records synchronized
       def synchronize(options = {})
         where_clause = options[:where] || {}
-        output = options[:output] || nil
-        count = 0
-        query = self.where(where_clause)
-        query = query.includes(sync_includes) if sync_includes
+        output       = options[:output] || nil
+        count        = 0
+        query        = self.where(where_clause)
+        query        = query.includes(sync_includes) if sync_includes
         query.find_each do |m|
           next unless m.isimud_synchronize?
           begin
@@ -109,13 +109,13 @@ module Isimud
     end
 
     def isimud_model_watcher_schema
-      Isimud.model_watcher_schema || if defined?(Rails)
-                                       Rails.configuration.database_configuration[Rails.env]['database']
-                                     end
+      Isimud.config.model_watcher_schema || if defined?(Rails)
+                                              Rails.configuration.database_configuration[Rails.env]['database']
+                                            end
     end
 
     def isimud_model_watcher_exchange
-      Isimud.model_watcher_exchange || DEFAULT_EXCHANGE
+      Isimud.config.model_watcher_exchange
     end
 
     def isimud_model_watcher_type
