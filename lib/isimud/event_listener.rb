@@ -10,12 +10,15 @@ module Isimud
     DEFAULT_ERROR_LIMIT = 100
     DEFAULT_ERROR_INTERVAL = 3600
 
+    DEFAULT_EVENTS_EXCHANGE = 'events'
+    DEFAULT_MODELS_EXCHANGE = 'models'
+
     def initialize(options = {})
       default_options = {
           error_limit:     Isimud.listener_error_limit || DEFAULT_ERROR_LIMIT,
           error_interval:  DEFAULT_ERROR_INTERVAL,
-          events_exchange: Isimud::Event::DEFAULT_EXCHANGE,
-          models_exchange: Isimud::ModelWatcher::DEFAULT_EXCHANGE,
+          events_exchange: Isimud.events_exchange || DEFAULT_EVENTS_EXCHANGE,
+          models_exchange: Isimud.model_watcher_exchange || DEFAULT_MODELS_EXCHANGE,
           name:            "#{Rails.application.class.parent_name.downcase}-listener"
       }
       options.reverse_merge!(default_options)

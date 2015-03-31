@@ -71,6 +71,12 @@ if they do not exist.
 
 ## Changes
 
+### 0.4.1
+
+* Event now accepts an exchange option for publishing
+* Added Isimud.events_exchange
+* Cleaned up initializer template
+
 ### 0.4.0
 
 * Event logging of published message now set to debug level

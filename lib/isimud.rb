@@ -11,32 +11,58 @@ require 'isimud/version'
 
 module Isimud
   include ::ActiveSupport::Configurable
-
-  # @!attribute [rw] client_type
+  # @!attribute [r] client_type
   #   @return [Enumerable<'bunny', 'test'>] Type of client to use
-  # @!attribute [rw] client_options
+  # @!attribute [r] client_options
   #   @return [Hash] client specific options
-  # @!attribute [rw] default_client
+  # @!attribute [r] default_client
   #   @return [Isimud::Client] default client
-  # @!attribute [rw] enable_model_watcher
-  #   @return [Boolean] when set, send Isimud::ModelWatcher events
-  # @!attribute [rw] listener_error_limit
+  # @!attribute [r] events_exchange
+  #   @return [String] AMQP exchange used for publishing Event instances
+  # @!attribute [r] enable_model_watcher
+  #   @return [Boolean] when set, send Isimud::ModelWatcher messages
+  # @!attribute [r] listener_error_limit
   #   @return [Integer] maximum number of exceptions allowed per hour before listener shuts down (100)
-  # @!attribute [rw] logger
+  # @!attribute [r] logger
   #   @return [Logger] logger for tracing messages (Rails.logger)
-  # @!attribute [rw] log_level
+  # @!attribute [r] log_level
   #   @return [Symbol] log level (:debug)
-  # @!attribute [rw] model_watcher_schema
+  # @!attribute [r] model_watcher_exchange
+  #   @return [String] AMQP exchange used for publishing ModelWatcher messages
+  # @!attribute [r] model_watcher_schema
   #   @return [String] schema name (Rails.configuration.database_configuration[Rails.env]['database'])
-  # @!attribute [rw] prefetch_count
+  # @!attribute [r] prefetch_count
   #   @return [Integer] number of messages to fetch -- only applies to BunnyClient
-  # @!attribute [rw] retry_failures
+  # @!attribute [r] retry_failures
   #   @return [Boolean] when set, if an exception occurs during message processing, requeue it
-  # @!attribute [rw] server
+  # @!attribute [r] server
   #   @return [<String, Hash>] server connection attributes
+  config_accessor :client_type do
+    :bunny
+  end
+  config_accessor :client_options, :default_client, :enable_model_watcher, :model_watcher_schema, :retry_failures
+  config_accessor :listener_error_limit do
+    100
+  end
+  config_accessor :logger do
+    Rails.logger
+  end
+  config_accessor :log_level do
+    :debug
+  end
+  config_accessor :events_exchange do
+    'events'
+  end
+  config_accessor :model_watcher_exchange do
+    'models'
+  end
+  config_accessor :prefetch_count do
+    100
+  end
+  config_accessor :server do
+    ENV['AMQP_URL'] || 'amqp://guest:guest@localhost'
+  end
 
-  config_accessor :client_type, :client_options, :default_client, :enable_model_watcher, :listener_error_limit, :logger,
-                  :log_level, :model_watcher_schema, :model_watcher_exchange, :prefetch_count, :retry_failures, :server
   def self.client_class
     type = "#{client_type}_client".classify
     "Isimud::#{type}".constantize

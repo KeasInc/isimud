@@ -4,9 +4,9 @@ module Isimud
   class Event
     include Isimud::Logging
     attr_accessor :type, :action, :user_id, :occurred_at, :eventful_type, :eventful_id, :parameters
+    attr_writer :exchange
 
-    DEFAULT_EXCHANGE = 'events'
-    DEFAULT_TYPE  = :model
+    DEFAULT_TYPE = :model
 
     # Initialize a new Event
     # @overload Event.new(user, eventful, parameters)
@@ -18,6 +18,7 @@ module Isimud
     #   @option attributes [Integer] :user_id ID of User associated with event
     #   @option attributes [String] :eventful_type class of object associated with event
     #   @option attributes [Integer] :eventful_id id of object associated with event
+    #   @option attributes [Integer] :exchange exchange for publishing event (Isimud.events_exchange)
     #   @option attributes [ActiveRecord::Base] :eventful object associated with event. This sets :eventful_type and :eventful_id.
     #   @option attributes [String] :type event type
     #   @option attributes [String] :action event action
@@ -27,6 +28,7 @@ module Isimud
       options = args.extract_options!.with_indifferent_access
 
       self.type        = options.delete(:type).try(:to_sym) || DEFAULT_TYPE
+      self.exchange    = options.delete(:exchange)
       self.action      = options.delete(:action).try(:to_sym)
       self.user_id     = options.delete(:user_id)
       self.occurred_at = if (occurred = options.delete(:occurred_at))
@@ -54,7 +56,10 @@ module Isimud
       end
 
       self.parameters = options.delete(:parameters) || options
+    end
 
+    def exchange
+      @exchange || Isimud.events_exchange
     end
 
     def routing_key
@@ -67,7 +72,7 @@ module Isimud
     def as_json(options = {})
       session_id = parameters.delete(:session_id) || Thread.current[:keas_session_id]
 
-      data              = {type: type, action: action, user_id: user_id, occurred_at: occurred_at,
+      data              = {type:          type, action: action, user_id: user_id, occurred_at: occurred_at,
                            eventful_type: eventful_type, eventful_id: eventful_id, session_id: session_id}
       data[:parameters] = parameters unless options[:omit_parameters]
       data
@@ -85,13 +90,14 @@ module Isimud
       def publish(*args)
         Event.new(*args).publish
       end
+
       alias_method :dispatch, :publish
     end
 
     def publish
       data = self.serialize
       log "Event#publish: #{self.inspect}", :debug
-      Isimud.client.publish(DEFAULT_EXCHANGE, routing_key, data)
+      Isimud.client.publish(exchange, routing_key, data)
     end
   end
 end
