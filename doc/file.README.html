@@ -6,7 +6,7 @@
 <title>
   File: README
   
-    &mdash; Documentation by YARD 0.8.7.4
+    &mdash; Documentation by YARD 0.8.7.6
   
 </title>
 
@@ -62,15 +62,40 @@
     <iframe id="search_frame"></iframe>
 
     <div id="content"><div id='filecontents'>
-<h1 id="label-Isimud">Isimud</h1>
+<h1 id="label-Isimud-3A+AMQP+based+Messaging+abstraction+component.">Isimud: AMQP based Messaging abstraction component.</h1>
 
-<p>Messaging abstraction layer for AMQP and testing.</p>
+<blockquote>
+<p>Isimud is a minor god, the messenger of the god Enki in Sumerian mythology.
+He is readily identifiable by the fact that he possesses two faces looking
+in opposite directions.</p>
+
+<p><em>Source: Wikipedia</em></p>
+</blockquote>
+
+<p>Isimud is a message publishing and consumption gem. It consists of the
+following components:</p>
+<ul><li>
+<p>A <a href="http://rubybunny.info">Bunny</a> based client interface for
+publishing and receiving messages using AMQP.</p>
+</li><li>
+<p>A test client which mocks most client operations and allows for synchronous
+delivery and processing of messages for unit tests.</p>
+</li><li>
+<p>A Model Watcher mixin for ActiveRecord that automatically sends messages
+whenever an ActiveRecord instance is created, modified, or destroyed.</p>
+</li><li>
+<p>An Event Observer mixin for registering ActiveRecord models and instances
+with the EventListener for receiving messages.</p>
+</li><li>
+<p>An Event Listener daemon process which manages queues for Event Observers.</p>
+</li></ul>
 
 <h2 id="label-Installation">Installation</h2>
 
 <p>Add this line to your application&#39;s Gemfile:</p>
 
-<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_gem'>gem</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>isimud</span><span class='tstring_end'>&#39;</span></span></code></pre>
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_gem'>gem</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>isimud</span><span class='tstring_end'>&#39;</span></span>
+</code></pre>
 
 <p>And then execute:</p>
 
@@ -92,17 +117,145 @@ $ rails g isimud:initializer</code></pre>
 
 <h3 id="label-Connecting+to+an+AMQP+server">Connecting to an AMQP server</h3>
 
-<p>TBD</p>
+<p>There are two supported conventions for specifying a RabbitMQ server
+(broker) in the configuration file:</p>
+
+<h4 id="label-Using+a+URL">Using a URL</h4>
+
+<pre class="code ruby"><code class="ruby">server: amqp:port//user_name:password@host/vhost</code></pre>
+
+<h4 id="label-Using+separate+parameters-3A">Using separate parameters:</h4>
+
+<pre class="code ruby"><code class="ruby">server:
+    host:  hostname
+    port:  15672
+    user:  user_name
+    pass:  password
+    vhost: vhost</code></pre>
+
+<p><a href="http://rubybunny.info/articles/connecting.html">Complete list of
+Bunny options available here</a></p>
+
+<p>Isimud is designed to work with <a
+href="http://www.rabbitmq.com">RabbitMQ</a>. Besides the standard AMQP
+0.9.1 protocol, Isimud relies on Publishing Confirms (Acknowledgements),
+which is a RabbitMQ specific extension to AMQP 0.9.1.</p>
+
+<p>Note that Isimud does not automatically create exchanges. Make sure the
+exchange has been declared on the message server, or you will get an
+exception. It is highly recommended to set the /durable/ parameter on the
+exchange in order to prevent loss of messages due to failures.</p>
+
+<p>Isimud uses <a href="http://rubybunny.info">Bunny</a> to connect to
+RabbitMQ.</p>
 
 <h3 id="label-Message+publication">Message publication</h3>
 
-<p>TBD</p>
+<p>Isimud uses topic based exchanges publish messages. This allows for
+multiple listener workers to operate in parallel to process messages.</p>
 
 <h3 id="label-Message+binding+and+consumption">Message binding and consumption</h3>
 
-<p>TBD</p>
+<p>Isimud uses non-exclusive, durable queues to listen for and consume
+messages. Named queues are automatically created if they do not exist.</p>
 
 <h2 id="label-Changes">Changes</h2>
+
+<h3 id="label-0.4.2">0.4.2</h3>
+<ul><li>
+<p>Fixed issue with exception handling</p>
+</li></ul>
+
+<h3 id="label-0.4.1">0.4.1</h3>
+<ul><li>
+<p>Event now accepts an exchange option for publishing</p>
+</li><li>
+<p>Added Isimud.events_exchange</p>
+</li><li>
+<p>Cleaned up initializer template</p>
+</li></ul>
+
+<h3 id="label-0.4.0">0.4.0</h3>
+<ul><li>
+<p>Event logging of published message now set to debug level</p>
+</li><li>
+<p>Added EventListener and EventObserver</p>
+</li><li>
+<p>Added new Client methods: create_queue, delete_queue. It is now possible to
+create queues with  customized options (such as exclusive, non-durable
+queues).</p>
+</li><li>
+<p>Clients can now be configured with an exception handler. This is used by
+EventListener to intercept exceptions raised  during message handling by an
+observer.</p>
+</li></ul>
+
+<h3 id="label-0.3.7">0.3.7</h3>
+<ul><li>
+<p>Added EventObserver mix-in</p>
+</li><li>
+<p>Added accessors for queues and routing_keys to TestClient</p>
+</li></ul>
+
+<h3 id="label-0.3.6">0.3.6</h3>
+<ul><li>
+<p>Reraise all exceptions in message processing block in BunnyClient#bind.</p>
+</li></ul>
+
+<h3 id="label-0.3.5">0.3.5</h3>
+<ul><li>
+<p>Fixed deprecation on setting manual ack on Bunny queue subscriptions.</p>
+</li></ul>
+
+<h3 id="label-0.3.4">0.3.4</h3>
+<ul><li>
+<p>Catch Timeout::Error in ModelWatcher.synchronize</p>
+</li></ul>
+
+<h3 id="label-0.3.1">0.3.1</h3>
+<ul><li>
+<p>Tuning gargabe collector on ModelWatcher.synchronize</p>
+</li></ul>
+
+<h3 id="label-0.3.0">0.3.0</h3>
+<ul><li>
+<p>Added rake task for manual synchronization using ModelWatcher</p>
+</li></ul>
+
+<h3 id="label-0.2.17">0.2.17</h3>
+<ul><li>
+<p>Added guard on null #updated_at instances</p>
+</li><li>
+<p>Added ModelWatcher#isimud_sync for manual synchronization</p>
+</li></ul>
+
+<h3 id="label-0.2.15">0.2.15</h3>
+<ul><li>
+<p>Changed Event#send to Event#publish, to avoid overloading Ruby.</p>
+</li></ul>
+
+<h3 id="label-0.2.13">0.2.13</h3>
+<ul><li>
+<p>Add :omit_parameters option to Event#as_json</p>
+</li></ul>
+
+<h3 id="label-0.2.12">0.2.12</h3>
+<ul><li>
+<p>Demodulize ActiveRecord model name when setting ModelWatcher event type</p>
+</li></ul>
+
+<h3 id="label-0.2.10">0.2.10</h3>
+<ul><li>
+<p>Added Isimud.retry_failures</p>
+</li><li>
+<p>Isimud::ModelWatcher now includes :created_at and :updated_at columns by
+default</p>
+</li><li>
+<p>Added Isimud::Client.connected?</p>
+</li><li>
+<p>Avoid connecting to database when Isimud::ModelWatcher.watch_attributes is
+called</p>
+</li></ul>
 
 <h3 id="label-0.2.4">0.2.4</h3>
 <ul><li>
@@ -153,7 +306,7 @@ synchronization. Override to activate.</p>
 <p>Initializer generator for Rails</p>
 </li></ul>
 
-<h3 id="label-0.0.8+%28first+working+version%29">0.0.8 (first working version)</h3>
+<h3 id="label-0.0.8+-28first+working+version-29">0.0.8 (first working version)</h3>
 <ul><li>
 <p>Don&#39;t clear the queues when reconnecting TestClient</p>
 </li></ul>
@@ -176,9 +329,9 @@ feature&#39;</code>)</p>
 </div></div>
 
     <div id="footer">
-  Generated on Tue Oct 21 07:30:20 2014 by
+  Generated on Fri Apr  3 09:28:08 2015 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.4 (ruby-2.1.3).
+  0.8.7.6 (ruby-2.2.1).
 </div>
 
   </body>

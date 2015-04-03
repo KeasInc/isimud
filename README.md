@@ -1,9 +1,17 @@
-# Isimud: Messaging abstraction layer for AMQP and testing.
+# Isimud: AMQP based Messaging abstraction component.
 
 >Isimud is a minor god, the messenger of the god Enki in Sumerian mythology.
 >He is readily identifiable by the fact that he possesses two faces looking in opposite directions.
 >
 >*Source: Wikipedia*
+
+Isimud is a message publishing and consumption gem. It consists of the following components:
+
+* A [Bunny](http://rubybunny.info) based client interface for publishing and receiving messages using AMQP.
+* A test client which mocks most client operations and allows for synchronous delivery and processing of messages for unit tests.
+* A Model Watcher mixin for ActiveRecord that automatically sends messages whenever an ActiveRecord instance is created, modified, or destroyed.
+* An Event Observer mixin for registering ActiveRecord models and instances with the EventListener for receiving messages.
+* An Event Listener daemon process which manages queues for Event Observers.
 
 ## Installation
 
@@ -38,8 +46,6 @@ There are two supported conventions for specifying a RabbitMQ server (broker) in
 
 #### Using separate parameters:
 
-[Complete list of Bunny options available here](http://rubybunny.info/articles/connecting.html)
-
     server:
         host:  hostname
         port:  15672
@@ -47,7 +53,7 @@ There are two supported conventions for specifying a RabbitMQ server (broker) in
         pass:  password
         vhost: vhost
 
-
+[Complete list of Bunny options available here](http://rubybunny.info/articles/connecting.html)
 
 Isimud is designed to work with [RabbitMQ](http://www.rabbitmq.com).
 Besides the standard AMQP 0.9.1 protocol, Isimud relies on Publishing Confirms (Acknowledgements), which
@@ -182,7 +188,7 @@ if they do not exist.
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/isimud/fork )
+1. Fork it ( https://github.com/KeasInc/isimud/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
