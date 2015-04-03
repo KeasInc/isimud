@@ -25,10 +25,10 @@ module Isimud
       @error_count     = 0
       @observers       = Hash.new
       @observed_models = Set.new
-      @events_exchange = options[:events_exchange]
-      @models_exchange = options[:models_exchange]
-      @error_limit     = options[:error_limit]
-      @error_interval  = options[:error_interval]
+      @events_exchange = options[:events_exchange] || DEFAULT_EVENTS_EXCHANGE
+      @models_exchange = options[:models_exchange] || DEFAULT_MODELS_EXCHANGE
+      @error_limit     = options[:error_limit] || DEFAULT_ERROR_LIMIT
+      @error_interval  = options[:error_interval] || DEFAULT_ERROR_INTERVAL
       @name            = options[:name]
       @observer_mutex  = Mutex.new
       @running         = false

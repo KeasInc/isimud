@@ -18,11 +18,11 @@ module Isimud
     #   @option attributes [Integer] :user_id ID of User associated with event
     #   @option attributes [String] :eventful_type class of object associated with event
     #   @option attributes [Integer] :eventful_id id of object associated with event
-    #   @option attributes [Integer] :exchange exchange for publishing event (Isimud.events_exchange)
+    #   @option attributes [String] :exchange (Isimud.events_exchange) exchange for publishing event
     #   @option attributes [ActiveRecord::Base] :eventful object associated with event. This sets :eventful_type and :eventful_id.
-    #   @option attributes [String] :type event type
+    #   @option attributes [String, Symbol] :type (:model) event type
     #   @option attributes [String] :action event action
-    #   @option attributes [Time] :occurred_at date and time event occurred (defaults to now)
+    #   @option attributes [Time] :occurred_at (Time.now) date and time event occurred
     #   @option attributes [Hash] :parameters additional parameters
     def initialize(*args)
       options = args.extract_options!.with_indifferent_access

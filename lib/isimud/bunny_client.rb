@@ -74,7 +74,9 @@ module Isimud
     end
 
     def exception_handler(&block)
-      channel.on_uncaught_exception(block)
+      channel.on_uncaught_exception do
+        yield
+      end
     end
 
     def connected?
