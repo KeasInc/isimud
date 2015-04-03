@@ -60,7 +60,7 @@ module Isimud
     100
   end
   config_accessor :server do
-    ENV['AMQP_URL'] || 'amqp://guest:guest@localhost'
+    ENV['AMQP_URL']
   end
 
   def self.client_class
