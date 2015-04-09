@@ -15,23 +15,23 @@ module Isimud
 
     def initialize(options = {})
       default_options = {
-          error_limit:     Isimud.listener_error_limit || DEFAULT_ERROR_LIMIT,
-          error_interval:  DEFAULT_ERROR_INTERVAL,
+          error_limit: Isimud.listener_error_limit || DEFAULT_ERROR_LIMIT,
+          error_interval: DEFAULT_ERROR_INTERVAL,
           events_exchange: Isimud.events_exchange || DEFAULT_EVENTS_EXCHANGE,
           models_exchange: Isimud.model_watcher_exchange || DEFAULT_MODELS_EXCHANGE,
-          name:            "#{Rails.application.class.parent_name.downcase}-listener"
+          name: "#{Rails.application.class.parent_name.downcase}-listener"
       }
       options.reverse_merge!(default_options)
-      @error_count     = 0
-      @observers       = Hash.new
+      @error_count = 0
+      @observers = Hash.new
       @observed_models = Set.new
       @events_exchange = options[:events_exchange] || DEFAULT_EVENTS_EXCHANGE
       @models_exchange = options[:models_exchange] || DEFAULT_MODELS_EXCHANGE
-      @error_limit     = options[:error_limit] || DEFAULT_ERROR_LIMIT
-      @error_interval  = options[:error_interval] || DEFAULT_ERROR_INTERVAL
-      @name            = options[:name]
-      @observer_mutex  = Mutex.new
-      @running         = false
+      @error_limit = options[:error_limit] || DEFAULT_ERROR_LIMIT
+      @error_interval = options[:error_interval] || DEFAULT_ERROR_INTERVAL
+      @name = options[:name]
+      @observer_mutex = Mutex.new
+      @running = false
     end
 
     def max_errors
@@ -48,7 +48,7 @@ module Isimud
       start_shutdown_thread
       start_error_counter_thread
       client.connect
-      client.exception_handler(&method(:count_error))
+      client.exception_handler { |exception| count_error(exception) }
       start_event_thread
 
       puts 'EventListener started. Hit Ctrl-C to exit'
@@ -105,7 +105,7 @@ module Isimud
 
     def count_error(exception)
       @error_count += 1
-      log "EventListsner: caught error #{exception.inspect}, count = #{@error_count}", :warn
+      log "EventListener#count_error count = #{@error_count}", :warn
       if (@error_count > error_limit) && @running
         log 'EventListener: too many errors, exiting', :fatal
         @running = false
@@ -166,8 +166,8 @@ module Isimud
     # Create or return the observer queue which listens for ModelWatcher events
     def observer_queue
       @observer_queue ||= client.create_queue("", Isimud.model_watcher_exchange,
-                                               queue_options:     {exclusive: true},
-                                               subscribe_options: {manual_ack: true}, &method(:handle_observer_event))
+                                              queue_options: {exclusive: true},
+                                              subscribe_options: {manual_ack: true}, &method(:handle_observer_event))
     end
 
     # Register the observer class watcher
