@@ -40,7 +40,7 @@ module Isimud
         rescue => e
           log("Isimud: queue #{queue_name} error processing #{delivery_info.delivery_tag} payload #{payload.inspect}: #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}", :warn)
           current_channel.reject(delivery_info.delivery_tag, Isimud.retry_failures)
-          raise
+          exception_handler.try(:call, e)
         end
       end
       queue
@@ -71,12 +71,6 @@ module Isimud
 
     def reset
       connection.close_all_channels
-    end
-
-    def exception_handler(&block)
-      channel.on_uncaught_exception do
-        yield
-      end
     end
 
     def connected?

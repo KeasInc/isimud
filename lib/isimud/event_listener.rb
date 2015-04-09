@@ -7,7 +7,7 @@ module Isimud
     attr_reader :error_count, :error_interval, :error_limit, :name, :queues, :events_exchange, :models_exchange,
                 :running
 
-    DEFAULT_ERROR_LIMIT = 100
+    DEFAULT_ERROR_LIMIT = 10
     DEFAULT_ERROR_INTERVAL = 3600
 
     DEFAULT_EVENTS_EXCHANGE = 'events'
@@ -47,8 +47,10 @@ module Isimud
       bind_queues and return if test_env?
       start_shutdown_thread
       start_error_counter_thread
+      client.on_exception do |e|
+        count_error(e)
+      end
       client.connect
-      client.exception_handler { |exception| count_error(exception) }
       start_event_thread
 
       puts 'EventListener started. Hit Ctrl-C to exit'
@@ -69,7 +71,6 @@ module Isimud
     def has_observer?(observer)
       @observers.has_key?(observer_key_for(observer.class, observer.id))
     end
-
 
     private
 

@@ -3,6 +3,8 @@ module Isimud
   class Client
     include Isimud::Logging
 
+    attr_reader :exception_handler
+
     def initialize(server = nil, options = nil)
     end
 
@@ -27,7 +29,8 @@ module Isimud
     def delete_queue(queue_name)
     end
 
-    def exception_handler(&block)
+    def on_exception(&block)
+      @exception_handler = block
     end
 
     def publish(exchange, routing_key, payload)

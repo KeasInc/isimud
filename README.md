@@ -77,13 +77,9 @@ if they do not exist.
 
 ## Changes
 
-### 0.4.4
+### 0.4.5
 
-* Fixing call to exception handler
-
-### 0.4.2
-
-* Fixed issue with exception handling
+* Fixed issues with exception handling
 
 ### 0.4.1
 

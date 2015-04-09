@@ -27,7 +27,7 @@ describe Isimud::EventListener do
       listener = Isimud::EventListener.new
       expect(listener.events_exchange).to eq('events')
       expect(listener.models_exchange).to eq('models')
-      expect(listener.error_limit).to eq(100)
+      expect(listener.error_limit).to eq(10)
       expect(listener.error_interval).to eq(1.hour)
       expect(listener.name).to eq('combustion-listener')
     end

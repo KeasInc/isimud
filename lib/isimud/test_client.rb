@@ -1,7 +1,6 @@
 module Isimud
   class TestClient < Isimud::Client
     attr_accessor :queues
-    attr_reader :exception_handler
 
     class Queue
       attr_reader :name, :routing_keys
@@ -21,7 +20,7 @@ module Isimud
         @routing_keys.any? { |k| route =~ k }
       end
 
-      def publish(data)
+      def deliver(data)
         begin
           @listener.call(data)
         rescue => e
@@ -73,12 +72,8 @@ module Isimud
       call_queues = queues.values.select { |queue| queue.has_matching_key?(routing_key) }
       call_queues.each do |queue|
         log "Isimud::TestClient: Queue #{queue.name} matches routing key #{routing_key}"
-        queue.publish(payload)
+        queue.deliver(payload)
       end
-    end
-
-    def exception_handler(&block)
-      @exception_handler = block
     end
 
     def reset
