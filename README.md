@@ -77,6 +77,12 @@ if they do not exist.
 
 ## Changes
 
+### 0.4.6
+
+* Corrected trap of INT and TERM signals
+* Added error counter mutex and cleaned up logging
+* 
+
 ### 0.4.5
 
 * Fixed issues with exception handling

@@ -7,7 +7,7 @@ module Isimud
     attr_reader :error_count, :error_interval, :error_limit, :name, :queues, :events_exchange, :models_exchange,
                 :running
 
-    DEFAULT_ERROR_LIMIT = 10
+    DEFAULT_ERROR_LIMIT    = 10
     DEFAULT_ERROR_INTERVAL = 3600
 
     DEFAULT_EVENTS_EXCHANGE = 'events'
@@ -15,23 +15,24 @@ module Isimud
 
     def initialize(options = {})
       default_options = {
-          error_limit: Isimud.listener_error_limit || DEFAULT_ERROR_LIMIT,
-          error_interval: DEFAULT_ERROR_INTERVAL,
+          error_limit:     Isimud.listener_error_limit || DEFAULT_ERROR_LIMIT,
+          error_interval:  DEFAULT_ERROR_INTERVAL,
           events_exchange: Isimud.events_exchange || DEFAULT_EVENTS_EXCHANGE,
           models_exchange: Isimud.model_watcher_exchange || DEFAULT_MODELS_EXCHANGE,
-          name: "#{Rails.application.class.parent_name.downcase}-listener"
+          name:            "#{Rails.application.class.parent_name.downcase}-listener"
       }
       options.reverse_merge!(default_options)
-      @error_count = 0
-      @observers = Hash.new
-      @observed_models = Set.new
-      @events_exchange = options[:events_exchange] || DEFAULT_EVENTS_EXCHANGE
-      @models_exchange = options[:models_exchange] || DEFAULT_MODELS_EXCHANGE
-      @error_limit = options[:error_limit] || DEFAULT_ERROR_LIMIT
-      @error_interval = options[:error_interval] || DEFAULT_ERROR_INTERVAL
-      @name = options[:name]
-      @observer_mutex = Mutex.new
-      @running = false
+      @error_count         = 0
+      @observers           = Hash.new
+      @observed_models     = Set.new
+      @events_exchange     = options[:events_exchange] || DEFAULT_EVENTS_EXCHANGE
+      @models_exchange     = options[:models_exchange] || DEFAULT_MODELS_EXCHANGE
+      @error_limit         = options[:error_limit] || DEFAULT_ERROR_LIMIT
+      @error_interval      = options[:error_interval] || DEFAULT_ERROR_INTERVAL
+      @name                = options[:name]
+      @observer_mutex      = Mutex.new
+      @error_counter_mutex = Mutex.new
+      @running             = false
     end
 
     def max_errors
@@ -55,13 +56,15 @@ module Isimud
 
       puts 'EventListener started. Hit Ctrl-C to exit'
       Thread.stop
-      puts 'Exiting.'
+      puts 'Main thread wakeup - exiting.'
       client.close
     end
 
     # Override this method to set up message observers
     def bind_queues
       EventObserver.observed_models.each do |model_class|
+        log "EventListener: registering observers for #{model_class}"
+        register_observer_class(model_class)
         model_class.find_active_observers.each do |model|
           register_observer(model)
         end
@@ -81,7 +84,7 @@ module Isimud
         @running = false
         Thread.main.run
       end
-      %w(INT TERM).each { |sig| trap(sig) { shutdown_thread.wakeup } }
+      %w(SIGINT SIGTERM).each { |sig| trap(sig) { shutdown_thread.wakeup } }
     end
 
     def client
@@ -105,12 +108,14 @@ module Isimud
     end
 
     def count_error(exception)
-      @error_count += 1
-      log "EventListener#count_error count = #{@error_count} limit=#{error_limit}", :warn
-      if (@error_count >= error_limit)
-        log 'EventListener: too many errors, exiting', :fatal
-        @running = false
-        Thread.main.run unless test_env?
+      @error_counter_mutex.synchronize do
+        @error_count += 1
+        log "EventListener#count_error count = #{@error_count} limit=#{error_limit}", :warn
+        if (@error_count >= error_limit)
+          log 'EventListener: too many errors, exiting', :fatal
+          @running = false
+          Thread.main.run unless test_env?
+        end
       end
     end
 
@@ -121,8 +126,10 @@ module Isimud
       Thread.new do
         while true
           sleep(error_interval)
-          log 'EventListener: resetting error counter'
-          @error_count = 0
+          @error_counter_mutex.synchronize do
+            log('EventListener: resetting error counter') if @error_count > 0
+            @error_count = 0
+          end
         end
       end
     end
@@ -141,7 +148,6 @@ module Isimud
 
     # Create and bind a queue for the observer. Also ensure that we are listening for observer class update events
     def register_observer(observer)
-      register_observer_class(observer.class)
       @observer_mutex.synchronize do
         log "EventListener: registering observer #{observer.class} #{observer.id}"
         observer.observe_events(client, events_exchange)
@@ -167,7 +173,7 @@ module Isimud
     # Create or return the observer queue which listens for ModelWatcher events
     def observer_queue
       @observer_queue ||= client.create_queue("", Isimud.model_watcher_exchange,
-                                              queue_options: {exclusive: true},
+                                              queue_options:     {exclusive: true},
                                               subscribe_options: {manual_ack: true}, &method(:handle_observer_event))
     end
 
