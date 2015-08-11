@@ -9,12 +9,8 @@ module Isimud
     extend ::ActiveSupport::Concern
     include Isimud::Logging
 
-    @@observed_models = Array.new
-    mattr_reader :observed_models
-
-    included do
-      include Isimud::ModelWatcher unless self.include?(Isimud::ModelWatcher)
-      @@observed_models << self.base_class
+    mattr_accessor :observed_models do
+      Array.new
     end
 
     # Event handling hook. Override in your class.
@@ -49,6 +45,20 @@ module Isimud
       def event_queue_name(id)
         [queue_prefix, base_class.name.underscore, id].join('.')
       end
+
+      protected
+
+      def register_class
+        unless Isimud::EventObserver.observed_models.include?(self.base_class)
+          Rails.logger.info("Isimud::EventObserver: registering #{self.base_class}")
+          Isimud::EventObserver.observed_models << self.base_class
+        end
+      end
+    end
+
+    included do
+      include Isimud::ModelWatcher unless self.include?(Isimud::ModelWatcher)
+      register_class
     end
   end
 end

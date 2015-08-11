@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    isimud (0.4.6)
+    isimud (0.4.8)
       activerecord (>= 3.2.17)
       activesupport (>= 3.2.17)
       bunny (>= 1.6.0)
@@ -35,7 +35,7 @@ GEM
     arel (3.0.3)
     awesome_print (1.2.0)
     builder (3.0.4)
-    bunny (1.7.0)
+    bunny (2.0.1)
       amq-protocol (>= 1.9.2)
     chronic_duration (0.10.6)
       numerizer (~> 0.1.1)

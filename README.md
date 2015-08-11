@@ -77,11 +77,11 @@ if they do not exist.
 
 ## Changes
 
-### 0.4.6
+### 0.4.8
 
 * Corrected trap of INT and TERM signals
 * Added error counter mutex and cleaned up logging
-* 
+* Corrected race condition for registering EventObserver classes
 
 ### 0.4.5
 
