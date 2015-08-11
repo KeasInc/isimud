@@ -106,11 +106,11 @@ module Isimud
 
     def count_error(exception)
       @error_count += 1
-      log "EventListener#count_error count = #{@error_count}", :warn
-      if (@error_count > error_limit) && @running
+      log "EventListener#count_error count = #{@error_count} limit=#{error_limit}", :warn
+      if (@error_count >= error_limit)
         log 'EventListener: too many errors, exiting', :fatal
         @running = false
-        Thread.main.wakeup unless test_env?
+        Thread.main.run unless test_env?
       end
     end
 

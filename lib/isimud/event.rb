@@ -96,7 +96,7 @@ module Isimud
 
     def publish
       data = self.serialize
-      log "Event#publish: #{self.inspect}", :debug
+      log "Event#publish: #{self.inspect}"
       Isimud.client.publish(exchange, routing_key, data)
     end
   end
