@@ -13,6 +13,10 @@ module Isimud
       Array.new
     end
 
+    mattr_reader :observed_mutex do
+      Mutex.new
+    end
+
     # Event handling hook. Override in your class.
     def handle_event(event)
       Rails.logger.warn("Isimud::EventObserver#handle_event not implemented for #{event_queue_name}")
@@ -49,9 +53,11 @@ module Isimud
       protected
 
       def register_class
-        unless Isimud::EventObserver.observed_models.include?(self.base_class)
-          Rails.logger.info("Isimud::EventObserver: registering #{self.base_class}")
-          Isimud::EventObserver.observed_models << self.base_class
+        Isimud::EventObserver.observed_mutex.synchronize do
+          unless Isimud::EventObserver.observed_models.include?(self.base_class)
+            Rails.logger.info("Isimud::EventObserver: registering #{self.base_class}")
+            Isimud::EventObserver.observed_models << self.base_class
+          end
         end
       end
     end
