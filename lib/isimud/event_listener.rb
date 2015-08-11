@@ -62,7 +62,7 @@ module Isimud
 
     # Override this method to set up message observers
     def bind_queues
-      EventObserver.observed_models.each do |model_class|
+      Isimud::EventObserver.observed_models.each do |model_class|
         log "EventListener: registering observers for #{model_class}"
         register_observer_class(model_class)
         model_class.find_active_observers.each do |model|
