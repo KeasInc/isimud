@@ -30,7 +30,7 @@ module Isimud
       # in the list of attributes.
       # @param [Array<String,Symbol>] attributes list of attributes / properties
       def watch_attributes(*attributes)
-        self.isimud_watch_attributes = attributes.flatten.map(&:to_sym) if attributes.present?
+        self.isimud_watch_attributes = attributes.flatten.map(&:to_s) if attributes.present?
       end
 
       # Include the following tables when fetching records for synchronization
@@ -90,7 +90,7 @@ module Isimud
     end
 
     def isimud_notify_updated
-      changed_attrs = previous_changes.symbolize_keys.keys
+      changed_attrs = previous_changes.keys
       attributes    = isimud_watch_attributes || isimud_default_attributes
       isimud_send_action_message(:update) if (changed_attrs & attributes).any?
     end
@@ -109,13 +109,13 @@ module Isimud
     end
 
     def isimud_model_watcher_schema
-      Isimud.config.model_watcher_schema || if defined?(Rails)
+      Isimud.model_watcher_schema || if defined?(Rails)
                                               Rails.configuration.database_configuration[Rails.env]['database']
                                             end
     end
 
     def isimud_model_watcher_exchange
-      Isimud.config.model_watcher_exchange
+      Isimud.model_watcher_exchange
     end
 
     def isimud_model_watcher_type

@@ -9,11 +9,11 @@ module Isimud
     DEFAULT_TYPE = :model
 
     # Initialize a new Event
-    # @overload Event.new(user, eventful, parameters)
+    # @overload new(user, eventful, attributes)
     #   @param[#id] user user associated by the event
     #   @param[ActiveRecord::Base] eventful object associated with event
-    #   @param[Hash] parameters optional additional parameters
-    # @overload Event.new(attributes)
+    #   @param[Hash] parameters optional additional attributes
+    # @overload new(attributes)
     #   @param[Hash] attributes event attributes
     #   @option attributes [Integer] :user_id ID of User associated with event
     #   @option attributes [String] :eventful_type class of object associated with event

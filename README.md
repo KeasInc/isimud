@@ -77,6 +77,14 @@ if they do not exist.
 
 ## Changes
 
+### 0.5.0
+
+* Allow EventObserver classes to override the exchange for listening to events
+* Corrected initialization of EventListener for handling defaults
+* Create an explicit name for EventListener model queues for EventObserver instances
+* Fixed a bug in EventObserver that caused ModelWatcher to not send update events appropriately when default columns are watched
+* Moved requires for Isimud below config attribute declarations
+
 ### 0.4.10
 
 * Corrected trap of INT and TERM signals

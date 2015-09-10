@@ -3,6 +3,7 @@ module Isimud
     attr_accessor :queues
 
     class Queue
+      include Isimud::Logging
       attr_reader :name, :routing_keys
 
       def initialize(name, listener)
@@ -13,6 +14,7 @@ module Isimud
 
       def bind(exchange, options = {})
         key = options[:routing_key]
+        log "TestClient: adding routing key #{key} to queue #{name}"
         @routing_keys << Regexp.new(key.gsub(/\./, "\\.").gsub(/\*/, ".*"))
       end
 
@@ -24,7 +26,7 @@ module Isimud
         begin
           @listener.call(data)
         rescue => e
-          puts "TestClient: error delivering message: #{e.message}\n  #{e.backtrace.join("\n  ")}"
+          log "TestClient: error delivering message: #{e.message}\n  #{e.backtrace.join("\n  ")}", :error
           @listener.exception_handler.try(:call, e)
         end
       end
@@ -82,10 +84,6 @@ module Isimud
 
     def reconnect
       self
-    end
-
-    def logger
-      Isimud.logger
     end
   end
 end

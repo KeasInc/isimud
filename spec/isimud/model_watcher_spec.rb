@@ -13,13 +13,13 @@ describe Isimud::ModelWatcher do
     context 'when assigned' do
       it 'assigns the watch attributes appropriately' do
         # User: watch_attributes :key, :login_count
-        expect(User.isimud_watch_attributes).to eq([:key, :login_count])
+        expect(User.isimud_watch_attributes).to eq(%w(key login_count))
       end
     end
 
     context 'for a subclass' do
       it 'uses the watch attributes for the superclass' do
-        expect(Admin.isimud_watch_attributes).to eq([:key, :login_count])
+        expect(Admin.isimud_watch_attributes).to eq(%w(key login_count))
       end
     end
   end
@@ -36,7 +36,7 @@ describe Isimud::ModelWatcher do
 
           messages    = Array.new
           exchange    = Isimud::ModelWatcher::DEFAULT_EXCHANGE
-          routing_key = 'db/combustion_test.sqlite.User.create'
+          routing_key = 'test_schema.User.create'
 
           Isimud.client.bind('model_watcher_spec_create', exchange, routing_key) do |payload|
             messages << payload
@@ -51,7 +51,7 @@ describe Isimud::ModelWatcher do
       it 'sends a create message with default attributes' do
         messages    = Array.new
         exchange    = Isimud::ModelWatcher::DEFAULT_EXCHANGE
-        routing_key = 'db/combustion_test.sqlite.Company.create'
+        routing_key = 'test_schema.Company.create'
 
         Isimud.client.bind('model_watcher_spec_create_company', exchange, routing_key) do |payload|
           messages << payload
@@ -108,7 +108,7 @@ describe Isimud::ModelWatcher do
       @messages = Array.new
       Isimud.client.bind('model_watcher_spec_update',
                          Isimud::ModelWatcher::DEFAULT_EXCHANGE,
-                         'db/combustion_test.sqlite.User.update') do |payload|
+                         'test_schema.User.update') do |payload|
         @messages << payload
       end
     end
@@ -147,7 +147,7 @@ describe Isimud::ModelWatcher do
       @messages = Array.new
       Isimud.client.bind('model_watcher_spec_destroy',
                          Isimud::ModelWatcher::DEFAULT_EXCHANGE,
-                         'db/combustion_test.sqlite.User.destroy') do |payload|
+                         'test_schema.User.destroy') do |payload|
         @messages << payload
       end
     end
@@ -162,7 +162,7 @@ describe Isimud::ModelWatcher do
     it 'sends a destroy message' do
       Timecop.freeze do
         user.destroy
-        expected_message = {schema:    'db/combustion_test.sqlite',
+        expected_message = {schema:    'test_schema',
                             type:      'User',
                             action:    :destroy,
                             id:        user.id,
@@ -176,7 +176,7 @@ describe Isimud::ModelWatcher do
 
   def expected_user_payload(user, action)
     {
-        :schema     => "db/combustion_test.sqlite",
+        :schema     => "test_schema",
         :type       => "User",
         :action     => action,
         :id         => user.id,

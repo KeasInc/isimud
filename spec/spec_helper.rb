@@ -8,13 +8,17 @@ require 'isimud'
 require 'combustion'
 require 'database_cleaner'
 
-Combustion.initialize! :active_record
-
 Isimud.client_type = :test
 Isimud.logger = Logger.new(STDOUT)
 Isimud.logger.level = Logger::DEBUG
 Isimud.log_level = :debug
 Isimud.enable_model_watcher = true
+Isimud.model_watcher_schema = 'test_schema'
+Isimud::EventObserver.observed_models = Array.new
+Isimud::EventObserver.observed_mutex = Mutex.new
+Combustion.initialize! :active_record
+
+puts "database configuration: "
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate

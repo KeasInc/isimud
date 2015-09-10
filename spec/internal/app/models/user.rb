@@ -1,10 +1,11 @@
 require_relative "../../../../lib/isimud"
 
 class User < ActiveRecord::Base
+  include Isimud::EventObserver
+
   belongs_to :company
 
   attr_accessor :events, :routing_keys
-  include Isimud::EventObserver
 
   scope :active, -> {where('deactivated != ?', true)}
 

@@ -13,7 +13,7 @@ module Isimud
       Array.new
     end
 
-    mattr_reader :observed_mutex do
+    mattr_accessor :observed_mutex do
       Mutex.new
     end
 
@@ -27,10 +27,21 @@ module Isimud
       []
     end
 
+    # Returns true if this instance is enabled for listening to events. Override in your subclass.
+    def enable_listener?
+      true
+    end
+
+    # Exchange used for listening to events. Override in your subclass if you want to specify an alternative exchange for
+    # events. Otherwise
+    def observed_exchange
+      nil
+    end
+
     # Create or attach to a queue on the specified exchange. When an event message that matches the observer's routing keys
     # is received, parse the event and call handle_event on same.
-    def observe_events(client, exchange)
-      client.bind(self.class.event_queue_name(id), exchange, *routing_keys) do |message|
+    def observe_events(client, default_exchange)
+      client.bind(self.class.event_queue_name(id), observed_exchange || default_exchange, *routing_keys) do |message|
         event = Event.parse(message)
         handle_event(event)
       end

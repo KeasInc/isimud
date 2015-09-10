@@ -67,7 +67,13 @@ describe Isimud::EventListener do
         expect(listener.has_observer?(another_company)).to eql(true)
       end
 
-      it 're-registers an updated observer'
+      it 're-registers an updated observer' do
+        expect(listener.has_observer?(company)).to eql(true)
+        company.update_attributes!(active: false)
+        expect(listener.has_observer?(company)).to eql(false)
+      end
+
+      it 'does not register an observer when listening is disabled'
 
       it 'purges the queue for a deleted observer'
     end

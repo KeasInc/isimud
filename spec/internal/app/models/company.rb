@@ -9,8 +9,12 @@ class Company < ActiveRecord::Base
     where(active: true).all
   end
 
+  def enable_listener?
+    active
+  end
+
   def routing_keys
-    ["*.*.User.create", "*.*.User.destroy"]
+    ["*.User.create", "*.User.destroy"]
   end
 
   def handle_event(event)
@@ -19,10 +23,10 @@ class Company < ActiveRecord::Base
     case event.action.to_s
       when 'create'
         reload
-        update_attribute(:user_count, user_count + 1)
+        update_attributes!(user_count: user_count + 1)
       when 'destroy'
         reload
-        update_attribute(:user_count, user_count - 1)
+        update_attributes!(user_count: user_count - 1)
       else
         raise "unexpected action: #{event.action}"
     end

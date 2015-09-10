@@ -1,13 +1,5 @@
 require 'active_support'
 require 'active_support/core_ext/module/attribute_accessors'
-require 'isimud/logging'
-require 'isimud/client'
-require 'isimud/event'
-require 'isimud/event_listener'
-require 'isimud/event_observer'
-require 'isimud/model_watcher'
-require 'isimud/version'
-
 
 module Isimud
   include ::ActiveSupport::Configurable
@@ -89,3 +81,11 @@ module Isimud
     client.reconnect
   end
 end
+
+require 'isimud/logging'
+require 'isimud/client'
+require 'isimud/event'
+require 'isimud/event_listener'
+require 'isimud/event_observer'
+require 'isimud/model_watcher'
+require 'isimud/version'

@@ -13,5 +13,5 @@ Isimud.model_watcher_schema = Rails.configuration.database_configuration[Rails.e
 config = configs[Rails.env]
 
 config.each do |key, val|
-  Isimud.config.send("#{key}=".to_sym, val)
+  Isimud.send("#{key}=".to_sym, val)
 end
