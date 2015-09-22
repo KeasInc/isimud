@@ -3,7 +3,7 @@ require 'active_support'
 module Isimud
   class Event
     include Isimud::Logging
-    attr_accessor :type, :action, :user_id, :occurred_at, :eventful_type, :eventful_id, :parameters
+    attr_accessor :type, :action, :user_id, :occurred_at, :eventful_type, :eventful_id, :attributes, :parameters
     attr_writer :exchange
 
     DEFAULT_TYPE = :model
@@ -23,7 +23,8 @@ module Isimud
     #   @option attributes [String, Symbol] :type (:model) event type
     #   @option attributes [String] :action event action
     #   @option attributes [Time] :occurred_at (Time.now) date and time event occurred
-    #   @option attributes [Hash] :parameters additional parameters
+    #   @option attributes [Hash] :attributes event attributes
+    #   @option attributes [Hash] :parameters additional parameters (deprecated)
     def initialize(*args)
       options = args.extract_options!.with_indifferent_access
 
@@ -54,7 +55,7 @@ module Isimud
         self.eventful_type = options.delete(:eventful_type)
         self.eventful_id   = options.delete(:eventful_id)
       end
-
+      self.attributes = options.delete(:attributes)
       self.parameters = options.delete(:parameters) || options
     end
 
@@ -67,14 +68,22 @@ module Isimud
     end
 
     # Return hash of data to be serialized to JSON
-    # @option options [Boolean] :omit_parameters when set, do not include parameters in data
+    # @option options [Boolean] :omit_parameters when set, do not include attributes or parameters in data
     # @return [Hash] data to serialize
     def as_json(options = {})
       session_id = parameters.delete(:session_id) || Thread.current[:keas_session_id]
 
-      data              = {type:          type, action: action, user_id: user_id, occurred_at: occurred_at,
-                           eventful_type: eventful_type, eventful_id: eventful_id, session_id: session_id}
-      data[:parameters] = parameters unless options[:omit_parameters]
+      data = {type:          type,
+              action:        action,
+              user_id:       user_id,
+              occurred_at:   occurred_at,
+              eventful_type: eventful_type,
+              eventful_id:   eventful_id,
+              session_id:    session_id}
+      unless options[:omit_parameters]
+        data[:parameters] = parameters
+        data[:attributes] = attributes
+      end
       data
     end
 

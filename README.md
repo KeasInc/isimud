@@ -77,6 +77,10 @@ if they do not exist.
 
 ## Changes
 
+### 0.5.1
+
+* Added Event#attributes
+
 ### 0.5.0
 
 * Allow EventObserver classes to override the exchange for listening to events
