@@ -9,10 +9,6 @@ describe Isimud::BunnyClient do
   let!(:client) { Isimud::BunnyClient.new(@url) }
   let!(:connection) { client.connection }
 
-  after(:each) do
-    client.close
-  end
-
   describe '#initialize' do
     it 'sets the broker URL' do
       expect(client.url).to eq(@url)
@@ -35,7 +31,7 @@ describe Isimud::BunnyClient do
 
     it 'binds specified routing keys and subscribes to the specified exchange' do
       queue = double('queue', bind: 'ok')
-      channel.stub(:queue).and_return(queue)
+      expect(channel).to receive(:queue).and_return(queue)
       expect(queue).to receive(:subscribe).with(manual_ack: true)
       keys.each { |key| expect(queue).to receive(:bind).with(@exchange_name, routing_key: key, nowait: false).once }
       client.bind('my_queue', @exchange_name, *keys, proc)
