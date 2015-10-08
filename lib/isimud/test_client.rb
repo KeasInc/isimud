@@ -13,7 +13,7 @@ module Isimud
       end
 
       def bind(exchange, options = {})
-        key = options[:routing_key]
+        key = "\\A#{options[:routing_key]}\\Z"
         log "TestClient: adding routing key #{key} to queue #{name}"
         @routing_keys << Regexp.new(key.gsub(/\./, "\\.").gsub(/\*/, ".*"))
       end

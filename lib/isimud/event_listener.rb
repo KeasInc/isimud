@@ -65,9 +65,12 @@ module Isimud
       Isimud::EventObserver.observed_models.each do |model_class|
         log "EventListener: registering observers for #{model_class}"
         register_observer_class(model_class)
+        count = 0
         model_class.find_active_observers.each do |model|
           register_observer(model)
+          count += 1
         end
+        log "EventListener: registered #{count} observers for #{model_class}"
       end
     end
 
@@ -97,6 +100,7 @@ module Isimud
         while @running
           begin
             bind_queues
+            Rails.logger.info 'EventListener: event_thread finished'
             Thread.stop
           rescue Bunny::Exception => e
             count_error(e)

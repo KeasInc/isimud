@@ -77,6 +77,11 @@ if they do not exist.
 
 ## Changes
 
+### 0.5.2
+
+* Fixed regexp bug in TestClient affecting message delivery
+* Add more logging for EventObserver binding
+
 ### 0.5.1
 
 * Added Event#attributes
