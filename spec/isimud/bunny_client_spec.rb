@@ -19,9 +19,14 @@ describe Isimud::BunnyClient do
     let(:channel) { client.channel }
     let(:proc) { Proc.new { puts('hello') } }
     let(:keys) { %w(foo.bar baz.*) }
+    let(:queue_name) { 'my_queue' }
     before do
       Isimud.logger = Logger.new(STDOUT)
     end
+    after do
+      client.delete_queue(queue_name)
+    end
+
 
     it 'creates a new queue' do
       queue = client.bind('my_queue', @exchange_name, keys, &proc)
@@ -39,11 +44,12 @@ describe Isimud::BunnyClient do
 
     it 'calls block when a message is received' do
       @block_called = Array.new
-      queue_name    = 'test queue'
+      queue_name    = 'test_queue'
       client.bind("#{queue_name}", @exchange_name, 'my.test.key') do |payload|
         @block_called << payload
       end
       client.publish(@exchange_name, 'my.test.key', "Hi there")
+      sleep(1)
       expect(@block_called).to eq ['Hi there']
     end
   end

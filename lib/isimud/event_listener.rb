@@ -140,13 +140,16 @@ module Isimud
 
     def handle_observer_event(payload)
       event = JSON.parse(payload).with_indifferent_access
-      log "EventListener: received observer model message: #{payload.inspect}"
-      if %w(update destroy).include?(event[:action])
-        unregister_observer(event[:type], event[:id])
-      end
-      unless event[:action] == 'destroy'
-        observer = event[:type].constantize.find(event[:id])
-        register_observer(observer) if observer.enable_listener?
+      action = event[:action]
+      log "EventListener: received observer model message: #{event.inspect}"
+      observer = event[:type].constantize.find(event[:id]) unless action == 'destroy'
+      case
+        when action == 'create'
+          register_observer(observer) if observer.enable_listener?
+        when action == 'update' && observer.enable_listener?
+          rebind_observer(observer)
+        else
+          unregister_observer(event[:type], event[:id])
       end
     end
 
@@ -159,26 +162,25 @@ module Isimud
       end
     end
 
+    # Update the bindings for an observer.
+    def rebind_observer(observer)
+      log "EventListener: rebinding observer #{observer.class} #{observer.id}"
+      client.rebind(observer.event_queue_name, events_exchange, observer.routing_keys)
+    end
+
     # Delete a queue for an observer. This also purges all messages associated with it
     def unregister_observer(observer_class, observer_id)
       @observer_mutex.synchronize do
-        if (observer = @observers.delete(observer_key_for(observer_class, observer_id)))
-          begin
-            log "EventListener: unregistering #{observer.class} #{observer.id}"
-            queue_name = observer_class.constantize.event_queue_name(observer_id)
-            client.delete_queue(queue_name)
-          rescue => e
-            log "EventListener: error unregistering #{observer_class} #{observer_id}: #{e.message}", :warn
-          end
-        end
+        log "EventListener: un-registering observer #{observer_class} #{observer_id}"
+        queue_name = observer_class.constantize.event_queue_name(observer_id)
+        client.delete_queue(queue_name)
+        @observers.delete(observer_key_for(observer_class, observer_id))
       end
     end
 
     # Create or return the observer queue which listens for ModelWatcher events
     def observer_queue
-      @observer_queue ||= client.create_queue("#{name}.listener.#{Process.pid}", models_exchange,
-                                              queue_options:     {exclusive: true},
-                                              subscribe_options: {manual_ack: true}, &method(:handle_observer_event))
+      @observer_queue ||= client.create_queue("#{name}.listener", models_exchange, &method(:handle_observer_event))
     end
 
     # Register the observer class watcher

@@ -41,10 +41,14 @@ module Isimud
     # Create or attach to a queue on the specified exchange. When an event message that matches the observer's routing keys
     # is received, parse the event and call handle_event on same.
     def observe_events(client, default_exchange)
-      client.bind(self.class.event_queue_name(id), observed_exchange || default_exchange, *routing_keys) do |message|
+      client.bind(event_queue_name, observed_exchange || default_exchange, *routing_keys) do |message|
         event = Event.parse(message)
         handle_event(event)
       end
+    end
+
+    def event_queue_name
+      self.class.event_queue_name(id)
     end
 
     module ClassMethods

@@ -18,6 +18,10 @@ module Isimud
         @routing_keys << Regexp.new(key.gsub(/\./, "\\.").gsub(/\*/, ".*"))
       end
 
+      def unbind(exchange)
+        @routing_keys.clear
+      end
+
       def has_matching_key?(route)
         @routing_keys.any? { |k| route =~ k }
       end
@@ -57,6 +61,12 @@ module Isimud
 
     def bind(queue_name, exchange_name, *keys, &method)
       create_queue(queue_name, exchange_name, routing_keys: keys, &method)
+    end
+
+    def rebind(queue_name, exchange_name, keys)
+      queue = queues[queue_name] || return
+      queue.unbind(exchange_name)
+      keys.each { |key| queue.bind(exchange_name, routing_key: key) }
     end
 
     def create_queue(queue_name, exchange_name, options = {}, &method)

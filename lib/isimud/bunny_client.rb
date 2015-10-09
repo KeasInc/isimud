@@ -26,8 +26,8 @@ module Isimud
       subscribe_options = options[:subscribe_options] || {}
       log "Isimud: create_queue #{queue_name}: queue_options=#{queue_options.inspect} routing_keys=#{routing_keys.join(',')} subscribe_options=#{subscribe_options.inspect}"
       current_channel = channel
-      queue           = current_channel.queue(queue_name, queue_options)
-      routing_keys.each { |key| queue.bind(exchange_name, routing_key: key, nowait: false) }
+      queue           = find_queue(queue_name, queue_options)
+      bind_routing_keys(queue, exchange_name, routing_keys)
       queue.subscribe(subscribe_options) do |delivery_info, properties, payload|
         begin
           log "Isimud: queue #{queue_name} received #{delivery_info.delivery_tag} routing_key: #{delivery_info.routing_key}"
@@ -46,8 +46,20 @@ module Isimud
       queue
     end
 
+    # replace all bindings on a queue
+    def rebind(queue_name, exchange_name, routing_keys)
+      log "Isimud: rebinding queue #{queue_name} exchange #{exchange_name} routing_keys #{routing_keys.inspect}"
+      queue = find_queue(queue_name)
+      begin
+        queue.unbind(exchange_name)
+      rescue => e
+        log "Isimud: error unbinding #{queue_name} from #{exchange_name}: #{e.message}", :warn
+      end
+      bind_routing_keys(queue, exchange_name, routing_keys)
+    end
+
     def delete_queue(queue_name)
-      channel.queue(queue_name).delete
+      channel.queue_delete(queue_name)
     end
 
     def connection
@@ -91,5 +103,16 @@ module Isimud
       close
       connect
     end
+
+    private
+
+    def find_queue(queue_name, options = {durable: true})
+      channel.queue(queue_name, options)
+    end
+
+    def bind_routing_keys(queue, exchange_name, routing_keys)
+      routing_keys.each { |key| queue.bind(exchange_name, routing_key: key, nowait: false) }
+    end
+
   end
 end

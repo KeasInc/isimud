@@ -77,6 +77,12 @@ if they do not exist.
 
 ## Changes
 
+### 0.6.0
+
+* Added Client#rebind to change the exchange and routing keys for a durable named queue. 
+* Changed BunnyClient#delete_queue to make it more reliable.
+* EventListener now uses a shared, durable queue for monitoring events on modified EventObserver instances.
+
 ### 0.5.2
 
 * Fixed regexp bug in TestClient affecting message delivery
