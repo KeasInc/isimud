@@ -50,12 +50,10 @@ module Isimud
     def rebind(queue_name, exchange_name, routing_keys)
       log "Isimud: rebinding queue #{queue_name} exchange #{exchange_name} routing_keys #{routing_keys.inspect}"
       queue = find_queue(queue_name)
-      begin
-        queue.unbind(exchange_name)
-      rescue => e
-        log "Isimud: error unbinding #{queue_name} from #{exchange_name}: #{e.message}", :warn
-      end
+      queue.unbind(exchange_name)
       bind_routing_keys(queue, exchange_name, routing_keys)
+    rescue => e
+      log "Isimud: error rebinding #{queue_name} from #{exchange_name}: #{e.message}", :error
     end
 
     def delete_queue(queue_name)
