@@ -13,6 +13,7 @@ Isimud.logger = Logger.new(STDOUT)
 Isimud.logger.level = Logger::DEBUG
 Isimud.log_level = :debug
 Isimud.enable_model_watcher = true
+Isimud.model_watcher_exchange = 'events'
 Isimud.model_watcher_schema = 'test_schema'
 Isimud::EventObserver.observed_models = Array.new
 Isimud::EventObserver.observed_mutex = Mutex.new

@@ -23,7 +23,7 @@ describe Isimud::EventObserver do
 
     it 'binds routing keys to the named queue in the exchange' do
       queue = client.queues["combustion.user.#{evented.id}"]
-      expect(queue).to have_matching_key("model.Company.123.create")
+      expect(queue).to have_matching_key('events', 'model.Company.123.create')
     end
 
     it 'parses messages and dispatches to the handle_event method'

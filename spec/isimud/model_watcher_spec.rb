@@ -35,7 +35,7 @@ describe Isimud::ModelWatcher do
 
 
           messages    = Array.new
-          exchange    = Isimud::ModelWatcher::DEFAULT_EXCHANGE
+          exchange    = 'events'
           routing_key = 'test_schema.User.create'
 
           Isimud.client.bind('model_watcher_spec_create', exchange, routing_key) do |payload|
@@ -50,7 +50,7 @@ describe Isimud::ModelWatcher do
     context 'with default attributes' do
       it 'sends a create message with default attributes' do
         messages    = Array.new
-        exchange    = Isimud::ModelWatcher::DEFAULT_EXCHANGE
+        exchange    = 'events'
         routing_key = 'test_schema.Company.create'
 
         Isimud.client.bind('model_watcher_spec_create_company', exchange, routing_key) do |payload|
@@ -107,7 +107,7 @@ describe Isimud::ModelWatcher do
     before(:all) do
       @messages = Array.new
       Isimud.client.bind('model_watcher_spec_update',
-                         Isimud::ModelWatcher::DEFAULT_EXCHANGE,
+                         'events',
                          'test_schema.User.update') do |payload|
         @messages << payload
       end
@@ -146,7 +146,7 @@ describe Isimud::ModelWatcher do
     before(:all) do
       @messages = Array.new
       Isimud.client.bind('model_watcher_spec_destroy',
-                         Isimud::ModelWatcher::DEFAULT_EXCHANGE,
+                         'events',
                          'test_schema.User.destroy') do |payload|
         @messages << payload
       end

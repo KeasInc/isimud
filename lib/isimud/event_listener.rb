@@ -165,7 +165,7 @@ module Isimud
     # Update the bindings for an observer.
     def rebind_observer(observer)
       log "EventListener: rebinding observer #{observer.class} #{observer.id}"
-      client.rebind(observer.event_queue_name, events_exchange, observer.routing_keys)
+      #client.rebind(observer.event_queue_name, events_exchange, observer.routing_keys)
     end
 
     # Delete a queue for an observer. This also purges all messages associated with it
@@ -189,7 +189,7 @@ module Isimud
         return if @observed_models.include?(observer_class)
         @observed_models << observer_class
         log "EventListener: registering observer class #{observer_class}"
-        observer_queue.bind(models_exchange, routing_key: "#{Isimud.model_watcher_schema}.#{observer_class.base_class.name}.*")
+        observer_queue.bind(models_exchange, "#{Isimud.model_watcher_schema}.#{observer_class.base_class.name}.*")
       end
     end
 

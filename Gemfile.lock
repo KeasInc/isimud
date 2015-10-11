@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    isimud (0.6.0)
+    isimud (0.6.1)
       activerecord (>= 3.2.17)
       activesupport (>= 3.2.17)
       bunny (>= 1.6.0)
@@ -106,7 +106,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activesupport (~> 3.2.17)
+  activesupport (>= 3.2.17)
   awesome_print
   bundler (~> 1.6)
   codeclimate-test-reporter
