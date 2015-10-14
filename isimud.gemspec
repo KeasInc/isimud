@@ -18,8 +18,8 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'activerecord', '>= 3.2.17'
-  spec.add_dependency 'activesupport', '>= 3.2.17'
+  spec.add_dependency 'activerecord', '>= 4.1.4'
+  spec.add_dependency 'activesupport', '>= 4.1.4'
   spec.add_dependency 'bunny', '>= 1.6.0'
   spec.add_dependency 'chronic_duration', '>= 0.10.6'
 end

@@ -16,22 +16,29 @@ describe Isimud::TestClient do
 
   describe '#initialize' do
     it 'sets up an empty set of queues' do
-      client.queues.should be_empty
+      expect( client.queues ).to be_empty
     end
   end
 
-  describe '#bind' do
+  describe 'queues and bindings' do
     before do
       client.bind('queue_name', 'exchange_name', *keys, &@proc)
     end
+    let!(:queue) { client.find_queue('queue_name') }
 
-    it 'creates a new queue' do
-      client.queues['queue_name'].should be_present
+    it 'binds routing keys to the queue' do
+      expect( queue.bindings ).to eql('exchange_name' => Set.new(keys))
     end
 
-    it 'binds specified routing keys' do
-      q = client.queues['queue_name']
-      q.routing_keys.should include(/\Aexchange_name:foo\.bar\Z/, /\Aexchange_name:baz\..*\.argle\Z/)
+    it 'removes a binding from the queue' do
+      queue.unbind('exchange_name', 'foo.bar')
+      expect( queue.bindings ).to eql('exchange_name' => Set.new(['baz.*.argle']))
+    end
+  end
+
+  describe '#unbind' do
+    before do
+      client.bind('queue_name', 'exchange_name', *keys, &@proc)
     end
   end
 

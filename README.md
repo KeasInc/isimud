@@ -77,7 +77,22 @@ if they do not exist.
 
 ## Changes
 
-### 0.6.0
+### 1.0.0
+
+#### Breaking Changes:
+
+* EventObserver instances are now required to have the persistent attribute /exchange_routing_keys/. These are used to
+  store the current value of routing keys assoicated with an instance. The queue associated with an EventObserver is
+  now created and updated at the same time the EventObserver is updated, rather than relying on the EventListener to
+  create it. 
+* Removed Client#rebind.
+
+#### Other Changes:
+
+* TestClient::Queue now responds to bind() and unbind() in the same manner as Bunny::Queue.
+* BunnyClient#create_queue now may be called without a block to instantiate an AMQP queue without subscribing to messages
+
+### 0.6.0 (broken)
 
 * Added Client#rebind to change the exchange and routing keys for a durable named queue. 
 * Changed BunnyClient#delete_queue to make it more reliable.

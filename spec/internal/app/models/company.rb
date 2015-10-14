@@ -13,6 +13,10 @@ class Company < ActiveRecord::Base
     active
   end
 
+  def observed_exchange
+    'isimud.test.events'
+  end
+
   def routing_keys
     ["*.User.create", "*.User.destroy"]
   end
@@ -20,15 +24,9 @@ class Company < ActiveRecord::Base
   def handle_event(event)
     user = User.find(event.parameters[:id])
     return unless user.company_id == id
-    case event.action.to_s
-      when 'create'
-        reload
-        update_attributes!(user_count: user_count + 1)
-      when 'destroy'
-        reload
-        update_attributes!(user_count: user_count - 1)
-      else
-        raise "unexpected action: #{event.action}"
-    end
+    raise "unexpected action: #{event.action}" unless ['create','destroy' ].include?(event.action.to_s)
+    self.user_count = User.where(company: self).count
+    self.total_points = user_count * points_per_user
+    save!
   end
 end

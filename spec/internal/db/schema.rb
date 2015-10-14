@@ -5,6 +5,9 @@ ActiveRecord::Schema.define do
     t.string :url
     t.integer :user_count, default: 0, null: false
     t.boolean :active, default: true, null: false
+    t.string :exchange_routing_keys
+    t.integer :points_per_user, default: 1, null: false
+    t.integer :total_points, default: 0, null: false
     t.timestamps
   end
 
@@ -17,6 +20,8 @@ ActiveRecord::Schema.define do
     t.boolean :is_admin
     t.boolean :deactivated
     t.integer :login_count, default: 0, null: false
+    t.string :keys
+    t.string :exchange_routing_keys
     t.timestamps
   end
 end

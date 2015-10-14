@@ -12,7 +12,7 @@ describe Isimud do
       end
 
       it 'creates a new TestClient client' do
-        Isimud.client.should be_a Isimud::TestClient
+        expect( Isimud.client ).to be_a Isimud::TestClient
       end
     end
 
@@ -33,7 +33,7 @@ describe Isimud do
 
   describe '.model_watcher_enabled?' do
     it 'is true by default' do
-      Isimud.should be_model_watcher_enabled
+      expect(Isimud).to be_model_watcher_enabled
     end
 
     it 'is true if enable_model_watcher is explicitly set' do

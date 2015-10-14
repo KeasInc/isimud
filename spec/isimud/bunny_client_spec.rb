@@ -29,17 +29,29 @@ describe Isimud::BunnyClient do
 
 
     it 'creates a new queue' do
-      queue = client.bind('my_queue', @exchange_name, keys, &proc)
-      expect(queue).to be_a Bunny::Queue
-      expect(queue.name).to eq('my_queue')
+      consumer = client.bind('my_queue', @exchange_name, keys, &proc)
+      expect(consumer).to be_a Bunny::Consumer
+      expect(consumer.queue_name).to eq('my_queue')
     end
 
-    it 'binds specified routing keys and subscribes to the specified exchange' do
-      queue = double('queue', bind: 'ok')
-      expect(channel).to receive(:queue).and_return(queue)
-      expect(queue).to receive(:subscribe).with(manual_ack: true)
-      keys.each { |key| expect(queue).to receive(:bind).with(@exchange_name, routing_key: key, nowait: false).once }
-      client.bind('my_queue', @exchange_name, *keys, proc)
+    context 'when a block is passed to the call' do
+      it 'binds specified routing keys and subscribes to the specified exchange' do
+        queue = double('queue', bind: 'ok')
+        expect(client).to receive(:find_queue).with('my_queue', durable: true).and_return(queue)
+        expect(queue).to receive(:subscribe).with({manual_ack: true})
+        keys.each { |key| expect(queue).to receive(:bind).with(@exchange_name, routing_key: key, nowait: false).once }
+        client.bind('my_queue', @exchange_name, *keys, &proc)
+      end
+    end
+
+    context 'when a block is NOT passed' do
+      it 'binds specified routing keys BUT does not subscribes to the specified exchange' do
+        queue = double('queue', bind: 'ok')
+        expect(client).to receive(:find_queue).with('my_queue', durable: true).and_return(queue)
+        expect(queue).not_to receive(:subscribe).with(manual_ack: true)
+        keys.each { |key| expect(queue).to receive(:bind).with(@exchange_name, routing_key: key, nowait: false).once }
+        client.bind('my_queue', @exchange_name, *keys)
+      end
     end
 
     it 'calls block when a message is received' do

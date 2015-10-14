@@ -26,8 +26,8 @@ describe Isimud::EventListener do
     it 'applies defaults' do
       listener = Isimud::EventListener.new
       expect(listener.events_exchange).to eq('events')
-      expect(listener.models_exchange).to eq('events')
-      expect(listener.error_limit).to eq(10)
+      expect(listener.models_exchange).to eq('isimud.test.events')
+      expect(listener.error_limit).to eq(50)
       expect(listener.error_interval).to eq(1.hour)
       expect(listener.name).to eq('combustion-listener')
     end
@@ -52,35 +52,63 @@ describe Isimud::EventListener do
       end
     end
 
-    describe 'handling messages' do
-      it 'dispatches events to observer' do
-        expect {
-          User.create!(company: company, first_name: 'Larry', last_name: 'Page')
-          company.reload
-        }.to change(company, :user_count)
-      end
-    end
-
-    describe 'handling observer updates' do
-      it 'registers a new observer' do
-        another_company = Company.create!(name: 'Apple', active: true)
-        expect(listener.has_observer?(another_company)).to eql(true)
+    describe '#handle_observer_event' do
+      context 'handling observer destroy messages' do
+        it 'purges the queue for a destroy observer' do
+          expect(listener).to have_observer(company)
+          company.destroy
+          expect(listener).not_to have_observer(company)
+        end
       end
 
-      it 're-registers an updated observer' do
-        expect(listener.has_observer?(company)).to eql(true)
-        company.update_attributes!(active: false)
-        expect(listener.has_observer?(company)).to eql(false)
+      context 'handling new observer messages' do
+        it 'registers a new observer' do
+          another_company = Company.create!(name: 'Apple', active: true)
+          expect(listener).to have_observer(another_company)
+        end
+
+        it 'does not register an observer when listening is disabled' do
+          another_company = Company.create!(name: 'Apple', active: false)
+          expect(listener).not_to have_observer(another_company)
+        end
       end
 
-      it 'does not register an observer when listening is disabled'
+      context 'handling observer update messages' do
+        it 'reloads the observer and processes events accordingly' do
+          company.update_attributes!(points_per_user: 2)
+          expect(listener).to have_observer(company)
+          expect {
+            User.create!(company: company, first_name: 'Larry', last_name: 'Page')
+            company.reload
+          }.to change(company, :user_count).by(1)
+          expect(company.total_points).to eql(company.user_count * 2)
+        end
+      end
 
-      it 'purges the queue for a deleted observer'
+      context 'handling messages' do
+        it 'dispatches events to observer' do
+          expect {
+            User.create!(company: company, first_name: 'Larry', last_name: 'Page')
+            company.reload
+          }.to change(company, :user_count)
+        end
+      end
     end
 
     describe 'handling errors' do
-      it 'counts errors'
-      it 'triggers a shutdown if errors exceed limit'
+      before do
+        @some_company = Company.create!(name: 'Apple', active: true)
+      end
+      xit 'counts errors' do
+        # Verify that the listener's error count starts from zero
+        expect(listener.error_count).to eql 0
+
+        # Verify that the listener's error count increased to one with the first new exception
+        # Verify that the listener's error count increased to two with the second new exception
+      end
+      xit 'triggers a shutdown if errors exceed limit' do
+        # Verify that the listener shuts down / stops listening when the threshold is exceeded
+      end
     end
   end
 end

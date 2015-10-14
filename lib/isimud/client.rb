@@ -39,9 +39,6 @@ module Isimud
     def reconnect
     end
 
-    def rebind(queue_name, exchange_name, *keys)
-    end
-
     def reset
     end
   end
