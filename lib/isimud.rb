@@ -37,7 +37,7 @@ module Isimud
     100
   end
   config_accessor :logger do
-    Rails.logger
+    logger
   end
   config_accessor :log_level do
     :debug

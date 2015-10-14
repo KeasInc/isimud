@@ -16,3 +16,4 @@ tmp
 *.a
 *.sqlite
 mkmf.log
+.idea

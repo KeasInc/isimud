@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in isimud.gemspec
 gemspec
 
-gem 'activesupport', '>= 3.2.17'
+gem 'activesupport', '4.1.4'
 gem 'bundler', '~> 1.6'
 gem 'rake'
 

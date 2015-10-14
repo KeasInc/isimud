@@ -23,7 +23,7 @@ module Isimud
     def connected?
     end
 
-    def create_queue(queue_name, exchange_name, options = {}, &method)
+    def create_queue(queue_name, exchange_name, options = {})
     end
 
     def delete_queue(queue_name)
@@ -39,10 +39,10 @@ module Isimud
     def reconnect
     end
 
-    def rebind(queue_name, exchange_name, *keys)
+    def reset
     end
 
-    def reset
+    def subscribe(queue, options = {}, &block)
     end
   end
 end

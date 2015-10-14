@@ -7,32 +7,32 @@ module Isimud
     attr_reader :error_count, :error_interval, :error_limit, :name, :queues, :events_exchange, :models_exchange,
                 :running
 
-    DEFAULT_ERROR_LIMIT    = 10
-    DEFAULT_ERROR_INTERVAL = 3600
+    DEFAULT_ERROR_LIMIT     = 10
+    DEFAULT_ERROR_INTERVAL  = 3600
 
     DEFAULT_EVENTS_EXCHANGE = 'events'
     DEFAULT_MODELS_EXCHANGE = 'models'
 
     def initialize(options = {})
       default_options = {
-          error_limit:     Isimud.listener_error_limit || DEFAULT_ERROR_LIMIT,
-          error_interval:  DEFAULT_ERROR_INTERVAL,
-          events_exchange: Isimud.events_exchange || DEFAULT_EVENTS_EXCHANGE,
-          models_exchange: Isimud.model_watcher_exchange || DEFAULT_MODELS_EXCHANGE,
-          name:            "#{Rails.application.class.parent_name.downcase}-listener"
+          error_limit:      Isimud.listener_error_limit || DEFAULT_ERROR_LIMIT,
+          error_interval:   DEFAULT_ERROR_INTERVAL,
+          events_exchange:  Isimud.events_exchange || DEFAULT_EVENTS_EXCHANGE,
+          models_exchange:  Isimud.model_watcher_exchange || DEFAULT_MODELS_EXCHANGE,
+          name:             "#{Rails.application.class.parent_name.downcase}-listener"
       }
       options.reverse_merge!(default_options)
-      @error_count         = 0
-      @observers           = Hash.new
-      @observed_models     = Set.new
-      @error_limit         = options[:error_limit]
-      @error_interval      = options[:error_interval]
-      @events_exchange     = options[:events_exchange]
-      @models_exchange     = options[:models_exchange]
-      @name                = options[:name]
-      @observer_mutex      = Mutex.new
-      @error_counter_mutex = Mutex.new
-      @running             = false
+      @error_count          = 0
+      @observers            = Hash.new
+      @observed_models      = Set.new
+      @error_limit          = options[:error_limit]
+      @error_interval       = options[:error_interval]
+      @events_exchange      = options[:events_exchange]
+      @models_exchange      = options[:models_exchange]
+      @name                 = options[:name]
+      @observer_mutex       = Mutex.new
+      @error_counter_mutex  = Mutex.new
+      @running              = false
     end
 
     def max_errors
@@ -62,6 +62,9 @@ module Isimud
 
     # Override this method to set up message observers
     def bind_queues
+      client.subscribe(observer_queue) do |payload|
+        handle_observer_event(payload)
+      end
       Isimud::EventObserver.observed_models.each do |model_class|
         log "EventListener: registering observers for #{model_class}"
         register_observer_class(model_class)
@@ -100,17 +103,18 @@ module Isimud
         while @running
           begin
             bind_queues
-            Rails.logger.info 'EventListener: event_thread finished'
+            log 'EventListener: event_thread finished'
             Thread.stop
           rescue Bunny::Exception => e
             count_error(e)
-            Rails.logger.warn 'EventListener: resetting queues'
+            log 'EventListener: resetting queues', :warn
             client.reset
           end
         end
       end
     end
 
+    # **We're not logging the exception passed in as param
     def count_error(exception)
       @error_counter_mutex.synchronize do
         @error_count += 1
@@ -142,45 +146,39 @@ module Isimud
       event = JSON.parse(payload).with_indifferent_access
       action = event[:action]
       log "EventListener: received observer model message: #{event.inspect}"
-      observer = event[:type].constantize.find(event[:id]) unless action == 'destroy'
-      case
-        when action == 'create'
-          register_observer(observer) if observer.enable_listener?
-        when action == 'update' && observer.enable_listener?
-          rebind_observer(observer)
-        else
-          unregister_observer(event[:type], event[:id])
+      if %w(update destroy).include?(action)
+        unregister_observer(event[:type], event[:id])
+      end
+      if %w(create update).include?(action)
+        observer = event[:type].constantize.find(event[:id])
+        register_observer(observer) if observer.enable_listener?
       end
     end
 
-    # Create and bind a queue for the observer. Also ensure that we are listening for observer class update events
+    # Register an observer instance, and start listening for events on its associated queue.
+    # Also ensure that we are listening for observer class update events
     def register_observer(observer)
       @observer_mutex.synchronize do
         log "EventListener: registering observer #{observer.class} #{observer.id}"
-        observer.observe_events(client, events_exchange)
-        @observers[observer_key_for(observer.class, observer.id)] = observer
+        @observers[observer_key_for(observer.class, observer.id)] = observer.observe_events(client, events_exchange)
       end
     end
 
-    # Update the bindings for an observer.
-    def rebind_observer(observer)
-      log "EventListener: rebinding observer #{observer.class} #{observer.id}"
-      #client.rebind(observer.event_queue_name, events_exchange, observer.routing_keys)
-    end
-
-    # Delete a queue for an observer. This also purges all messages associated with it
+    # Unregister an observer instance, and cancel consumption of messages. Any pre-fetched messages will be returned to the queue.
     def unregister_observer(observer_class, observer_id)
       @observer_mutex.synchronize do
         log "EventListener: un-registering observer #{observer_class} #{observer_id}"
-        queue_name = observer_class.constantize.event_queue_name(observer_id)
-        client.delete_queue(queue_name)
-        @observers.delete(observer_key_for(observer_class, observer_id))
+        if (consumer = @observers.delete(observer_key_for(observer_class, observer_id)))
+          consumer.cancel
+        end
       end
     end
 
     # Create or return the observer queue which listens for ModelWatcher events
     def observer_queue
-      @observer_queue ||= client.create_queue("#{name}.listener", models_exchange, &method(:handle_observer_event))
+      @observer_queue ||= client.create_queue("#{name}.listener.#{Process.pid}", models_exchange,
+                                              queue_options:      {exclusive: true},
+                                              subscribe_options:  {manual_ack: true})
     end
 
     # Register the observer class watcher
@@ -189,7 +187,7 @@ module Isimud
         return if @observed_models.include?(observer_class)
         @observed_models << observer_class
         log "EventListener: registering observer class #{observer_class}"
-        observer_queue.bind(models_exchange, "#{Isimud.model_watcher_schema}.#{observer_class.base_class.name}.*")
+        observer_queue.bind(models_exchange, routing_key: "#{Isimud.model_watcher_schema}.#{observer_class.base_class.name}.*")
       end
     end
 

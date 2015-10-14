@@ -4,31 +4,48 @@ module Isimud
 
     class Queue
       include Isimud::Logging
-      attr_reader :name, :routing_keys
+      attr_reader :name, :bindings
+      attr_accessor :proc
 
-      def initialize(name, proc)
+      def initialize(name, proc = Proc.new{ |_| } )
         @name         = name
+        @bindings     = Hash.new{ |hash, key| hash[key] = Set.new }
         @proc         = proc
-        @routing_keys = Set.new
       end
 
-      def bind(exchange, routing_key)
-        key = "\\A#{exchange}:#{routing_key}\\Z"
-        log "TestClient: adding routing key #{key} for exchange #{exchange} to queue #{name}"
-        @routing_keys << Regexp.new(key.gsub(/\./, "\\.").gsub(/\*/, '.*'))
+      def bind(exchange, opts = {})
+        routing_key = opts[:routing_key]
+        log "TestClient: adding routing key #{routing_key} for exchange #{exchange} to queue #{name}"
+        @bindings[exchange] << routing_key
       end
 
-      def unbind
-        @routing_keys.clear
+      def cancel
+        @proc = nil
+      end
+
+      def delete(opts = {})
+        log "TestClient: delete queue #{name}"
+        @bindings.clear
+        @proc = nil
+      end
+
+      def unbind(exchange, opts = {})
+        routing_key = opts[:routing_key]
+        log "TestClient: removing routing key #{routing_key} for exchange #{exchange} from queue #{name}"
+        @bindings[exchange].delete(routing_key)
+      end
+
+      def make_regexp(key)
+        Regexp.new(key.gsub(/\./, "\\.").gsub(/\*/, '.*'))
       end
 
       def has_matching_key?(exchange, route)
-        @routing_keys.any? { |k| "#{exchange}:#{route}" =~ k }
+        @bindings[exchange].any? { |key| route =~ make_regexp(key) }
       end
 
       def deliver(data)
         begin
-          @proc.call(data)
+          @proc.try(:call, data)
         rescue => e
           log "TestClient: error delivering message: #{e.message}\n  #{e.backtrace.join("\n  ")}", :error
           exception_handler.try(:call, e)
@@ -59,23 +76,27 @@ module Isimud
       queues.delete(queue_name)
     end
 
-    def bind(queue_name, exchange_name, *keys, &method)
-      create_queue(queue_name, exchange_name, routing_keys: keys, &method)
+    def bind(queue_name, exchange_name, *keys, &block)
+      queue = create_queue(queue_name, exchange_name, routing_keys: keys)
+      subscribe(queue, &block)
     end
 
-    def rebind(queue_name, exchange_name, keys)
-      queue = queues[queue_name] || return
-      queue.unbind(exchange_name)
-      keys.each { |key| queue.bind(exchange_name, routing_key: key) }
+    def find_queue(queue_name)
+      queues[queue_name] ||= Queue.new(queue_name)
     end
 
-    def create_queue(queue_name, exchange_name, options = {}, &method)
+    def create_queue(queue_name, exchange_name, options = {})
       keys = options[:routing_keys] || []
       log "Isimud::TestClient: Binding queue #{queue_name} for keys #{keys.inspect}"
-      queue = queues[queue_name] ||= Queue.new(queue_name, method)
+      queue = find_queue(queue_name)
       keys.each do |k|
-        queue.bind(exchange_name, k)
+        queue.bind(exchange_name, routing_key: k)
       end
+      queue
+    end
+
+    def subscribe(queue, options = {}, &block)
+      queue.proc = block
       queue
     end
 

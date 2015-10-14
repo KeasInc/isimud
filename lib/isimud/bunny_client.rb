@@ -13,49 +13,45 @@ module Isimud
       @bunny_options = _bunny_options
     end
 
+    # Convenience method to find or create a queue, bind to the exchange, and subscribe to messages
     def bind(queue_name, exchange_name, *routing_keys, &block)
-      create_queue(queue_name, exchange_name,
-                   queue_options:     {durable: true},
-                   routing_keys:      routing_keys,
-                   subscribe_options: {manual_ack: true}, &block)
+      queue = create_queue(queue_name, exchange_name,
+                           queue_options: {durable: true},
+                           routing_keys:  routing_keys)
+      subscribe(queue, &block) if block_given?
     end
 
-    def create_queue(queue_name, exchange_name, options = {}, &block)
-      queue_options     = options[:queue_options] || {}
+    # Find or create a named queue and bind it to the specified exchange
+    def create_queue(queue_name, exchange_name, options = {})
+      queue_options     = options[:queue_options] || {durable: true}
       routing_keys      = options[:routing_keys] || []
-      subscribe_options = options[:subscribe_options] || {}
-      log "Isimud: create_queue #{queue_name}: queue_options=#{queue_options.inspect} routing_keys=#{routing_keys.join(',')} subscribe_options=#{subscribe_options.inspect}"
+      log "Isimud::BunnyClient: create_queue #{queue_name}: queue_options=#{queue_options.inspect}"
+      queue = find_queue(queue_name, queue_options)
+      bind_routing_keys(queue, exchange_name, routing_keys) if routing_keys.any?
+      queue
+    end
+
+    # Subscribe to messages on the named queue. Returns the consumer
+    def subscribe(queue, options = {manual_ack: true}, &block)
       current_channel = channel
-      queue           = find_queue(queue_name, queue_options)
-      bind_routing_keys(queue, exchange_name, routing_keys)
-      queue.subscribe(subscribe_options) do |delivery_info, properties, payload|
+      queue.subscribe(options) do |delivery_info, properties, payload|
         begin
-          log "Isimud: queue #{queue_name} received #{delivery_info.delivery_tag} routing_key: #{delivery_info.routing_key}"
-          Thread.current['isimud_queue_name']    = queue_name
+          log "Isimud: queue #{queue.name} received #{delivery_info.delivery_tag} routing_key: #{delivery_info.routing_key}"
+          Thread.current['isimud_queue_name']    = queue.name
           Thread.current['isimud_delivery_info'] = delivery_info
           Thread.current['isimud_properties']    = properties
           block.call(payload)
-          log "Isimud: queue #{queue_name} finished with #{delivery_info.delivery_tag}, acknowledging"
+          log "Isimud: queue #{queue.name} finished with #{delivery_info.delivery_tag}, acknowledging"
           current_channel.ack(delivery_info.delivery_tag)
         rescue => e
-          log("Isimud: queue #{queue_name} error processing #{delivery_info.delivery_tag} payload #{payload.inspect}: #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}", :warn)
+          log("Isimud: queue #{queue.name} error processing #{delivery_info.delivery_tag} payload #{payload.inspect}: #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}", :warn)
           current_channel.reject(delivery_info.delivery_tag, Isimud.retry_failures)
           exception_handler.try(:call, e)
         end
       end
-      queue
     end
 
-    # replace all bindings on a queue
-    def rebind(queue_name, exchange_name, routing_keys)
-      log "Isimud: rebinding queue #{queue_name} exchange #{exchange_name} routing_keys #{routing_keys.inspect}"
-      queue = find_queue(queue_name)
-      queue.unbind(exchange_name)
-      bind_routing_keys(queue, exchange_name, routing_keys)
-    rescue => e
-      log "Isimud: error rebinding #{queue_name} from #{exchange_name}: #{e.message}", :error
-    end
-
+    # Permanently delete the queue from the broker
     def delete_queue(queue_name)
       channel.queue_delete(queue_name)
     end
@@ -102,13 +98,15 @@ module Isimud
       connect
     end
 
-    private
-
     def find_queue(queue_name, options = {durable: true})
       channel.queue(queue_name, options)
     end
 
+    private
+
     def bind_routing_keys(queue, exchange_name, routing_keys)
+      log "Isimud::BunnyClient: bind queue #{queue.name} exchange #{exchange_name} routing_keys: #{routing_keys.join(',')}"
+      channel.exchange(exchange_name, type: :topic, durable: true)
       routing_keys.each { |key| queue.bind(exchange_name, routing_key: key, nowait: false) }
     end
 

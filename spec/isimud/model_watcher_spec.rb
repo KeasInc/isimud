@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe Isimud::ModelWatcher do
   let(:client) { Isimud.client }
+  let(:exchange) { Isimud.model_watcher_exchange }
 
   describe '.watch_attributes' do
     context 'default' do
@@ -35,7 +36,6 @@ describe Isimud::ModelWatcher do
 
 
           messages    = Array.new
-          exchange    = 'events'
           routing_key = 'test_schema.User.create'
 
           Isimud.client.bind('model_watcher_spec_create', exchange, routing_key) do |payload|
@@ -50,7 +50,6 @@ describe Isimud::ModelWatcher do
     context 'with default attributes' do
       it 'sends a create message with default attributes' do
         messages    = Array.new
-        exchange    = 'events'
         routing_key = 'test_schema.Company.create'
 
         Isimud.client.bind('model_watcher_spec_create_company', exchange, routing_key) do |payload|
@@ -59,7 +58,7 @@ describe Isimud::ModelWatcher do
         company = Company.new(name: 'Google', url: 'http://google.com')
         company.save!
         message = JSON.parse(messages.first)
-        expect(message['attributes'].keys).to eql(%w(name description url user_count active created_at updated_at))
+        expect(message['attributes'].keys).to eql(%w(name description url user_count active exchange_routing_keys points_per_user total_points created_at updated_at))
       end
 
     end
@@ -71,7 +70,7 @@ describe Isimud::ModelWatcher do
                       last_name:          'Feil',
                       encrypted_password: "itsasecret",
                       email:              'george.feil@keas.com')
-      user.stub(:isimud_synchronize?).and_return(false)
+      expect(user).to receive(:isimud_synchronize?).and_return(false)
       messages = Array.new
       Isimud.client.bind('model_watcher_spec_create', Isimud::ModelWatcher::DEFAULT_EXCHANGE, '*') do |payload|
         messages << payload
@@ -107,7 +106,7 @@ describe Isimud::ModelWatcher do
     before(:all) do
       @messages = Array.new
       Isimud.client.bind('model_watcher_spec_update',
-                         'events',
+                         Isimud.model_watcher_exchange,
                          'test_schema.User.update') do |payload|
         @messages << payload
       end
@@ -143,32 +142,27 @@ describe Isimud::ModelWatcher do
   end
 
   describe 'when destroying an instance' do
-    before(:all) do
+    before(:each) do
       @messages = Array.new
+      @user     = User.create!(first_name:         'Geo',
+                               last_name:          'Feil',
+                               encrypted_password: "itsasecret",
+                               email:              'george.feil@keas.com')
       Isimud.client.bind('model_watcher_spec_destroy',
-                         'events',
+                         exchange,
                          'test_schema.User.destroy') do |payload|
         @messages << payload
       end
     end
-    before(:each) do
-      @messages.clear
-    end
 
-    let!(:user) { User.create!(first_name:         'Geo',
-                               last_name:          'Feil',
-                               encrypted_password: "itsasecret",
-                               email:              'george.feil@keas.com') }
     it 'sends a destroy message' do
-      Timecop.freeze do
-        user.destroy
-        expected_message = {schema:    'test_schema',
-                            type:      'User',
-                            action:    :destroy,
-                            id:        user.id,
-                            timestamp: Time.now.utc}.to_json
-        expect(@messages).to include(expected_message)
-      end
+      @user.destroy
+      expected_message = {schema:    'test_schema',
+                          type:      'User',
+                          action:    :destroy,
+                          id:        @user.id,
+                          timestamp: @user.updated_at.utc}.to_json
+      expect(@messages).to include(expected_message)
     end
   end
 

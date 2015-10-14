@@ -5,7 +5,9 @@ class User < ActiveRecord::Base
 
   belongs_to :company
 
-  attr_accessor :events, :routing_keys
+  attr_accessor :events
+
+  serialize :keys, Array
 
   scope :active, -> {where('deactivated != ?', true)}
 
@@ -16,6 +18,10 @@ class User < ActiveRecord::Base
 
   def queue_prefix
     'test'
+  end
+
+  def routing_keys
+    keys
   end
 
   watch_attributes :key, :login_count
