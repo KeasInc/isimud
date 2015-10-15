@@ -13,7 +13,8 @@ module Isimud
         @proc         = proc
       end
 
-      def bind(exchange, routing_key)
+      def bind(exchange, opts = {})
+        routing_key = opts[:routing_key]
         log "TestClient: adding routing key #{routing_key} for exchange #{exchange} to queue #{name}"
         @bindings[exchange] << routing_key
       end
@@ -26,7 +27,8 @@ module Isimud
         @bindings.clear
       end
 
-      def unbind(exchange, routing_key)
+      def unbind(exchange, opts = {})
+        routing_key = opts[:routing_key]
         @bindings[exchange].delete(routing_key)
       end
 
@@ -83,9 +85,7 @@ module Isimud
       keys = options[:routing_keys] || []
       log "Isimud::TestClient: Binding queue #{queue_name} for keys #{keys.inspect}"
       queue = find_queue(queue_name)
-      keys.each do |k|
-        queue.bind(exchange_name, k)
-      end
+      keys.each {|k| queue.bind(exchange_name, routing_key: k)}
       queue.proc = method if block_given?
       queue
     end

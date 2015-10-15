@@ -183,7 +183,7 @@ module Isimud
         return if @observed_models.include?(observer_class)
         @observed_models << observer_class
         log "EventListener: registering observer class #{observer_class}"
-        observer_queue.bind(models_exchange, "#{Isimud.model_watcher_schema}.#{observer_class.base_class.name}.*")
+        observer_queue.bind(models_exchange, routing_key: "#{Isimud.model_watcher_schema}.#{observer_class.base_class.name}.*")
       end
     end
 

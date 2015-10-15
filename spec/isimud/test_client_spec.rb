@@ -31,7 +31,7 @@ describe Isimud::TestClient do
     end
 
     it 'removes a binding from the queue' do
-      queue.unbind('exchange_name', 'foo.bar')
+      queue.unbind('exchange_name', routing_key: 'foo.bar')
       expect( queue.bindings ).to eql('exchange_name' => Set.new(['baz.*.argle']))
     end
   end

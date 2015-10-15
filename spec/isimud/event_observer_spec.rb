@@ -29,8 +29,8 @@ describe Isimud::EventObserver do
 
     it 'creates observer queue' do
       expect(@client).to receive(:find_queue).and_return(@queue)
-      expect(@queue).to receive(:bind).with(@exchange, 'a.b.c')
-      expect(@queue).to receive(:bind).with(@exchange, 'd.*.f')
+      expect(@queue).to receive(:bind).with(@exchange, routing_key: 'a.b.c')
+      expect(@queue).to receive(:bind).with(@exchange, routing_key: 'd.*.f')
       User.create(user_params)
     end
 
@@ -62,15 +62,15 @@ describe Isimud::EventObserver do
 
       it 'binds new keys' do
         @user.keys << 'some_other_value'
-        expect(@queue).to receive(:bind).with(@exchange, 'some_other_value')
-        expect(@queue).not_to receive(:bind).with(@exchange, 'a.b.c')
+        expect(@queue).to receive(:bind).with(@exchange, routing_key: 'some_other_value')
+        expect(@queue).not_to receive(:bind).with(@exchange, routing_key: 'a.b.c')
         @user.save
       end
 
       it 'removes old keys' do
         @user.keys.delete('a.b.c')
-        expect(@queue).to receive(:unbind).with(@exchange, 'a.b.c')
-        expect(@queue).not_to receive(:unbind).with(@exchange, 'd.*.f')
+        expect(@queue).to receive(:unbind).with(@exchange, routing_key: 'a.b.c')
+        expect(@queue).not_to receive(:unbind).with(@exchange, routing_key: 'd.*.f')
         @user.save
       end
     end

@@ -83,8 +83,8 @@ module Isimud
       prev_keys    = routing_key_changes[0] || []
       current_keys = routing_key_changes[1] || []
       queue        = isimud_client.find_queue(event_queue_name)
-      (prev_keys - current_keys).each { |key| queue.unbind(exchange, key) }
-      (current_keys - prev_keys).each { |key| queue.bind(exchange, key) }
+      (prev_keys - current_keys).each { |key| queue.unbind(exchange, routing_key: key) }
+      (current_keys - prev_keys).each { |key| queue.bind(exchange, routing_key: key) }
     end
 
     def delete_queue
