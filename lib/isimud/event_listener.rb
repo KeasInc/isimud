@@ -160,7 +160,7 @@ module Isimud
     def register_observer(observer)
       @observer_mutex.synchronize do
         log "EventListener: registering observer #{observer.class} #{observer.id}"
-        @observers[observer_key_for(observer.class, observer.id)] = observer.observe_events(client, events_exchange)
+        @observers[observer_key_for(observer.class, observer.id)] = observer.observe_events(client)
       end
     end
 

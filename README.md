@@ -85,6 +85,8 @@ if they do not exist.
   store the current value of routing keys assoicated with an instance. The queue associated with an EventObserver is
   now created and updated at the same time the EventObserver is updated, rather than relying on the EventListener to
   create it.
+* EventObserver#observe_events now has only one parameter, the Isimud::Client instance. No queue bindings are done within
+  this method.
 * Client#bind has been refactored in order to separate concerns. A new method, #subscribe, is now used for subscribing
   to messages by linking a Proc.
 * Client#create_queue no longer accepts a block parameter and does not subscribe to messages.

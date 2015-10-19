@@ -90,7 +90,7 @@ describe Isimud::EventObserver do
   describe '#observe_events' do
     before do
       @user = User.create( user_params.merge(keys: ['model.Company.*.create']))
-      @user.observe_events(@client, @exchange)
+      @user.observe_events(@client)
     end
 
     it 'parses messages and dispatches to the handle_event method' do
