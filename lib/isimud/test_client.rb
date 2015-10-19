@@ -24,11 +24,14 @@ module Isimud
       end
 
       def delete(opts = {})
+        log "TestClient: delete queue #{name}"
         @bindings.clear
+        @proc = nil
       end
 
       def unbind(exchange, opts = {})
         routing_key = opts[:routing_key]
+        log "TestClient: removing routing key #{routing_key} for exchange #{exchange} from queue #{name}"
         @bindings[exchange].delete(routing_key)
       end
 
@@ -73,20 +76,27 @@ module Isimud
       queues.delete(queue_name)
     end
 
-    def bind(queue_name, exchange_name, *keys, &method)
-      create_queue(queue_name, exchange_name, routing_keys: keys, &method)
+    def bind(queue_name, exchange_name, *keys, &block)
+      queue = create_queue(queue_name, exchange_name, routing_keys: keys)
+      subscribe(queue, &block)
     end
 
     def find_queue(queue_name)
       queues[queue_name] ||= Queue.new(queue_name)
     end
 
-    def create_queue(queue_name, exchange_name, options = {}, &method)
+    def create_queue(queue_name, exchange_name, options = {})
       keys = options[:routing_keys] || []
       log "Isimud::TestClient: Binding queue #{queue_name} for keys #{keys.inspect}"
       queue = find_queue(queue_name)
-      keys.each {|k| queue.bind(exchange_name, routing_key: k)}
-      queue.proc = method if block_given?
+      keys.each do |k|
+        queue.bind(exchange_name, routing_key: k)
+      end
+      queue
+    end
+
+    def subscribe(queue, options = {}, &block)
+      queue.proc = block
       queue
     end
 

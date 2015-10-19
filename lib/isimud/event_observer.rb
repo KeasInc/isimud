@@ -53,7 +53,7 @@ module Isimud
 
     # Create or attach to a queue on the specified exchange. When an event message that matches the observer's routing keys
     # is received, parse the event and call handle_event on same.
-    # Returns the queue for the observer
+    # Returns the consumer for the observer
     def observe_events(client, default_exchange)
       client.bind(event_queue_name, observed_exchange || default_exchange) do |message|
         event = Event.parse(message)
@@ -74,11 +74,12 @@ module Isimud
     def create_queue
       exchange = observed_exchange || Isimud.events_exchange
       log "Isimud::EventObserver: creating queue #{event_queue_name} on exchange #{exchange} with bindings [#{exchange_routing_keys.join(',')}]"
-      isimud_client.bind(event_queue_name, exchange, *exchange_routing_keys)
+      isimud_client.create_queue(event_queue_name, exchange, routing_keys: exchange_routing_keys)
     end
 
     def update_queue
-      return unless routing_key_changes = previous_changes[:exchange_routing_keys]
+      routing_key_changes = previous_changes[:exchange_routing_keys]
+      return unless routing_key_changes
       exchange     = observed_exchange || Isimud.events_exchange
       prev_keys    = routing_key_changes[0] || []
       current_keys = routing_key_changes[1] || []

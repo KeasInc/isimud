@@ -42,10 +42,11 @@ describe Isimud::EventObserver do
 
   describe 'when modified' do
     before do
-      @queue = double(:queue)
       @exchange = Isimud.events_exchange
       @user = User.create( user_params )
+      @queue = @client.find_queue(@user.event_queue_name)
     end
+
     context 'when the change does not affect the routing keys' do
       before do
         expect(@client).not_to receive(:find_queue)
@@ -56,22 +57,20 @@ describe Isimud::EventObserver do
     end
 
     context 'when the change does affect the routing keys' do
-      before do
-        expect(@client).to receive(:find_queue).and_return(@queue)
-      end
-
       it 'binds new keys' do
+        expect(@queue).to receive(:bind).with(@exchange, routing_key: 'some_other_value').and_call_original
+        expect(@queue).not_to receive(:bind).with(@exchange, routing_key: 'a.b.c').and_call_original
+        @user.transaction do
         @user.keys << 'some_other_value'
-        expect(@queue).to receive(:bind).with(@exchange, routing_key: 'some_other_value')
-        expect(@queue).not_to receive(:bind).with(@exchange, routing_key: 'a.b.c')
-        @user.save
+        @user.save!
+        end
       end
 
       it 'removes old keys' do
-        @user.keys.delete('a.b.c')
         expect(@queue).to receive(:unbind).with(@exchange, routing_key: 'a.b.c')
         expect(@queue).not_to receive(:unbind).with(@exchange, routing_key: 'd.*.f')
-        @user.save
+        @user.keys.delete('a.b.c')
+        @user.save!
       end
     end
   end

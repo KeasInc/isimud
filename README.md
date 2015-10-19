@@ -84,7 +84,10 @@ if they do not exist.
 * EventObserver instances are now required to have the persistent attribute /exchange_routing_keys/. These are used to
   store the current value of routing keys assoicated with an instance. The queue associated with an EventObserver is
   now created and updated at the same time the EventObserver is updated, rather than relying on the EventListener to
-  create it. 
+  create it.
+* Client#bind has been refactored in order to separate concerns. A new method, #subscribe, is now used for subscribing
+  to messages by linking a Proc.
+* Client#create_queue no longer accepts a block parameter and does not subscribe to messages.
 * Removed Client#rebind.
 
 #### Other Changes:

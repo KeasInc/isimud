@@ -62,6 +62,9 @@ module Isimud
 
     # Override this method to set up message observers
     def bind_queues
+      client.subscribe(observer_queue) do |payload|
+        handle_observer_event(payload)
+      end
       Isimud::EventObserver.observed_models.each do |model_class|
         log "EventListener: registering observers for #{model_class}"
         register_observer_class(model_class)
@@ -152,7 +155,8 @@ module Isimud
       end
     end
 
-    # Create and bind a queue for the observer. Also ensure that we are listening for observer class update events
+    # Register an observer instance, and start listening for events on its associated queue.
+    # Also ensure that we are listening for observer class update events
     def register_observer(observer)
       @observer_mutex.synchronize do
         log "EventListener: registering observer #{observer.class} #{observer.id}"
@@ -160,7 +164,7 @@ module Isimud
       end
     end
 
-    # Delete a queue for an observer. This also purges all messages associated with it
+    # Unregister an observer instance, and cancel consumption of messages. Any pre-fetched messages will be returned to the queue.
     def unregister_observer(observer_class, observer_id)
       @observer_mutex.synchronize do
         log "EventListener: un-registering observer #{observer_class} #{observer_id}"
@@ -174,7 +178,7 @@ module Isimud
     def observer_queue
       @observer_queue ||= client.create_queue("#{name}.listener.#{Process.pid}", models_exchange,
                                               queue_options:      {exclusive: true},
-                                              subscribe_options:  {manual_ack: true}, &method(:handle_observer_event))
+                                              subscribe_options:  {manual_ack: true})
     end
 
     # Register the observer class watcher

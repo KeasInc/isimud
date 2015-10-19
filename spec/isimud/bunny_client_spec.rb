@@ -36,7 +36,7 @@ describe Isimud::BunnyClient do
 
     context 'when a block is passed to the call' do
       it 'binds specified routing keys and subscribes to the specified exchange' do
-        queue = double('queue', bind: 'ok')
+        queue = double('queue', name: 'my_queue', bind: 'ok')
         expect(client).to receive(:find_queue).with('my_queue', durable: true).and_return(queue)
         expect(queue).to receive(:subscribe).with({manual_ack: true})
         keys.each { |key| expect(queue).to receive(:bind).with(@exchange_name, routing_key: key, nowait: false).once }
@@ -46,7 +46,7 @@ describe Isimud::BunnyClient do
 
     context 'when a block is NOT passed' do
       it 'binds specified routing keys BUT does not subscribes to the specified exchange' do
-        queue = double('queue', bind: 'ok')
+        queue = double('queue', name: 'my_queue', bind: 'ok')
         expect(client).to receive(:find_queue).with('my_queue', durable: true).and_return(queue)
         expect(queue).not_to receive(:subscribe).with(manual_ack: true)
         keys.each { |key| expect(queue).to receive(:bind).with(@exchange_name, routing_key: key, nowait: false).once }
