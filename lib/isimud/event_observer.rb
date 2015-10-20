@@ -55,7 +55,7 @@ module Isimud
     # is received, parse the event and call handle_event on same.
     # Returns the consumer for the observer
     def observe_events(client)
-      queue = client.find_queue(event_queue_name)
+      queue = client.kind_of?(Isimud::TestClient) ? create_queue(client) : client.find_queue(event_queue_name)
       client.subscribe(queue) do |message|
         event = Event.parse(message)
         handle_event(event)
@@ -72,10 +72,10 @@ module Isimud
 
     private
 
-    def create_queue
+    def create_queue(client = isimud_client)
       exchange = observed_exchange || Isimud.events_exchange
       log "Isimud::EventObserver: creating queue #{event_queue_name} on exchange #{exchange} with bindings [#{exchange_routing_keys.join(',')}]"
-      isimud_client.create_queue(event_queue_name, exchange, routing_keys: exchange_routing_keys)
+      client.create_queue(event_queue_name, exchange, routing_keys: exchange_routing_keys)
     end
 
     def update_queue
