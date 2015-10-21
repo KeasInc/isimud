@@ -21,13 +21,13 @@ module Isimud
     end
 
     included do
-      include Isimud::ModelWatcher unless self.include?(Isimud::ModelWatcher)
       register_class
       before_save :set_routing_keys
       serialize :exchange_routing_keys, Array
-      after_commit :create_queue, on: :create
-      after_commit :update_queue, on: :update
-      after_commit :delete_queue, on: :destroy
+      after_commit :create_queue, on: :create, if: :enable_listener?, prepend: true
+      after_commit :update_queue, on: :update, prepend: true
+      after_commit :delete_queue, on: :destroy, prepend: true
+      include Isimud::ModelWatcher unless self.include?(Isimud::ModelWatcher)
     end
 
     # Event handling hook. Override in your class.
@@ -45,8 +45,7 @@ module Isimud
       true
     end
 
-    # Exchange used for listening to events. Override in your subclass if you want to specify an alternative exchange for
-    # events. Otherwise
+    # Exchange used for listening to events. Override in your subclass if you want to specify an alternative exchange.
     def observed_exchange
       nil
     end
@@ -55,6 +54,7 @@ module Isimud
     # is received, parse the event and call handle_event on same.
     # Returns the consumer for the observer
     def observe_events(client)
+      return unless enable_listener?
       queue = client.kind_of?(Isimud::TestClient) ? create_queue(client) : client.find_queue(event_queue_name)
       client.subscribe(queue) do |message|
         event = Event.parse(message)
@@ -79,14 +79,18 @@ module Isimud
     end
 
     def update_queue
-      routing_key_changes = previous_changes[:exchange_routing_keys]
-      return unless routing_key_changes
-      exchange     = observed_exchange || Isimud.events_exchange
-      prev_keys    = routing_key_changes[0] || []
-      current_keys = routing_key_changes[1] || []
-      queue        = isimud_client.find_queue(event_queue_name)
-      (prev_keys - current_keys).each { |key| queue.unbind(exchange, routing_key: key) }
-      (current_keys - prev_keys).each { |key| queue.bind(exchange, routing_key: key) }
+      if enable_listener?
+        routing_key_changes = previous_changes[:exchange_routing_keys]
+        return unless routing_key_changes
+        exchange     = observed_exchange || Isimud.events_exchange
+        prev_keys    = routing_key_changes[0] || []
+        current_keys = routing_key_changes[1] || []
+        queue        = isimud_client.find_queue(event_queue_name)
+        (prev_keys - current_keys).each { |key| queue.unbind(exchange, routing_key: key) }
+        (current_keys - prev_keys).each { |key| queue.bind(exchange, routing_key: key) }
+      else
+        isimud_client.delete_queue(event_queue_name)
+      end
     end
 
     def delete_queue
