@@ -48,7 +48,7 @@ module Isimud
           @proc.try(:call, data)
         rescue => e
           log "TestClient: error delivering message: #{e.message}\n  #{e.backtrace.join("\n  ")}", :error
-          exception_handler.try(:call, e)
+          run_exception_handlers(e)
         end
       end
     end

@@ -3,8 +3,6 @@ module Isimud
   class Client
     include Isimud::Logging
 
-    attr_reader :exception_handler
-
     def initialize(server = nil, options = nil)
     end
 
@@ -30,7 +28,11 @@ module Isimud
     end
 
     def on_exception(&block)
-      @exception_handler = block
+      exception_handlers << block
+    end
+
+    def run_exception_handlers(exception)
+      exception_handlers.each{|handler| handler.call(exception)}
     end
 
     def publish(exchange, routing_key, payload)
@@ -43,6 +45,12 @@ module Isimud
     end
 
     def subscribe(queue, options = {}, &block)
+    end
+
+    private
+
+    def exception_handlers
+      @exception_handlers ||= Array.new
     end
   end
 end

@@ -46,7 +46,7 @@ module Isimud
         rescue => e
           log("Isimud: queue #{queue.name} error processing #{delivery_info.delivery_tag} payload #{payload.inspect}: #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}", :warn)
           current_channel.reject(delivery_info.delivery_tag, Isimud.retry_failures)
-          exception_handler.try(:call, e)
+          run_exception_handlers(e)
         end
       end
     end
