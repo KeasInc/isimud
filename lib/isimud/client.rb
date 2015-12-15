@@ -21,10 +21,15 @@ module Isimud
     def connected?
     end
 
+    # Find or create a named queue and bind it to the specified exchange
     def create_queue(queue_name, exchange_name, options = {})
     end
 
     def delete_queue(queue_name)
+    end
+
+    # Look up a queue by name, or create it if it does not already exist.
+    def find_queue(queue_name, options = {})
     end
 
     def on_exception(&block)

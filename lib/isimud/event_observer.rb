@@ -70,6 +70,14 @@ module Isimud
       Isimud.client
     end
 
+    # Activate the queues for an observer. This will create the observer queue and send an update message on the
+    # instance, which will trigger EventListener instances to set up consumers. This is useful for situations when
+    # an observer is to be made active without an update.
+    def activate_observer(client = isimud_client)
+      create_queue(client)
+      isimud_send_action_message(:update)
+    end
+
     private
 
     def create_queue(client = isimud_client)
@@ -81,13 +89,12 @@ module Isimud
     def update_queue
       if enable_listener?
         routing_key_changes = previous_changes[:exchange_routing_keys]
-        return unless routing_key_changes
-        exchange     = observed_exchange || Isimud.events_exchange
-        prev_keys    = routing_key_changes[0] || []
-        current_keys = routing_key_changes[1] || []
+        prev_keys    = routing_key_changes.try(:[], 0) || []
+        current_keys = routing_key_changes.try(:[], 1) || exchange_routing_keys
         queue        = isimud_client.find_queue(event_queue_name)
+        exchange     = observed_exchange || Isimud.events_exchange
         (prev_keys - current_keys).each { |key| queue.unbind(exchange, routing_key: key) }
-        (current_keys - prev_keys).each { |key| queue.bind(exchange, routing_key: key) }
+        (current_keys).each { |key| queue.bind(exchange, routing_key: key) }
       else
         isimud_client.delete_queue(event_queue_name)
       end

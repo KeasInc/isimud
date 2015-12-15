@@ -24,6 +24,10 @@ class User < ActiveRecord::Base
     keys
   end
 
+  def enable_listener?
+    !deactivated
+  end
+
   watch_attributes :key, :login_count
 
   def key

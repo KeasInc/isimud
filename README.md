@@ -77,6 +77,13 @@ if they do not exist.
 
 ## Changes
 
+### 1.2.0
+
+* EventObserver#update_queue now always binds current routing keys. This ensures that when an enable_listener? changes
+  state from false to true during an update, all bindings for the queue are established.
+* Add EventObserver#activate_observer(), which creates and binds a queue for an observer instance on demand.
+* Add declaration for Client#find_queue, and normalize the method signature for subclasses.
+
 ### 1.1.0
 
 * Clients now support multiple exception handlers. Each call to Client#on_exception will add a new block to the

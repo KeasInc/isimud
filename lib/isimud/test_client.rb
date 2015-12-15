@@ -81,7 +81,7 @@ module Isimud
       subscribe(queue, &block)
     end
 
-    def find_queue(queue_name)
+    def find_queue(queue_name, options = {})
       queues[queue_name] ||= Queue.new(queue_name)
     end
 

@@ -9,10 +9,11 @@ describe Isimud::EventObserver do
   #let(:client) { Isimud.client }
   let(:exchange_name) { 'events' }
   let(:company) { Company.create!(name: 'Keas', description: 'Health Engagement Platform', url: 'http://keas.com') }
+  let(:keys) { %w(a.b.c d.*.f) }
   let(:user_params) { {first_name:         'Geo',
                        last_name:          'Feil',
                        encrypted_password: "itsasecret",
-                       keys:               %w(a.b.c d.*.f),
+                       keys:               keys,
                        email:              'george.feil@keas.com'} }
   let(:time) { 1.hour.ago }
   let(:params) { {'a' => 'foo', 'b' => 123} }
@@ -23,15 +24,19 @@ describe Isimud::EventObserver do
 
   describe 'when created' do
     before do
-      @queue = double(:queue)
+      @queue    = double(:queue)
       @exchange = Isimud.events_exchange
     end
 
     it 'creates observer queue' do
       expect(@client).to receive(:find_queue).and_return(@queue)
-      expect(@queue).to receive(:bind).with(@exchange, routing_key: 'a.b.c')
-      expect(@queue).to receive(:bind).with(@exchange, routing_key: 'd.*.f')
+      keys.each { |key| expect(@queue).to receive(:bind).with(@exchange, routing_key: key) }
       User.create(user_params)
+    end
+
+    it 'does not create observer queue when listener is not enabled' do
+      expect(@client).not_to receive(:create_queue)
+      User.create(user_params.merge(deactivated: true))
     end
 
     it 'sets exchange_routing_keys' do
@@ -43,26 +48,41 @@ describe Isimud::EventObserver do
   describe 'when modified' do
     before do
       @exchange = Isimud.events_exchange
-      @user = User.create( user_params )
-      @queue = @client.find_queue(@user.event_queue_name)
     end
 
-    context 'when the change does not affect the routing keys' do
+    context 'for an instance that is made active on update' do
       before do
-        expect(@client).not_to receive(:find_queue)
+        @user  = User.create(user_params.merge(deactivated: true))
+        @queue = @client.find_queue(@user.event_queue_name)
       end
-      it 'should NOT touch the queue called' do
-        @user.update_attributes({:first_name =>'bettar name'})
+
+      it 'creates the queue' do
+        expect(@client).to receive(:find_queue).with(@user.event_queue_name).and_call_original
+        @user.update_attributes(deactivated: false)
+      end
+
+      it 'binds the routing keys' do
+        @user.exchange_routing_keys.each do |k|
+          expect(@queue).to receive(:bind).with(@exchange, routing_key: k).and_call_original
+        end
+        @user.update_attributes(deactivated: false)
       end
     end
 
-    context 'when the change does affect the routing keys' do
+    context 'for an already active instance' do
+      before do
+        @user  = User.create(user_params)
+        @queue = @client.find_queue(@user.event_queue_name)
+      end
+
       it 'binds new keys' do
+        @user.exchange_routing_keys.each do |k|
+          expect(@queue).to receive(:bind).with(@exchange, routing_key: k).and_call_original
+        end
         expect(@queue).to receive(:bind).with(@exchange, routing_key: 'some_other_value').and_call_original
-        expect(@queue).not_to receive(:bind).with(@exchange, routing_key: 'a.b.c').and_call_original
         @user.transaction do
-        @user.keys << 'some_other_value'
-        @user.save!
+          @user.keys << 'some_other_value'
+          @user.save!
         end
       end
 
@@ -78,7 +98,7 @@ describe Isimud::EventObserver do
   describe 'when destroyed' do
     before do
       @exchange = Isimud.events_exchange
-      @user = User.create( user_params )
+      @user     = User.create(user_params)
     end
 
     it 'removes the queue' do
@@ -89,7 +109,7 @@ describe Isimud::EventObserver do
 
   describe '#observe_events' do
     before do
-      @user = User.create( user_params.merge(keys: ['model.Company.*.create']))
+      @user = User.create(user_params.merge(keys: ['model.Company.*.create']))
       @user.observe_events(@client)
     end
 

@@ -98,6 +98,7 @@ module Isimud
       connect
     end
 
+    # Look up a queue by name, or create it if it does not already exist.
     def find_queue(queue_name, options = {durable: true})
       channel.queue(queue_name, options)
     end
