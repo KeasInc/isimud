@@ -157,11 +157,12 @@ describe Isimud::ModelWatcher do
 
     it 'sends a destroy message' do
       @user.destroy
-      expected_message = {schema:    'test_schema',
-                          type:      'User',
-                          action:    :destroy,
-                          id:        @user.id,
-                          timestamp: @user.updated_at.utc}.to_json
+      expected_message = {schema:     'test_schema',
+                          type:       'User',
+                          action:     :destroy,
+                          id:         @user.id,
+                          timestamp:  @user.updated_at.utc,
+                          attributes: {:key => @user.key, :login_count => @user.login_count}}.to_json
       expect(@messages).to include(expected_message)
     end
   end

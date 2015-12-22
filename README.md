@@ -77,6 +77,10 @@ if they do not exist.
 
 ## Changes
 
+### 1.2.1
+
+* Include attributes in ModelWatcher destroy message
+
 ### 1.2.0
 
 * EventObserver#update_queue now always binds current routing keys. This ensures that when an enable_listener? changes
