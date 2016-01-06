@@ -490,7 +490,7 @@ a return value may be included in the list of attributes.</p>
       <pre class="code"><span class="info file"># File 'lib/isimud/model_watcher.rb', line 32</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_watch_attributes'>watch_attributes</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_attributes'>attributes</span><span class='rparen'>)</span>
-  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_isimud_watch_attributes'>isimud_watch_attributes</span> <span class='op'>=</span> <span class='id identifier rubyid_attributes'>attributes</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:to_sym</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_attributes'>attributes</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_isimud_watch_attributes'>isimud_watch_attributes</span> <span class='op'>=</span> <span class='id identifier rubyid_attributes'>attributes</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:to_s</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_attributes'>attributes</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -502,9 +502,9 @@ a return value may be included in the list of attributes.</p>
 </div>
 
     <div id="footer">
-  Generated on Fri Apr  3 09:28:08 2015 by
+  Generated on Wed Jan  6 14:39:27 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.6 (ruby-2.2.1).
+  0.8.7.6 (ruby-2.2.3).
 </div>
 
   </body>

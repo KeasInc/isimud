@@ -77,6 +77,14 @@ if they do not exist.
 
 ## Changes
 
+### 1.3.0
+
+* Added a new method, EventListener#bind_event_queues() for registering custom event handlers. Override
+  this method instead of bind_queues() to bind custom queues not handled by EventObserver instances.
+* Add local host name to the EventListener observer queue to avoid possible collisions caused by processes on different
+  hosts sharing the same PID.
+* Added lots of documentation.
+
 ### 1.2.1
 
 * Include attributes in ModelWatcher destroy message

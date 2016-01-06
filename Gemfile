@@ -6,6 +6,7 @@ gemspec
 gem 'activesupport', '4.1.4'
 gem 'bundler', '~> 1.6'
 gem 'rake'
+gem 'yard'
 
 group :development, :test do
   gem 'awesome_print'

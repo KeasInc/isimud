@@ -101,7 +101,26 @@
 </dl>
 <div class="clear"></div>
 
-<h2>Defined Under Namespace</h2>
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>Interface for a messaging client that is suitable for testing. No network
+connections are involved. Note that all message deliveries are handled in a
+synchronous manner. When a message is published to the client, each
+declared queue is examined and, if the message&#39;s routing key matches
+any of the patterns bound to the queue, the queue&#39;s block is called
+with the message. Any uncaught exceptions raised within a message
+processing block will cause any declared exception handlers to be run.
+However, the message will not be re-placed onto the queue should this
+occur.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><h2>Defined Under Namespace</h2>
 <p class="children">
   
     
@@ -117,35 +136,6 @@
 
   <h2>Instance Attribute Summary <small>(<a href="#" class="summary_toggle">collapse</a>)</small></h2>
   <ul class="summary">
-    
-      <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#exception_handler-instance_method" title="#exception_handler (instance method)">- (Object) <strong>exception_handler</strong>(&amp;block) </a>
-    
-
-    
-  </span>
-  
-  
-  
-    
-      <span class="note title readonly">readonly</span>
-    
-    
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute exception_handler.</p>
-</div></span>
-  
-</li>
-
     
       <li class="public ">
   <span class="summary_signature">
@@ -190,7 +180,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#bind-instance_method" title="#bind (instance method)">- (Object) <strong>bind</strong>(queue_name, exchange_name, *keys, &amp;method) </a>
+      <a href="#bind-instance_method" title="#bind (instance method)">- (Object) <strong>bind</strong>(queue_name, exchange_name, *keys, &amp;block) </a>
     
 
     
@@ -300,7 +290,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#create_queue-instance_method" title="#create_queue (instance method)">- (Object) <strong>create_queue</strong>(queue_name, exchange_name, options = {}, &amp;method) </a>
+      <a href="#create_queue-instance_method" title="#create_queue (instance method)">- (Object) <strong>create_queue</strong>(queue_name, exchange_name, options = {}) </a>
     
 
     
@@ -344,7 +334,29 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">- (TestClient) <strong>initialize</strong>(connection = nil, options = nil) </a>
+      <a href="#find_queue-instance_method" title="#find_queue (instance method)">- (Object) <strong>find_queue</strong>(queue_name, options = {}) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">- (TestClient) <strong>initialize</strong>(connection = nil, options = {}) </a>
     
 
     
@@ -363,28 +375,6 @@
     <span class="summary_desc"><div class='inline'>
 <p>A new instance of TestClient.</p>
 </div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#logger-instance_method" title="#logger (instance method)">- (Object) <strong>logger</strong> </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -455,6 +445,28 @@
 </li>
 
       
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#subscribe-instance_method" title="#subscribe (instance method)">- (Object) <strong>subscribe</strong>(queue, options = {}, &amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
     </ul>
   
 
@@ -467,6 +479,11 @@
   
   
   
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="Client.html" title="Isimud::Client (class)">Client</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Client.html#on_exception-instance_method" title="Isimud::Client#on_exception (method)">#on_exception</a></span>, <span class='object_link'><a href="Client.html#run_exception_handlers-instance_method" title="Isimud::Client#run_exception_handlers (method)">#run_exception_handlers</a></span></p>
+
+  
+  
   
   
   
@@ -474,14 +491,14 @@
   
   
   <h3 class="inherited">Methods included from <span class='object_link'><a href="Logging.html" title="Isimud::Logging (module)">Logging</a></span></h3>
-  <p class="inherited"><span class='object_link'><a href="Logging.html#log-instance_method" title="Isimud::Logging#log (method)">#log</a></span></p>
+  <p class="inherited"><span class='object_link'><a href="Logging.html#log-instance_method" title="Isimud::Logging#log (method)">#log</a></span>, <span class='object_link'><a href="Logging.html#logger-instance_method" title="Isimud::Logging#logger (method)">#logger</a></span></p>
 <div id="constructor_details" class="method_details_list">
   <h2>Constructor Details</h2>
   
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    - (<tt><span class='object_link'><a href="" title="Isimud::TestClient (class)">TestClient</a></span></tt>) <strong>initialize</strong>(connection = nil, options = nil) 
+    - (<tt><span class='object_link'><a href="" title="Isimud::TestClient (class)">TestClient</a></span></tt>) <strong>initialize</strong>(connection = nil, options = {}) 
   
 
   
@@ -504,14 +521,14 @@
       <pre class="lines">
 
 
-34
-35
-36</pre>
+63
+64
+65</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 34</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 63</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_connection'>connection</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_connection'>connection</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_queues'>queues</span> <span class='op'>=</span> <span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -525,52 +542,9 @@
     <h2>Instance Attribute Details</h2>
     
       
-      <span id=""></span>
-      <div class="method_details first">
-  <h3 class="signature first" id="exception_handler-instance_method">
-  
-    - (<tt>Object</tt>) <strong>exception_handler</strong>(&amp;block)  <span class="extras">(readonly)</span>
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    
-<p>Returns the value of attribute exception_handler</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-4
-5
-6</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 4</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_exception_handler'>exception_handler</span>
-  <span class='ivar'>@exception_handler</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
-      
       <span id="queues=-instance_method"></span>
-      <div class="method_details ">
-  <h3 class="signature " id="queues-instance_method">
+      <div class="method_details first">
+  <h3 class="signature first" id="queues-instance_method">
   
     - (<tt>Object</tt>) <strong>queues</strong> 
   
@@ -595,12 +569,12 @@
       <pre class="lines">
 
 
-3
-4
-5</pre>
+10
+11
+12</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 3</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 10</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_queues'>queues</span>
   <span class='ivar'>@queues</span>
@@ -620,7 +594,7 @@
       <div class="method_details first">
   <h3 class="signature first" id="bind-instance_method">
   
-    - (<tt>Object</tt>) <strong>bind</strong>(queue_name, exchange_name, *keys, &amp;method) 
+    - (<tt>Object</tt>) <strong>bind</strong>(queue_name, exchange_name, *keys, &amp;block) 
   
 
   
@@ -632,15 +606,17 @@
       <pre class="lines">
 
 
-57
-58
-59</pre>
+86
+87
+88
+89</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 57</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 86</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_bind'>bind</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='comma'>,</span> <span class='id identifier rubyid_exchange_name'>exchange_name</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_keys'>keys</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_method'>method</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_create_queue'>create_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='comma'>,</span> <span class='id identifier rubyid_exchange_name'>exchange_name</span><span class='comma'>,</span> <span class='label'>routing_keys:</span> <span class='id identifier rubyid_keys'>keys</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_method'>method</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_bind'>bind</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='comma'>,</span> <span class='id identifier rubyid_exchange_name'>exchange_name</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_keys'>keys</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_queue'>queue</span> <span class='op'>=</span> <span class='id identifier rubyid_create_queue'>create_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='comma'>,</span> <span class='id identifier rubyid_exchange_name'>exchange_name</span><span class='comma'>,</span> <span class='label'>routing_keys:</span> <span class='id identifier rubyid_keys'>keys</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_subscribe'>subscribe</span><span class='lparen'>(</span><span class='id identifier rubyid_queue'>queue</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -662,12 +638,12 @@
       <pre class="lines">
 
 
-42
-43
-44</pre>
+71
+72
+73</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 42</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 71</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_channel'>channel</span>
   <span class='kw'>self</span>
@@ -692,11 +668,11 @@
       <pre class="lines">
 
 
-50
-51</pre>
+79
+80</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 50</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 79</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_close'>close</span>
 <span class='kw'>end</span></pre>
@@ -720,12 +696,12 @@
       <pre class="lines">
 
 
-38
-39
-40</pre>
+67
+68
+69</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 38</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 67</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_connect'>connect</span>
   <span class='kw'>self</span>
@@ -772,12 +748,12 @@
       <pre class="lines">
 
 
-46
-47
-48</pre>
+75
+76
+77</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 46</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 75</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_connected?'>connected?</span>
   <span class='kw'>true</span>
@@ -790,7 +766,7 @@
       <div class="method_details ">
   <h3 class="signature " id="create_queue-instance_method">
   
-    - (<tt>Object</tt>) <strong>create_queue</strong>(queue_name, exchange_name, options = {}, &amp;method) 
+    - (<tt>Object</tt>) <strong>create_queue</strong>(queue_name, exchange_name, options = {}) 
   
 
   
@@ -802,23 +778,23 @@
       <pre class="lines">
 
 
-61
-62
-63
-64
-65
-66
-67
-68
-69</pre>
+95
+96
+97
+98
+99
+100
+101
+102
+103</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 61</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 95</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_create_queue'>create_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='comma'>,</span> <span class='id identifier rubyid_exchange_name'>exchange_name</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_method'>method</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_create_queue'>create_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='comma'>,</span> <span class='id identifier rubyid_exchange_name'>exchange_name</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_keys'>keys</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:routing_keys</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='id identifier rubyid_log'>log</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Isimud::TestClient: Binding queue </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='embexpr_end'>}</span><span class='tstring_content'> for keys </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_queue'>queue</span> <span class='op'>=</span> <span class='id identifier rubyid_queues'>queues</span><span class='lbracket'>[</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='const'>Queue</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='comma'>,</span> <span class='id identifier rubyid_method'>method</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_queue'>queue</span> <span class='op'>=</span> <span class='id identifier rubyid_find_queue'>find_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_k'>k</span><span class='op'>|</span>
     <span class='id identifier rubyid_queue'>queue</span><span class='period'>.</span><span class='id identifier rubyid_bind'>bind</span><span class='lparen'>(</span><span class='id identifier rubyid_exchange_name'>exchange_name</span><span class='comma'>,</span> <span class='label'>routing_key:</span> <span class='id identifier rubyid_k'>k</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
@@ -844,12 +820,12 @@
       <pre class="lines">
 
 
-53
-54
-55</pre>
+82
+83
+84</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 53</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 82</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_delete_queue'>delete_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_queues'>queues</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='rparen'>)</span>
@@ -860,9 +836,9 @@
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="logger-instance_method">
+  <h3 class="signature " id="find_queue-instance_method">
   
-    - (<tt>Object</tt>) <strong>logger</strong> 
+    - (<tt>Object</tt>) <strong>find_queue</strong>(queue_name, options = {}) 
   
 
   
@@ -874,15 +850,15 @@
       <pre class="lines">
 
 
+91
 92
-93
-94</pre>
+93</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 92</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 91</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_logger'>logger</span>
-  <span class='const'>Isimud</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_find_queue'>find_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_queues'>queues</span><span class='lbracket'>[</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='const'>Queue</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -904,24 +880,24 @@
       <pre class="lines">
 
 
-71
-72
-73
-74
-75
-76
-77
-78</pre>
+110
+111
+112
+113
+114
+115
+116
+117</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 71</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 110</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_publish'>publish</span><span class='lparen'>(</span><span class='id identifier rubyid_exchange'>exchange</span><span class='comma'>,</span> <span class='id identifier rubyid_routing_key'>routing_key</span><span class='comma'>,</span> <span class='id identifier rubyid_payload'>payload</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_log'>log</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Isimud::TestClient: Delivering message key: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_routing_key'>routing_key</span><span class='embexpr_end'>}</span><span class='tstring_content'> payload: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_payload'>payload</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_call_queues'>call_queues</span> <span class='op'>=</span> <span class='id identifier rubyid_queues'>queues</span><span class='period'>.</span><span class='id identifier rubyid_values'>values</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_queue'>queue</span><span class='op'>|</span> <span class='id identifier rubyid_queue'>queue</span><span class='period'>.</span><span class='id identifier rubyid_has_matching_key?'>has_matching_key?</span><span class='lparen'>(</span><span class='id identifier rubyid_routing_key'>routing_key</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_log'>log</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Isimud::TestClient: Delivering message exchange: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_exchange'>exchange</span><span class='embexpr_end'>}</span><span class='tstring_content'> key: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_routing_key'>routing_key</span><span class='embexpr_end'>}</span><span class='tstring_content'> payload: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_payload'>payload</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_call_queues'>call_queues</span> <span class='op'>=</span> <span class='id identifier rubyid_queues'>queues</span><span class='period'>.</span><span class='id identifier rubyid_values'>values</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_queue'>queue</span><span class='op'>|</span> <span class='id identifier rubyid_queue'>queue</span><span class='period'>.</span><span class='id identifier rubyid_has_matching_key?'>has_matching_key?</span><span class='lparen'>(</span><span class='id identifier rubyid_exchange'>exchange</span><span class='comma'>,</span> <span class='id identifier rubyid_routing_key'>routing_key</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
   <span class='id identifier rubyid_call_queues'>call_queues</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_queue'>queue</span><span class='op'>|</span>
     <span class='id identifier rubyid_log'>log</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Isimud::TestClient: Queue </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_queue'>queue</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> matches routing key </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_routing_key'>routing_key</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
-    <span class='id identifier rubyid_queue'>queue</span><span class='period'>.</span><span class='id identifier rubyid_publish'>publish</span><span class='lparen'>(</span><span class='id identifier rubyid_payload'>payload</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_queue'>queue</span><span class='period'>.</span><span class='id identifier rubyid_deliver'>deliver</span><span class='lparen'>(</span><span class='id identifier rubyid_payload'>payload</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -944,12 +920,12 @@
       <pre class="lines">
 
 
-88
-89
-90</pre>
+123
+124
+125</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 88</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 123</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_reconnect'>reconnect</span>
   <span class='kw'>self</span>
@@ -974,15 +950,47 @@
       <pre class="lines">
 
 
-84
-85
-86</pre>
+119
+120
+121</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 84</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 119</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_reset'>reset</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_queues'>queues</span><span class='period'>.</span><span class='id identifier rubyid_clear'>clear</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="subscribe-instance_method">
+  
+    - (<tt>Object</tt>) <strong>subscribe</strong>(queue, options = {}, &amp;block) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+105
+106
+107
+108</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 105</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_subscribe'>subscribe</span><span class='lparen'>(</span><span class='id identifier rubyid_queue'>queue</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_queue'>queue</span><span class='period'>.</span><span class='id identifier rubyid_proc'>proc</span> <span class='op'>=</span> <span class='id identifier rubyid_block'>block</span>
+  <span class='id identifier rubyid_queue'>queue</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -994,9 +1002,9 @@
 </div>
 
     <div id="footer">
-  Generated on Fri Apr  3 09:28:08 2015 by
+  Generated on Wed Jan  6 14:39:27 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.6 (ruby-2.2.1).
+  0.8.7.6 (ruby-2.2.3).
 </div>
 
   </body>

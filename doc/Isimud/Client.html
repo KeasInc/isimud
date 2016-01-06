@@ -250,7 +250,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#create_queue-instance_method" title="#create_queue (instance method)">- (Object) <strong>create_queue</strong>(queue_name, exchange_name, options = {}, &amp;method) </a>
+      <a href="#create_queue-instance_method" title="#create_queue (instance method)">- (Object) <strong>create_queue</strong>(queue_name, exchange_name, options = {}) </a>
     
 
     
@@ -294,7 +294,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#exception_handler-instance_method" title="#exception_handler (instance method)">- (Object) <strong>exception_handler</strong>(&amp;block) </a>
+      <a href="#find_queue-instance_method" title="#find_queue (instance method)">- (Object) <strong>find_queue</strong>(queue_name, options = {}) </a>
     
 
     
@@ -334,6 +334,31 @@
   
     <span class="summary_desc"><div class='inline'>
 <p>A new instance of Client.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_exception-instance_method" title="#on_exception (instance method)">- (Object) <strong>on_exception</strong> {|e| ... }</a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Declare a proc to be run whenever an uncaught exception is raised within a
+message processing block.</p>
 </div></span>
   
 </li>
@@ -387,6 +412,52 @@
   <span class="summary_signature">
     
       <a href="#reset-instance_method" title="#reset (instance method)">- (Object) <strong>reset</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#run_exception_handlers-instance_method" title="#run_exception_handlers (instance method)">- (Object) <strong>run_exception_handlers</strong>(exception) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Call each of the exception handlers declared by #on_exception.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#subscribe-instance_method" title="#subscribe (instance method)">- (Object) <strong>subscribe</strong>(queue, options = {}, &amp;block) </a>
     
 
     
@@ -633,7 +704,7 @@
       <div class="method_details ">
   <h3 class="signature " id="create_queue-instance_method">
   
-    - (<tt>Object</tt>) <strong>create_queue</strong>(queue_name, exchange_name, options = {}, &amp;method) 
+    - (<tt>Object</tt>) <strong>create_queue</strong>(queue_name, exchange_name, options = {}) 
   
 
   
@@ -651,7 +722,7 @@
     <td>
       <pre class="code"><span class="info file"># File 'lib/isimud/client.rb', line 24</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_create_queue'>create_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='comma'>,</span> <span class='id identifier rubyid_exchange_name'>exchange_name</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_method'>method</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_create_queue'>create_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='comma'>,</span> <span class='id identifier rubyid_exchange_name'>exchange_name</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -687,9 +758,9 @@
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="exception_handler-instance_method">
+  <h3 class="signature " id="find_queue-instance_method">
   
-    - (<tt>Object</tt>) <strong>exception_handler</strong>(&amp;block) 
+    - (<tt>Object</tt>) <strong>find_queue</strong>(queue_name, options = {}) 
   
 
   
@@ -707,7 +778,70 @@
     <td>
       <pre class="code"><span class="info file"># File 'lib/isimud/client.rb', line 30</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_exception_handler'>exception_handler</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_find_queue'>find_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_exception-instance_method">
+  
+    - (<tt>Object</tt>) <strong>on_exception</strong> {|e| ... }
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Declare a proc to be run whenever an uncaught exception is raised within a
+message processing block. This is useful for logging or monitoring errors,
+for instance.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Yield Parameters:</p>
+<ul class="yieldparam">
+  
+    <li>
+      
+        <span class='name'>e</span>
+      
+      
+        <span class='type'>(<tt>Exception</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>exception raised</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+36
+37
+38</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/isimud/client.rb', line 36</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_exception'>on_exception</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_exception_handlers'>exception_handlers</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_block'>block</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -729,11 +863,11 @@
       <pre class="lines">
 
 
-33
-34</pre>
+46
+47</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/client.rb', line 33</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/client.rb', line 46</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_publish'>publish</span><span class='lparen'>(</span><span class='id identifier rubyid_exchange'>exchange</span><span class='comma'>,</span> <span class='id identifier rubyid_routing_key'>routing_key</span><span class='comma'>,</span> <span class='id identifier rubyid_payload'>payload</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -757,11 +891,11 @@
       <pre class="lines">
 
 
-36
-37</pre>
+49
+50</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/client.rb', line 36</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/client.rb', line 49</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_reconnect'>reconnect</span>
 <span class='kw'>end</span></pre>
@@ -785,13 +919,97 @@
       <pre class="lines">
 
 
-39
-40</pre>
+52
+53</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/client.rb', line 39</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/client.rb', line 52</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_reset'>reset</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="run_exception_handlers-instance_method">
+  
+    - (<tt>Object</tt>) <strong>run_exception_handlers</strong>(exception) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Call each of the exception handlers declared by #on_exception.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>exception</span>
+      
+      
+        <span class='type'>(<tt>Exception</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+42
+43
+44</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/isimud/client.rb', line 42</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_run_exception_handlers'>run_exception_handlers</span><span class='lparen'>(</span><span class='id identifier rubyid_exception'>exception</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_exception_handlers'>exception_handlers</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_handler'>handler</span><span class='op'>|</span> <span class='id identifier rubyid_handler'>handler</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_exception'>exception</span><span class='rparen'>)</span><span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="subscribe-instance_method">
+  
+    - (<tt>Object</tt>) <strong>subscribe</strong>(queue, options = {}, &amp;block) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+55
+56</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/isimud/client.rb', line 55</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_subscribe'>subscribe</span><span class='lparen'>(</span><span class='id identifier rubyid_queue'>queue</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -803,9 +1021,9 @@
 </div>
 
     <div id="footer">
-  Generated on Fri Apr  3 09:28:08 2015 by
+  Generated on Wed Jan  6 14:39:27 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.6 (ruby-2.2.1).
+  0.8.7.6 (ruby-2.2.3).
 </div>
 
   </body>

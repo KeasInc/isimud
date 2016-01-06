@@ -2,8 +2,53 @@ require 'isimud'
 require 'thread'
 
 module Isimud
-  class EventListener
+  # Daemon process manager for monitoring event queues.
+  # Known EventObserver models and their instances automatically registered upon startup. It is also possible to
+  # define ad-hoc queues and handlers by extending
+  # In addition, ad-hoc event managing may be set up by extending bind_queues() and making the appropriate subscribe
+  # calls directly.
+  #
+  # =====================================
+  # Threads created by the daemon process
+  # =====================================
+  #
+  # Upon startup, EventListener operates using the following threads:
+  # * An event processing thread that establishes consumers for message queues
+  # * An error counter thread that manages the error counter
+  # * A shutdown thread that listens for INT or TERM signals, which will trigger a graceful shutdown.
+  # * The main thread is put to sleep until a shutdown is required.
+  #
+  # ==================
+  # Registering Queues
+  # ==================
+  #
+  # All active instances of all known EventObserver classes (which are assumed to be ActiveRecord instances) are
+  # automatically loaded by the event processing thread, and their associated queues are bound. Note that queues
+  # and associated routing key bindings are established at the time the instance is created or modified.
+  # @see EventObserver.find_active_observers
+  #
+  # Each EventListener process creates an exclusive queue for monitoring the creation, modification, and destruction
+  # of EventObserver instances, using ModelWatcher messages.
+  #
+  # ==============
+  # Error Handling
+  # ==============
+  #
+  # Whenever an uncaught exception is rescued from a consumer handling a message, it is logged and the error counter
+  # is incremented. The error counter is reset periodically according to the value of +error_interval+.
+  # If the total number of errors logged exceeds +error_limit+, the process is terminated immediately.
+  # @see BunnyClient#subscribe()
+  #
+  # There are certain situations that may cause a Bunny exception to occur, such as a loss of network connection.
+  # Whenever a Bunny exception is rescued in the event processing thread, the Bunny session is closed (canceling all
+  # queue consumers), in addition to the error being counted, all Bunny channels are closed, and queues are
+  # reinitialized.
+class EventListener
     include Logging
+
+    # @!attribute [r] error_count
+    #   @return [Integer] count of errors (uncaught exceptions) that have occurred in the current error interval
+
     attr_reader :error_count, :error_interval, :error_limit, :name, :queues, :events_exchange, :models_exchange,
                 :running
 
@@ -13,6 +58,15 @@ module Isimud
     DEFAULT_EVENTS_EXCHANGE = 'events'
     DEFAULT_MODELS_EXCHANGE = 'models'
 
+    # Initialize a new EventListener daemon instance
+    # @param [Hash] options daemon options
+    # @option options [Integer] :error_limit (10) maximum number of errors that are allowed to occur within error_interval
+    #   before the process terminates
+    # @option options [Integer] :error_interval (3600) time interval, in seconds, before the error counter is cleared
+    # @option options [String] :events_exchange ('events') name of AMQP exchange used for listening to event messages
+    # @option options [String] :models_exchange ('models') name of AMQP exchange used for listening to EventObserver
+    #   instance create, update, and destroy messages
+    # @option options [String] :name ("#{Rails.application.class.parent_name.downcase}-listener") daemon instance name.
     def initialize(options = {})
       default_options = {
           error_limit:      Isimud.listener_error_limit || DEFAULT_ERROR_LIMIT,
@@ -35,14 +89,7 @@ module Isimud
       @running              = false
     end
 
-    def max_errors
-      Isimud.listener_error_limit || DEFAULT_ERROR_LIMIT
-    end
-
-    def test_env?
-      ['cucumber', 'test'].include?(Rails.env)
-    end
-
+    # Run the daemon process. This creates the event, error counter, and shutdown threads
     def run
       @running = true
       bind_queues and return if test_env?
@@ -60,11 +107,23 @@ module Isimud
       client.close
     end
 
-    # Override this method to set up message observers
+    # Hook for setting up custom queues in your application. Override in your subclass.
+    def bind_event_queues
+    end
+
+    # @private
     def bind_queues
-      client.subscribe(observer_queue) do |payload|
-        handle_observer_event(payload)
-      end
+      bind_observer_queues
+      bind_event_queues
+    end
+
+    private
+
+    def test_env?
+      ['cucumber', 'test'].include?(Rails.env)
+    end
+
+    def bind_observer_queues
       Isimud::EventObserver.observed_models.each do |model_class|
         log "EventListener: registering observers for #{model_class}"
         register_observer_class(model_class)
@@ -75,13 +134,14 @@ module Isimud
         end
         log "EventListener: registered #{count} observers for #{model_class}"
       end
+      client.subscribe(observer_queue) do |payload|
+        handle_observer_event(payload)
+      end
     end
 
     def has_observer?(observer)
       @observers.has_key?(observer_key_for(observer.class, observer.id))
     end
-
-    private
 
     def start_shutdown_thread
       shutdown_thread = Thread.new do
@@ -108,13 +168,13 @@ module Isimud
           rescue Bunny::Exception => e
             count_error(e)
             log 'EventListener: resetting queues', :warn
+            @observer_queue = nil
             client.reset
           end
         end
       end
     end
 
-    # **We're not logging the exception passed in as param
     def count_error(exception)
       @error_counter_mutex.synchronize do
         @error_count += 1
@@ -127,7 +187,6 @@ module Isimud
       end
     end
 
-    # start an error counter thread that clears the error count once per hour
     def start_error_counter_thread
       log 'EventListener: starting error counter'
       @error_count = 0
@@ -155,6 +214,16 @@ module Isimud
       end
     end
 
+    # Register the observer class watcher
+    def register_observer_class(observer_class)
+      @observer_mutex.synchronize do
+        return if @observed_models.include?(observer_class)
+        @observed_models << observer_class
+        log "EventListener: registering observer class #{observer_class}"
+        observer_queue.bind(models_exchange, routing_key: "#{Isimud.model_watcher_schema}.#{observer_class.base_class.name}.*")
+      end
+    end
+
     # Register an observer instance, and start listening for events on its associated queue.
     # Also ensure that we are listening for observer class update events
     def register_observer(observer)
@@ -176,19 +245,10 @@ module Isimud
 
     # Create or return the observer queue which listens for ModelWatcher events
     def observer_queue
-      @observer_queue ||= client.create_queue("#{name}.listener.#{Process.pid}", models_exchange,
+      @observer_queue ||= client.create_queue([name, 'listener', Socket.gethostname, Process.pid].join('.'),
+                                              models_exchange,
                                               queue_options:      {exclusive: true},
                                               subscribe_options:  {manual_ack: true})
-    end
-
-    # Register the observer class watcher
-    def register_observer_class(observer_class)
-      @observer_mutex.synchronize do
-        return if @observed_models.include?(observer_class)
-        @observed_models << observer_class
-        log "EventListener: registering observer class #{observer_class}"
-        observer_queue.bind(models_exchange, routing_key: "#{Isimud.model_watcher_schema}.#{observer_class.base_class.name}.*")
-      end
     end
 
     def observer_key_for(type, id)

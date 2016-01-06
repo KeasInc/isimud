@@ -21,21 +21,24 @@ module Isimud
     def connected?
     end
 
-    # Find or create a named queue and bind it to the specified exchange
     def create_queue(queue_name, exchange_name, options = {})
     end
 
     def delete_queue(queue_name)
     end
 
-    # Look up a queue by name, or create it if it does not already exist.
     def find_queue(queue_name, options = {})
     end
 
+    # Declare a proc to be run whenever an uncaught exception is raised within a message processing block.
+    # This is useful for logging or monitoring errors, for instance.
+    # @yieldparam [Exception] e exception raised
     def on_exception(&block)
       exception_handlers << block
     end
 
+    # Call each of the exception handlers declared by #on_exception.
+    # @param [Exception] exception
     def run_exception_handlers(exception)
       exception_handlers.each{|handler| handler.call(exception)}
     end

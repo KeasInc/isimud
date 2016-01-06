@@ -1,4 +1,11 @@
 module Isimud
+
+  # Interface for a messaging client that is suitable for testing. No network connections are involved.
+  # Note that all message deliveries are handled in a synchronous manner. When a message is published to the
+  # client, each declared queue is examined and, if the message's routing key matches any of the patterns bound to the
+  # queue, the queue's block is called with the message. Any uncaught exceptions raised within a message processing
+  # block will cause any declared exception handlers to be run. However, the message will not be re-placed onto the
+  # queue should this occur.
   class TestClient < Isimud::Client
     attr_accessor :queues
 

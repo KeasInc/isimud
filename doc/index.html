@@ -62,7 +62,7 @@
     <iframe id="search_frame"></iframe>
 
     <div id="content"><div id='filecontents'>
-<h1 id="label-Isimud-3A+AMQP+based+Messaging+abstraction+component.">Isimud: AMQP based Messaging abstraction component.</h1>
+<h1 id="label-Isimud-3A+AMQP+based+Messaging+and+Event+Processing+Abstraction+Component.">Isimud: AMQP based Messaging and Event Processing Abstraction Component.</h1>
 
 <blockquote>
 <p>Isimud is a minor god, the messenger of the god Enki in Sumerian mythology.
@@ -87,7 +87,8 @@ whenever an ActiveRecord instance is created, modified, or destroyed.</p>
 <p>An Event Observer mixin for registering ActiveRecord models and instances
 with the EventListener for receiving messages.</p>
 </li><li>
-<p>An Event Listener daemon process which manages queues for Event Observers.</p>
+<p>An Event Listener daemon process which manages queues and dispatches
+messages for Event Observers.</p>
 </li></ul>
 
 <h2 id="label-Installation">Installation</h2>
@@ -161,9 +162,126 @@ messages. Named queues are automatically created if they do not exist.</p>
 
 <h2 id="label-Changes">Changes</h2>
 
-<h3 id="label-0.4.2">0.4.2</h3>
+<h3 id="label-1.3.0">1.3.0</h3>
 <ul><li>
-<p>Fixed issue with exception handling</p>
+<p>Added a new method, EventListener#bind_event_queues() for registering
+custom event handlers. Override  this method instead of bind_queues() to
+bind custom queues not handled by EventObserver instances.</p>
+</li><li>
+<p>Add local host name to the EventListener observer queue to avoid possible
+collisions caused by processes on different  hosts sharing the same PID.</p>
+</li><li>
+<p>Added lots of documentation.</p>
+</li></ul>
+
+<h3 id="label-1.2.1">1.2.1</h3>
+<ul><li>
+<p>Include attributes in ModelWatcher destroy message</p>
+</li></ul>
+
+<h3 id="label-1.2.0">1.2.0</h3>
+<ul><li>
+<p>EventObserver#update_queue now always binds current routing keys. This
+ensures that when an enable_listener? changes  state from false to true
+during an update, all bindings for the queue are established.</p>
+</li><li>
+<p>Add EventObserver#activate_observer(), which creates and binds a queue for
+an observer instance on demand.</p>
+</li><li>
+<p>Add declaration for Client#find_queue, and normalize the method signature
+for subclasses.</p>
+</li></ul>
+
+<h3 id="label-1.1.0">1.1.0</h3>
+<ul><li>
+<p>Clients now support multiple exception handlers. Each call to
+Client#on_exception will add a new block to the  exception handlers list</p>
+</li></ul>
+
+<h3 id="label-1.0.2">1.0.2</h3>
+
+<h4 id="label-Breaking+Changes-3A">Breaking Changes:</h4>
+<ul><li>
+<p>EventObserver instances are now required to have the persistent attribute
+/exchange_routing_keys/. These are used to  store the current value of
+routing keys assoicated with an instance. The queue associated with an
+EventObserver is  now created and updated at the same time the
+EventObserver is updated, rather than relying on the EventListener to 
+create it.</p>
+</li><li>
+<p>EventObserver#observe_events now has only one parameter, the Isimud::Client
+instance. No queue bindings are done within  this method.</p>
+</li><li>
+<p>Client#bind has been refactored in order to separate concerns. A new
+method, #subscribe, is now used for subscribing  to messages by linking a
+Proc.</p>
+</li><li>
+<p>Client#create_queue no longer accepts a block parameter and does not
+subscribe to messages.</p>
+</li><li>
+<p>Removed Client#rebind.</p>
+</li></ul>
+
+<h4 id="label-Other+Changes-3A">Other Changes:</h4>
+<ul><li>
+<p>TestClient::Queue now responds to bind() and unbind() in the same manner as
+Bunny::Queue.</p>
+</li><li>
+<p>BunnyClient#create_queue now may be called without a block to instantiate
+an AMQP queue without subscribing to messages</p>
+</li></ul>
+
+<h3 id="label-0.6.0+-28broken-29">0.6.0 (broken)</h3>
+<ul><li>
+<p>Added Client#rebind to change the exchange and routing keys for a durable
+named queue.</p>
+</li><li>
+<p>Changed BunnyClient#delete_queue to make it more reliable.</p>
+</li><li>
+<p>EventListener now uses a shared, durable queue for monitoring events on
+modified EventObserver instances.</p>
+</li></ul>
+
+<h3 id="label-0.5.2">0.5.2</h3>
+<ul><li>
+<p>Fixed regexp bug in TestClient affecting message delivery</p>
+</li><li>
+<p>Add more logging for EventObserver binding</p>
+</li></ul>
+
+<h3 id="label-0.5.1">0.5.1</h3>
+<ul><li>
+<p>Added Event#attributes</p>
+</li></ul>
+
+<h3 id="label-0.5.0">0.5.0</h3>
+<ul><li>
+<p>Allow EventObserver classes to override the exchange for listening to
+events</p>
+</li><li>
+<p>Corrected initialization of EventListener for handling defaults</p>
+</li><li>
+<p>Create an explicit name for EventListener model queues for EventObserver
+instances</p>
+</li><li>
+<p>Fixed a bug in EventObserver that caused ModelWatcher to not send update
+events appropriately when default columns are watched</p>
+</li><li>
+<p>Moved requires for Isimud below config attribute declarations</p>
+</li></ul>
+
+<h3 id="label-0.4.10">0.4.10</h3>
+<ul><li>
+<p>Corrected trap of INT and TERM signals</p>
+</li><li>
+<p>Added error counter mutex and cleaned up logging</p>
+</li><li>
+<p>Corrected race condition for registering EventObserver classes</p>
+</li></ul>
+
+<h3 id="label-0.4.5">0.4.5</h3>
+<ul><li>
+<p>Fixed issues with exception handling</p>
 </li></ul>
 
 <h3 id="label-0.4.1">0.4.1</h3>
@@ -314,7 +432,7 @@ synchronization. Override to activate.</p>
 <h2 id="label-Contributing">Contributing</h2>
 <ol><li>
 <p>Fork it ( <a
-href="https://github.com/[my-github-username]/isimud/fork">github.com/[my-github-username]/isimud/fork</a>
+href="https://github.com/KeasInc/isimud/fork">github.com/KeasInc/isimud/fork</a>
 )</p>
 </li><li>
 <p>Create your feature branch (<code>git checkout -b my-new-feature</code>)</p>
@@ -329,9 +447,9 @@ feature&#39;</code>)</p>
 </div></div>
 
     <div id="footer">
-  Generated on Fri Apr  3 09:28:08 2015 by
+  Generated on Wed Jan  6 14:39:27 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.6 (ruby-2.2.1).
+  0.8.7.6 (ruby-2.2.3).
 </div>
 
   </body>
