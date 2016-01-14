@@ -144,6 +144,30 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#deactivate_observer-instance_method" title="#deactivate_observer (instance method)">- (Object) <strong>deactivate_observer</strong>(client = isimud_client) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Deactivate the queues for an observer.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#enable_listener%3F-instance_method" title="#enable_listener? (instance method)">- (Boolean) <strong>enable_listener?</strong> </a>
     
 
@@ -365,6 +389,53 @@ when an observer is to be made active without an update.</p>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_activate_observer'>activate_observer</span><span class='lparen'>(</span><span class='id identifier rubyid_client'>client</span> <span class='op'>=</span> <span class='id identifier rubyid_isimud_client'>isimud_client</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_create_queue'>create_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_client'>client</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_isimud_send_action_message'>isimud_send_action_message</span><span class='lparen'>(</span><span class='symbol'>:update</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="deactivate_observer-instance_method">
+  
+    - (<tt>Object</tt>) <strong>deactivate_observer</strong>(client = isimud_client) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Deactivate the queues for an observer. This will destroy the observer queue
+and send an update message on the instance, which will trigger
+EventListener instances to cancel consumers. Note that enable_listener?
+should resolve to false in order for the EventListener to cancel
+corresponding event consumers.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+84
+85
+86
+87</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/isimud/event_observer.rb', line 84</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_deactivate_observer'>deactivate_observer</span><span class='lparen'>(</span><span class='id identifier rubyid_client'>client</span> <span class='op'>=</span> <span class='id identifier rubyid_isimud_client'>isimud_client</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_delete_queue'>delete_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_client'>client</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_isimud_send_action_message'>isimud_send_action_message</span><span class='lparen'>(</span><span class='symbol'>:update</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -669,7 +740,7 @@ want to specify an alternative exchange.</p>
 </div>
 
     <div id="footer">
-  Generated on Wed Jan  6 14:39:27 2016 by
+  Generated on Wed Jan 13 16:27:29 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.7.6 (ruby-2.2.3).
 </div>
