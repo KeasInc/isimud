@@ -78,6 +78,14 @@ module Isimud
       isimud_send_action_message(:update)
     end
 
+    # Deactivate the queues for an observer. This will destroy the observer queue and send an update message on the
+    # instance, which will trigger EventListener instances to cancel consumers. Note that enable_listener? should
+    # resolve to false in order for the EventListener to cancel corresponding event consumers.
+    def deactivate_observer(client = isimud_client)
+      delete_queue(client)
+      isimud_send_action_message(:update)
+    end
+
     private
 
     def create_queue(client = isimud_client)

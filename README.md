@@ -77,6 +77,10 @@ if they do not exist.
 
 ## Changes
 
+### 1.3.1
+
+* Add EventObserver#deactivate_observer to trigger queue deletion for an observer instance.
+
 ### 1.3.0
 
 * Added a new method, EventListener#bind_event_queues() for registering custom event handlers. Override
