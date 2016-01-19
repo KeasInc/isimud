@@ -11,7 +11,7 @@ module Isimud
 
     class Queue
       include Isimud::Logging
-      attr_reader :name, :bindings
+      attr_reader :name, :bindings, :client
       attr_accessor :proc
 
       def initialize(client, name, proc = Proc.new{ |_| } )

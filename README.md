@@ -77,7 +77,7 @@ if they do not exist.
 
 ## Changes
 
-### 1.3.2
+### 1.3.3
 
 * Fixed handling of exceptions in TestClient
 * Make EventListener#has_observer? public
