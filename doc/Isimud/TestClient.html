@@ -521,12 +521,12 @@ occur.</p>
       <pre class="lines">
 
 
-63
 64
-65</pre>
+65
+66</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 63</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 64</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_connection'>connection</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_queues'>queues</span> <span class='op'>=</span> <span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
@@ -606,13 +606,13 @@ occur.</p>
       <pre class="lines">
 
 
-86
 87
 88
-89</pre>
+89
+90</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 86</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 87</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_bind'>bind</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='comma'>,</span> <span class='id identifier rubyid_exchange_name'>exchange_name</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_keys'>keys</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_queue'>queue</span> <span class='op'>=</span> <span class='id identifier rubyid_create_queue'>create_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='comma'>,</span> <span class='id identifier rubyid_exchange_name'>exchange_name</span><span class='comma'>,</span> <span class='label'>routing_keys:</span> <span class='id identifier rubyid_keys'>keys</span><span class='rparen'>)</span>
@@ -638,12 +638,12 @@ occur.</p>
       <pre class="lines">
 
 
-71
 72
-73</pre>
+73
+74</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 71</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 72</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_channel'>channel</span>
   <span class='kw'>self</span>
@@ -668,11 +668,11 @@ occur.</p>
       <pre class="lines">
 
 
-79
-80</pre>
+80
+81</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 79</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 80</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_close'>close</span>
 <span class='kw'>end</span></pre>
@@ -696,12 +696,12 @@ occur.</p>
       <pre class="lines">
 
 
-67
 68
-69</pre>
+69
+70</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 67</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 68</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_connect'>connect</span>
   <span class='kw'>self</span>
@@ -748,12 +748,12 @@ occur.</p>
       <pre class="lines">
 
 
-75
 76
-77</pre>
+77
+78</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 75</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 76</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_connected?'>connected?</span>
   <span class='kw'>true</span>
@@ -778,7 +778,6 @@ occur.</p>
       <pre class="lines">
 
 
-95
 96
 97
 98
@@ -786,10 +785,11 @@ occur.</p>
 100
 101
 102
-103</pre>
+103
+104</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 95</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 96</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create_queue'>create_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='comma'>,</span> <span class='id identifier rubyid_exchange_name'>exchange_name</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_keys'>keys</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:routing_keys</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -820,12 +820,12 @@ occur.</p>
       <pre class="lines">
 
 
-82
 83
-84</pre>
+84
+85</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 82</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 83</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_delete_queue'>delete_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_queues'>queues</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='rparen'>)</span>
@@ -850,15 +850,15 @@ occur.</p>
       <pre class="lines">
 
 
-91
 92
-93</pre>
+93
+94</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 91</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 92</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_find_queue'>find_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_queues'>queues</span><span class='lbracket'>[</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='const'>Queue</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_queues'>queues</span><span class='lbracket'>[</span><span class='id identifier rubyid_queue_name'>queue_name</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='const'>Queue</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='id identifier rubyid_queue_name'>queue_name</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -880,17 +880,17 @@ occur.</p>
       <pre class="lines">
 
 
-110
 111
 112
 113
 114
 115
 116
-117</pre>
+117
+118</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 110</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 111</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_publish'>publish</span><span class='lparen'>(</span><span class='id identifier rubyid_exchange'>exchange</span><span class='comma'>,</span> <span class='id identifier rubyid_routing_key'>routing_key</span><span class='comma'>,</span> <span class='id identifier rubyid_payload'>payload</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_log'>log</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Isimud::TestClient: Delivering message exchange: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_exchange'>exchange</span><span class='embexpr_end'>}</span><span class='tstring_content'> key: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_routing_key'>routing_key</span><span class='embexpr_end'>}</span><span class='tstring_content'> payload: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_payload'>payload</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
@@ -920,12 +920,12 @@ occur.</p>
       <pre class="lines">
 
 
-123
 124
-125</pre>
+125
+126</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 123</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 124</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_reconnect'>reconnect</span>
   <span class='kw'>self</span>
@@ -950,12 +950,12 @@ occur.</p>
       <pre class="lines">
 
 
-119
 120
-121</pre>
+121
+122</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 119</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 120</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_reset'>reset</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_queues'>queues</span><span class='period'>.</span><span class='id identifier rubyid_clear'>clear</span>
@@ -980,13 +980,13 @@ occur.</p>
       <pre class="lines">
 
 
-105
 106
 107
-108</pre>
+108
+109</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 105</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/test_client.rb', line 106</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_subscribe'>subscribe</span><span class='lparen'>(</span><span class='id identifier rubyid_queue'>queue</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_queue'>queue</span><span class='period'>.</span><span class='id identifier rubyid_proc'>proc</span> <span class='op'>=</span> <span class='id identifier rubyid_block'>block</span>
@@ -1002,7 +1002,7 @@ occur.</p>
 </div>
 
     <div id="footer">
-  Generated on Wed Jan 13 16:27:29 2016 by
+  Generated on Mon Jan 18 17:07:52 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.7.6 (ruby-2.2.3).
 </div>

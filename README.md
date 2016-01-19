@@ -77,6 +77,11 @@ if they do not exist.
 
 ## Changes
 
+### 1.3.2
+
+* Fixed handling of exceptions in TestClient
+* Make EventListener#has_observer? public
+
 ### 1.3.1
 
 * Add EventObserver#deactivate_observer to trigger queue deletion for an observer instance.

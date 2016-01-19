@@ -117,6 +117,11 @@ class EventListener
       bind_event_queues
     end
 
+    # @private
+    def has_observer?(observer)
+      @observers.has_key?(observer_key_for(observer.class, observer.id))
+    end
+
     private
 
     def test_env?
@@ -137,10 +142,6 @@ class EventListener
       client.subscribe(observer_queue) do |payload|
         handle_observer_event(payload)
       end
-    end
-
-    def has_observer?(observer)
-      @observers.has_key?(observer_key_for(observer.class, observer.id))
     end
 
     def start_shutdown_thread

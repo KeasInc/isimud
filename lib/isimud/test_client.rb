@@ -14,7 +14,8 @@ module Isimud
       attr_reader :name, :bindings
       attr_accessor :proc
 
-      def initialize(name, proc = Proc.new{ |_| } )
+      def initialize(client, name, proc = Proc.new{ |_| } )
+        @client = client
         @name         = name
         @bindings     = Hash.new{ |hash, key| hash[key] = Set.new }
         @proc         = proc
@@ -55,7 +56,7 @@ module Isimud
           @proc.try(:call, data)
         rescue => e
           log "TestClient: error delivering message: #{e.message}\n  #{e.backtrace.join("\n  ")}", :error
-          run_exception_handlers(e)
+          client.run_exception_handlers(e)
         end
       end
     end
@@ -89,7 +90,7 @@ module Isimud
     end
 
     def find_queue(queue_name, options = {})
-      queues[queue_name] ||= Queue.new(queue_name)
+      queues[queue_name] ||= Queue.new(self, queue_name)
     end
 
     def create_queue(queue_name, exchange_name, options = {})
