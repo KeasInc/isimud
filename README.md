@@ -77,6 +77,11 @@ if they do not exist.
 
 ## Changes
 
+### 1.3.4
+
+* Always recreate bindings for observer queues when EventListener starts the event thread.
+* Cleaned up method signature on EventObserver#delete_queue so that a client may be passed to it. 
+
 ### 1.3.3
 
 * Fixed handling of exceptions in TestClient

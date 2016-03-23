@@ -55,7 +55,7 @@ module Isimud
     # Returns the consumer for the observer
     def observe_events(client)
       return unless enable_listener?
-      queue = client.kind_of?(Isimud::TestClient) ? create_queue(client) : client.find_queue(event_queue_name)
+      queue = create_queue(client)
       client.subscribe(queue) do |message|
         event = Event.parse(message)
         handle_event(event)
@@ -108,8 +108,8 @@ module Isimud
       end
     end
 
-    def delete_queue
-      isimud_client.delete_queue(event_queue_name)
+    def delete_queue(client = isimud_client)
+      client.delete_queue(event_queue_name)
     end
 
     def set_routing_keys
