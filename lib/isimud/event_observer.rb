@@ -52,10 +52,14 @@ module Isimud
 
     # Create or attach to a queue on the specified exchange. When an event message that matches the observer's routing keys
     # is received, parse the event and call handle_event on same.
-    # Returns the consumer for the observer
-    def observe_events(client)
+    # @param [Isimud::Client] client client instance
+    # @param [Boolean] refresh_bindings when set, refresh bindings on queue (true)
+    # @return queue or consumer object
+    # @see BunnyClient#subscribe
+    # @see TestClient#subscribe
+    def observe_events(client, refresh_bindings = true)
       return unless enable_listener?
-      queue = create_queue(client)
+      queue = (refresh_bindings || client.kind_of?(Isimud::TestClient)) ? create_queue(client) : client.find_queue(event_queue_name)
       client.subscribe(queue) do |message|
         event = Event.parse(message)
         handle_event(event)

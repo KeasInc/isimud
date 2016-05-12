@@ -77,6 +77,11 @@ if they do not exist.
 
 ## Changes
 
+### 1.3.5
+
+* Added option to EventObserver#observe_events to recreate bindings for observer queues
+* EventListener only create bindings and queues for EventObserver instances on initial startup
+ 
 ### 1.3.4
 
 * Always recreate bindings for observer queues when EventListener starts the event thread.

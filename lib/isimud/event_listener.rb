@@ -43,20 +43,20 @@ module Isimud
   # Whenever a Bunny exception is rescued in the event processing thread, the Bunny session is closed (canceling all
   # queue consumers), in addition to the error being counted, all Bunny channels are closed, and queues are
   # reinitialized.
-class EventListener
+  class EventListener
     include Logging
 
-    # @!attribute [r] error_count
-    #   @return [Integer] count of errors (uncaught exceptions) that have occurred in the current error interval
+    attr_reader :error_count, :error_interval, :error_limit, :name, :queues, :events_exchange, :models_exchange, :status
 
-    attr_reader :error_count, :error_interval, :error_limit, :name, :queues, :events_exchange, :models_exchange,
-                :running
-
-    DEFAULT_ERROR_LIMIT     = 10
-    DEFAULT_ERROR_INTERVAL  = 3600
+    DEFAULT_ERROR_LIMIT    = 10
+    DEFAULT_ERROR_INTERVAL = 3600
 
     DEFAULT_EVENTS_EXCHANGE = 'events'
     DEFAULT_MODELS_EXCHANGE = 'models'
+
+    STATUS_INITIALIZE = :initialize
+    STATUS_RUNNING    = :running
+    STATUS_SHUTDOWN   = :shutdown
 
     # Initialize a new EventListener daemon instance
     # @param [Hash] options daemon options
@@ -69,29 +69,28 @@ class EventListener
     # @option options [String] :name ("#{Rails.application.class.parent_name.downcase}-listener") daemon instance name.
     def initialize(options = {})
       default_options = {
-          error_limit:      Isimud.listener_error_limit || DEFAULT_ERROR_LIMIT,
-          error_interval:   DEFAULT_ERROR_INTERVAL,
-          events_exchange:  Isimud.events_exchange || DEFAULT_EVENTS_EXCHANGE,
-          models_exchange:  Isimud.model_watcher_exchange || DEFAULT_MODELS_EXCHANGE,
-          name:             "#{Rails.application.class.parent_name.downcase}-listener"
+          error_limit:     Isimud.listener_error_limit || DEFAULT_ERROR_LIMIT,
+          error_interval:  DEFAULT_ERROR_INTERVAL,
+          events_exchange: Isimud.events_exchange || DEFAULT_EVENTS_EXCHANGE,
+          models_exchange: Isimud.model_watcher_exchange || DEFAULT_MODELS_EXCHANGE,
+          name:            "#{Rails.application.class.parent_name.downcase}-listener"
       }
       options.reverse_merge!(default_options)
-      @error_count          = 0
-      @observers            = Hash.new
-      @observed_models      = Set.new
-      @error_limit          = options[:error_limit]
-      @error_interval       = options[:error_interval]
-      @events_exchange      = options[:events_exchange]
-      @models_exchange      = options[:models_exchange]
-      @name                 = options[:name]
-      @observer_mutex       = Mutex.new
-      @error_counter_mutex  = Mutex.new
-      @running              = false
+      @error_count         = 0
+      @observers           = Hash.new
+      @observed_models     = Set.new
+      @error_limit         = options[:error_limit]
+      @error_interval      = options[:error_interval]
+      @events_exchange     = options[:events_exchange]
+      @models_exchange     = options[:models_exchange]
+      @name                = options[:name]
+      @observer_mutex      = Mutex.new
+      @error_counter_mutex = Mutex.new
+      @status              = STATUS_INITIALIZE
     end
 
     # Run the daemon process. This creates the event, error counter, and shutdown threads
     def run
-      @running = true
       bind_queues and return if test_env?
       start_shutdown_thread
       start_error_counter_thread
@@ -100,6 +99,7 @@ class EventListener
       end
       client.connect
       start_event_thread
+      @status = STATUS_RUNNING
 
       puts 'EventListener started. Hit Ctrl-C to exit'
       Thread.stop
@@ -148,7 +148,7 @@ class EventListener
       shutdown_thread = Thread.new do
         Thread.stop # wait until we get a TERM or INT signal.
         log 'EventListener: shutdown requested.  Shutting down AMQP...', :info
-        @running = false
+        @status = STATUS_SHUTDOWN
         Thread.main.run
       end
       %w(SIGINT SIGTERM).each { |sig| trap(sig) { shutdown_thread.wakeup } }
@@ -158,10 +158,26 @@ class EventListener
       Isimud.client
     end
 
+    def initializing?
+      status == STATUS_INITIALIZE
+    end
+
+    def running?
+      status == STATUS_RUNNING
+    end
+
+    def running
+      status != STATUS_SHUTDOWN
+    end
+
+    def shutdown?
+      status == STATUS_SHUTDOWN
+    end
+
     def start_event_thread
       Thread.new do
         log 'EventListener: starting event_thread'
-        while @running
+        while running
           begin
             bind_queues
             log 'EventListener: event_thread finished'
@@ -182,7 +198,7 @@ class EventListener
         log "EventListener#count_error count = #{@error_count} limit=#{error_limit}", :warn
         if (@error_count >= error_limit)
           log 'EventListener: too many errors, exiting', :fatal
-          @running = false
+          @status = STATUS_SHUTDOWN
           Thread.main.run unless test_env?
         end
       end
@@ -203,7 +219,7 @@ class EventListener
     end
 
     def handle_observer_event(payload)
-      event = JSON.parse(payload).with_indifferent_access
+      event  = JSON.parse(payload).with_indifferent_access
       action = event[:action]
       log "EventListener: received observer model message: #{event.inspect}"
       if %w(update destroy).include?(action)
@@ -230,7 +246,7 @@ class EventListener
     def register_observer(observer)
       @observer_mutex.synchronize do
         log "EventListener: registering observer #{observer.class} #{observer.id}"
-        @observers[observer_key_for(observer.class, observer.id)] = observer.observe_events(client)
+        @observers[observer_key_for(observer.class, observer.id)] = observer.observe_events(client, initializing?)
       end
     end
 
@@ -248,8 +264,8 @@ class EventListener
     def observer_queue
       @observer_queue ||= client.create_queue([name, 'listener', Socket.gethostname, Process.pid].join('.'),
                                               models_exchange,
-                                              queue_options:      {exclusive: true},
-                                              subscribe_options:  {manual_ack: true})
+                                              queue_options:     {exclusive: true},
+                                              subscribe_options: {manual_ack: true})
     end
 
     def observer_key_for(type, id)
