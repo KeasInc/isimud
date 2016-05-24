@@ -77,6 +77,11 @@ if they do not exist.
 
 ## Changes
 
+### 1.3.6
+
+* Don't include ModelWatcher attributes in event publish log message
+* Include routing key in ModelWatcher event publish log message
+
 ### 1.3.5
 
 * Added option to EventObserver#observe_events to recreate bindings for observer queues

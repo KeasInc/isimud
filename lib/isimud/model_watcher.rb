@@ -137,7 +137,7 @@ module Isimud
       }
       payload[:attributes] = isimud_attribute_data
       routing_key          = isimud_model_watcher_routing_key(action)
-      log "Isimud::ModelWatcher#publish: exchange #{isimud_model_watcher_exchange} routing_key #{routing_key} payload #{payload.inspect}"
+      log "Isimud::ModelWatcher#publish: exchange=#{isimud_model_watcher_exchange} routing_key=#{routing_key} id=#{id}"
       Isimud.client.publish(isimud_model_watcher_exchange, routing_key, payload.to_json)
     end
   end
