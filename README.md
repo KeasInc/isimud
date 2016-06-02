@@ -77,6 +77,10 @@ if they do not exist.
 
 ## Changes
 
+### 1.3.7
+
+* change instance var 'status' inside the start event thread
+
 ### 1.3.6
 
 * Don't include ModelWatcher attributes in event publish log message

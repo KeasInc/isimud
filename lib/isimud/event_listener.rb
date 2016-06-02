@@ -99,7 +99,6 @@ module Isimud
       end
       client.connect
       start_event_thread
-      @status = STATUS_RUNNING
 
       puts 'EventListener started. Hit Ctrl-C to exit'
       Thread.stop
@@ -181,6 +180,7 @@ module Isimud
           begin
             bind_queues
             log 'EventListener: event_thread finished'
+            @status = STATUS_RUNNING
             Thread.stop
           rescue Bunny::Exception => e
             count_error(e)
