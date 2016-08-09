@@ -106,6 +106,7 @@ module Isimud
         queue        = isimud_client.find_queue(event_queue_name)
         exchange     = observed_exchange || Isimud.events_exchange
         (prev_keys - current_keys).each { |key| queue.unbind(exchange, routing_key: key) }
+        log "Isimud::EventObserver: binding queue #{event_queue_name} on exchange #{exchange} with bindings [#{current_keys.join(',')}]"
         (current_keys).each { |key| queue.bind(exchange, routing_key: key) }
       else
         isimud_client.delete_queue(event_queue_name)
