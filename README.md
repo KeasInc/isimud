@@ -5,7 +5,7 @@
 >
 >*Source: Wikipedia*
 
-Isimud is a message publishing and consumption gem. It consists of the following components:
+Isimud is an AMQP message publishing and consumption gem intended for Rails applications. It includes the following components:
 
 * A [Bunny](http://rubybunny.info) based client interface for publishing and receiving messages using AMQP.
 * A test client which mocks most client operations and allows for synchronous delivery and processing of messages for unit tests.
