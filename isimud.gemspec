@@ -14,8 +14,10 @@ Isimud is an AMQP message publishing and consumption gem intended for Rails appl
 message consumption queues for ActiveRecord instances, or synchronize model updates between processes. It also provides
 an event listener background process for managing queues that consume messages.
   EOT
-  spec.homepage = 'https://github.com/KeasInc/isimud'
-  spec.license  = 'MITNFA'
+  spec.homepage    = 'https://github.com/KeasInc/isimud'
+  spec.license     = 'MITNFA'
+  spec.cert_chain  = ['certs/gfeil.pem']
+  spec.signing_key = File.expand_path("~/.ssh/gem-private_key.pem") if $0 =~ /gem\z/
 
   spec.files         = `git ls-files -z`.split("\x0")
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
