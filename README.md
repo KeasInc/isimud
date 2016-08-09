@@ -1,3 +1,5 @@
+[![Gem Version](https://badge.fury.io/rb/isimud.svg)](https://badge.fury.io/rb/isimud)
+
 # Isimud: AMQP based Messaging and Event Processing Abstraction Component.
 
 >Isimud is a minor god, the messenger of the god Enki in Sumerian mythology.
@@ -8,10 +10,10 @@
 Isimud is an AMQP message publishing and consumption gem intended for Rails applications. It includes the following components:
 
 * A [Bunny](http://rubybunny.info) based client interface for publishing and receiving messages using AMQP.
-* A test client which mocks most client operations and allows for synchronous delivery and processing of messages for unit tests.
 * A Model Watcher mixin for ActiveRecord that automatically sends messages whenever an ActiveRecord instance is created, modified, or destroyed.
 * An Event Observer mixin for registering ActiveRecord models and instances with the EventListener for receiving messages.
 * An Event Listener daemon process which manages queues and dispatches messages for Event Observers.
+* A test client for mocking message publication, allowing synchronous delivery and processing of messages in unit tests.
 
 ## Installation
 
