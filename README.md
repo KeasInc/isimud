@@ -152,9 +152,6 @@ if they do not exist.
 
 * TestClient::Queue now responds to bind() and unbind() in the same manner as Bunny::Queue.
 * BunnyClient#create_queue now may be called without a block to instantiate an AMQP queue without subscribing to messages
-
-### 0.6.0 (broken)
-
 * Added Client#rebind to change the exchange and routing keys for a durable named queue. 
 * Changed BunnyClient#delete_queue to make it more reliable.
 * EventListener now uses a shared, durable queue for monitoring events on modified EventObserver instances.
