@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+
+require 'colored'
+require 'digest/sha2'
+require File.expand_path('lib/isimud/version.rb')
+
+def run!(command)
+  puts "running #{command}".yellow
+  system(command) || abort("Command #{command} failed, terminating!")
+end
+
+gem_name = 'isimud'
+gem_version = "#{gem_name}-#{Isimud::VERSION}.gem"
+built_gem_path = "pkg/#{gem_version}"
+puts "Building #{gem_name} version #{Isimud::VERSION}".cyan
+run! "gem build #{gem_name}.gemspec"
+run! "mv #{gem_version} #{built_gem_path}"
+
+puts 'Adding and committing checksum'.cyan
+checksum      = Digest::SHA512.new.hexdigest(File.read(built_gem_path))
+checksum_path = "checksum/#{gem_name}-#{Isimud::VERSION}.gem.sha512"
+File.open(checksum_path, 'w') { |f| f.write(checksum) }
+run! "git add #{checksum_path}"
+run! "git commit -m 'added checksum for #{gem_version}' && git push origin"
+
+puts 'Publishing to RubyGems'.cyan
+run! "gem push #{built_gem_path}"
+
+puts 'Testing install'.cyan
+run! "gem install #{gem_name} -v #{Isimud::VERSION} -P MediumSecurity"
+Contact GitHub API Training Shop Blog About
