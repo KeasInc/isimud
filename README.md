@@ -77,9 +77,13 @@ if they do not exist.
 
 ## Changes
 
+### 1.3.8
+
+* In EventListener event thread, rescue all exceptions, not just Bunny ones.
+
 ### 1.3.7
 
-* change instance var 'status' inside the start event thread
+* Change instance var 'status' inside the start event thread
 
 ### 1.3.6
 

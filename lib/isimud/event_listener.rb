@@ -165,10 +165,6 @@ module Isimud
       status == STATUS_RUNNING
     end
 
-    def running
-      status != STATUS_SHUTDOWN
-    end
-
     def shutdown?
       status == STATUS_SHUTDOWN
     end
@@ -176,13 +172,13 @@ module Isimud
     def start_event_thread
       Thread.new do
         log 'EventListener: starting event_thread'
-        while running
+        until shutdown? do
           begin
             bind_queues
             log 'EventListener: event_thread finished'
             @status = STATUS_RUNNING
             Thread.stop
-          rescue Bunny::Exception => e
+          rescue => e
             count_error(e)
             log 'EventListener: resetting queues', :warn
             @observer_queue = nil

@@ -16,7 +16,7 @@ Isimud is an AMQP message publishing and consumption gem that is intended for ma
 * A test client which mocks most client operations and allows for synchronous delivery and processing of messages for unit tests.
 * A Model Watcher mixin for ActiveRecord that automatically sends messages whenever an ActiveRecord instance is created, modified, or destroyed.
 * An Event Observer mixin for registering ActiveRecord models and instances with the EventListener for receiving messages.
-* An Event Listener daemon process which manages queues and dispatches messages for Event Observers.
+* An Event Listener daemon process which manages queues and dispatches messages for Event Observers and other consumers.
 EOT
   spec.homepage      = 'https://github.com/KeasInc/isimud'
   spec.license       = 'MITNFA'
