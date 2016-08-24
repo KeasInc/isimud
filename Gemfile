@@ -5,6 +5,7 @@ gemspec
 
 gem 'activesupport', '4.1.4'
 gem 'bundler', '~> 1.6'
+gem 'colored', '~> 1.2'
 gem 'rake'
 gem 'yard'
 

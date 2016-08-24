@@ -42,6 +42,7 @@ GEM
       numerizer (~> 0.1.1)
     codeclimate-test-reporter (0.4.8)
       simplecov (>= 0.7.1, < 1.0.0)
+    colored (1.2)
     combustion (0.5.3)
       activesupport (>= 3.0.0)
       railties (>= 3.0.0)
@@ -99,6 +100,7 @@ DEPENDENCIES
   awesome_print
   bundler (~> 1.6)
   codeclimate-test-reporter
+  colored (~> 1.2)
   combustion
   database_cleaner
   isimud!
