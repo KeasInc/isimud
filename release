@@ -14,8 +14,7 @@ gem_version = "#{gem_name}-#{Isimud::VERSION}.gem"
 built_gem_path = "pkg/#{gem_version}"
 puts "Building #{gem_name} version #{Isimud::VERSION}".cyan
 run! "gem build #{gem_name}.gemspec"
-puts 'Publishing to RubyGems'.cyan
-run! "gem push #{gem_version}"
+run! "mv #{gem_version} #{built_gem_path}"
 
 puts 'Adding and committing checksum'.cyan
 checksum      = Digest::SHA512.new.hexdigest(File.read(built_gem_path))
@@ -24,5 +23,8 @@ File.open(checksum_path, 'w') { |f| f.write(checksum) }
 run! "git add #{checksum_path}"
 run! "git commit -m 'added checksum for #{gem_version}' && git push origin"
 
+puts 'Publishing to RubyGems'.cyan
+run! "gem push #{built_gem_path}"
+
 puts 'Testing install'.cyan
-run! "gem install #{gem_version} -P MediumSecurity"
+run! "gem install #{gem_name} -v #{Isimud::VERSION} -P MediumSecurity"

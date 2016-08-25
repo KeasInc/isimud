@@ -120,7 +120,7 @@ the message is not re-queued.
 
 # Changes
 
-## 1.4.0
+## 1.4.1
 
 * Enable conditional re-queuing of messages after an exception is raised (see *Exception Handling* above).
 * Log messages for receipt and ack of messages downgraded to debug level.
