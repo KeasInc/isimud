@@ -3,36 +3,41 @@ require 'active_support/core_ext/module/attribute_accessors'
 
 module Isimud
   include ::ActiveSupport::Configurable
-  # @!attribute [r] client_type
+  # @!attribute [rw] client_type
   #   @return [Enumerable<'bunny', 'test'>] Type of client to use
-  # @!attribute [r] client_options
+  # @!attribute [rw] client_options
   #   @return [Hash] client specific options
-  # @!attribute [r] default_client
+  # @!attribute [rw] default_client
   #   @return [Isimud::Client] default client
-  # @!attribute [r] events_exchange
+  # @!attribute [rw] events_exchange
   #   @return [String] AMQP exchange used for publishing Event instances
-  # @!attribute [r] enable_model_watcher
+  # @!attribute [rw] enable_model_watcher
   #   @return [Boolean] when set, send Isimud::ModelWatcher messages
-  # @!attribute [r] listener_error_limit
-  #   @return [Integer] maximum number of exceptions allowed per hour before listener shuts down (100)
-  # @!attribute [r] logger
+  # @!attribute [rw] listener_error_limit
+  #   @return [Integer] maximum number of uncaught exceptions allowed per hour before listener shuts down (100)
+  # @!attribute [rw] logger
   #   @return [Logger] logger for tracing messages (Rails.logger)
-  # @!attribute [r] log_level
+  # @!attribute [rw] log_level
   #   @return [Symbol] log level (:debug)
-  # @!attribute [r] model_watcher_exchange
+  # @!attribute [rw] model_watcher_exchange
   #   @return [String] AMQP exchange used for publishing ModelWatcher messages
-  # @!attribute [r] model_watcher_schema
+  # @!attribute [rw] model_watcher_schema
   #   @return [String] schema name (Rails.configuration.database_configuration[Rails.env]['database'])
-  # @!attribute [r] prefetch_count
+  # @!attribute [rw] prefetch_count
   #   @return [Integer] number of messages to fetch -- only applies to BunnyClient
-  # @!attribute [r] retry_failures
-  #   @return [Boolean] when set, if an exception occurs during message processing, requeue it
-  # @!attribute [r] server
-  #   @return [<String, Hash>] server connection attributes
+  # @!attribute [rw] retry_failures
+  #   @return [Boolean|nil] whether to requeue a message if an exception occurs during processing.
+  #   When set to nil, the return status from exception handlers is used. (false)
+  #   @see Isimud::Client#on_exception
+  # @!attribute [rw] server
+  #   @return [<String, Hash>] server connection attributes ()
   config_accessor :client_type do
     :bunny
   end
-  config_accessor :client_options, :default_client, :enable_model_watcher, :model_watcher_schema, :retry_failures
+  config_accessor :client_options, :default_client, :enable_model_watcher, :model_watcher_schema
+  config_accessor :retry_failures do
+    false
+  end
   config_accessor :listener_error_limit do
     100
   end

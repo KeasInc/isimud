@@ -84,7 +84,7 @@
   
     <dt class="r2 last">Defined in:</dt>
     <dd class="r2 last">lib/isimud/event_observer.rb<span class="defines">,<br />
-  lib/isimud.rb,<br /> lib/isimud/event.rb,<br /> lib/isimud/client.rb,<br /> lib/isimud/version.rb,<br /> lib/isimud/logging.rb,<br /> lib/isimud/railtie.rb,<br /> lib/isimud/test_client.rb,<br /> lib/isimud/bunny_client.rb,<br /> lib/isimud/model_watcher.rb,<br /> lib/isimud/event_listener.rb,<br /> lib/rails/generators/isimud/config_generator.rb,<br /> lib/rails/generators/isimud/initializer_generator.rb</span>
+  lib/isimud.rb,<br /> lib/isimud/event.rb,<br /> lib/isimud/client.rb,<br /> lib/isimud/railtie.rb,<br /> lib/isimud/version.rb,<br /> lib/isimud/logging.rb,<br /> lib/isimud/test_client.rb,<br /> lib/isimud/bunny_client.rb,<br /> lib/isimud/model_watcher.rb,<br /> lib/isimud/event_listener.rb,<br /> lib/rails/generators/isimud/config_generator.rb,<br /> lib/rails/generators/isimud/initializer_generator.rb</span>
 </dd>
   
 </dl>
@@ -125,7 +125,7 @@
         <dt id="VERSION-constant" class="">VERSION =
           
         </dt>
-        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1.3.2</span><span class='tstring_end'>&#39;</span></span></pre></dd>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1.4.0</span><span class='tstring_end'>&#39;</span></span></pre></dd>
       
     </dl>
   
@@ -147,8 +147,6 @@
   
   
   
-    
-      <span class="note title readonly">readonly</span>
     
     
   
@@ -177,8 +175,6 @@
   
   
     
-      <span class="note title readonly">readonly</span>
-    
     
   
   
@@ -205,8 +201,6 @@
   
   
   
-    
-      <span class="note title readonly">readonly</span>
     
     
   
@@ -235,8 +229,6 @@
   
   
     
-      <span class="note title readonly">readonly</span>
-    
     
   
   
@@ -264,8 +256,6 @@
   
   
     
-      <span class="note title readonly">readonly</span>
-    
     
   
   
@@ -292,8 +282,6 @@
   
   
   
-    
-      <span class="note title readonly">readonly</span>
     
     
   
@@ -323,8 +311,6 @@
   
   
     
-      <span class="note title readonly">readonly</span>
-    
     
   
   
@@ -351,8 +337,6 @@
   
   
   
-    
-      <span class="note title readonly">readonly</span>
     
     
   
@@ -381,8 +365,6 @@
   
   
     
-      <span class="note title readonly">readonly</span>
-    
     
   
   
@@ -409,8 +391,6 @@
   
   
   
-    
-      <span class="note title readonly">readonly</span>
     
     
   
@@ -440,8 +420,6 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
   
   
     
-      <span class="note title readonly">readonly</span>
-    
     
   
   
@@ -460,7 +438,7 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#retry_failures-instance_method" title="#retry_failures (instance method)">- (Boolean) <strong>retry_failures</strong> </a>
+      <a href="#retry_failures-instance_method" title="#retry_failures (instance method)">- (Boolean|nil) <strong>retry_failures</strong> </a>
     
 
     
@@ -468,8 +446,6 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
   
   
   
-    
-      <span class="note title readonly">readonly</span>
     
     
   
@@ -480,7 +456,7 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
 
   
     <span class="summary_desc"><div class='inline'>
-<p>When set, if an exception occurs during message processing, requeue it.</p>
+<p>When set to nil, the return status from exception handlers is used.</p>
 </div></span>
   
 </li>
@@ -498,8 +474,6 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
   
   
     
-      <span class="note title readonly">readonly</span>
-    
     
   
   
@@ -509,7 +483,7 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Server connection attributes.</p>
+<p>Server connection attributes ().</p>
 </div></span>
   
 </li>
@@ -655,11 +629,11 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
     <h2>Instance Attribute Details</h2>
     
       
-      <span id=""></span>
+      <span id="client_options=-instance_method"></span>
       <div class="method_details first">
   <h3 class="signature first" id="client_options-instance_method">
   
-    - (<tt>Hash</tt>) <strong>client_options</strong>  <span class="extras">(readonly)</span>
+    - (<tt>Hash</tt>) <strong>client_options</strong> 
   
 
   
@@ -700,12 +674,12 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
       <pre class="lines">
 
 
-32
-33
-34</pre>
+34
+35
+36</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 34</span>
 
 <span class='id identifier rubyid_config_accessor'>config_accessor</span> <span class='symbol'>:client_type</span> <span class='kw'>do</span>
   <span class='symbol'>:bunny</span>
@@ -716,11 +690,11 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
 </div>
     
       
-      <span id=""></span>
+      <span id="client_type=-instance_method"></span>
       <div class="method_details ">
   <h3 class="signature " id="client_type-instance_method">
   
-    - (<tt>Enumerable&lt;'bunny', 'test'&gt;</tt>) <strong>client_type</strong>  <span class="extras">(readonly)</span>
+    - (<tt>Enumerable&lt;'bunny', 'test'&gt;</tt>) <strong>client_type</strong> 
   
 
   
@@ -761,12 +735,12 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
       <pre class="lines">
 
 
-32
-33
-34</pre>
+34
+35
+36</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 34</span>
 
 <span class='id identifier rubyid_config_accessor'>config_accessor</span> <span class='symbol'>:client_type</span> <span class='kw'>do</span>
   <span class='symbol'>:bunny</span>
@@ -777,11 +751,11 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
 </div>
     
       
-      <span id=""></span>
+      <span id="default_client=-instance_method"></span>
       <div class="method_details ">
   <h3 class="signature " id="default_client-instance_method">
   
-    - (<tt><span class='object_link'><a href="Isimud/Client.html" title="Isimud::Client (class)">Isimud::Client</a></span></tt>) <strong>default_client</strong>  <span class="extras">(readonly)</span>
+    - (<tt><span class='object_link'><a href="Isimud/Client.html" title="Isimud::Client (class)">Isimud::Client</a></span></tt>) <strong>default_client</strong> 
   
 
   
@@ -822,12 +796,12 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
       <pre class="lines">
 
 
-32
-33
-34</pre>
+34
+35
+36</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 34</span>
 
 <span class='id identifier rubyid_config_accessor'>config_accessor</span> <span class='symbol'>:client_type</span> <span class='kw'>do</span>
   <span class='symbol'>:bunny</span>
@@ -838,11 +812,11 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
 </div>
     
       
-      <span id=""></span>
+      <span id="enable_model_watcher=-instance_method"></span>
       <div class="method_details ">
   <h3 class="signature " id="enable_model_watcher-instance_method">
   
-    - (<tt>Boolean</tt>) <strong>enable_model_watcher</strong>  <span class="extras">(readonly)</span>
+    - (<tt>Boolean</tt>) <strong>enable_model_watcher</strong> 
   
 
   
@@ -883,12 +857,12 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
       <pre class="lines">
 
 
-32
-33
-34</pre>
+34
+35
+36</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 34</span>
 
 <span class='id identifier rubyid_config_accessor'>config_accessor</span> <span class='symbol'>:client_type</span> <span class='kw'>do</span>
   <span class='symbol'>:bunny</span>
@@ -899,11 +873,11 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
 </div>
     
       
-      <span id=""></span>
+      <span id="events_exchange=-instance_method"></span>
       <div class="method_details ">
   <h3 class="signature " id="events_exchange-instance_method">
   
-    - (<tt>String</tt>) <strong>events_exchange</strong>  <span class="extras">(readonly)</span>
+    - (<tt>String</tt>) <strong>events_exchange</strong> 
   
 
   
@@ -944,12 +918,12 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
       <pre class="lines">
 
 
-32
-33
-34</pre>
+34
+35
+36</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 34</span>
 
 <span class='id identifier rubyid_config_accessor'>config_accessor</span> <span class='symbol'>:client_type</span> <span class='kw'>do</span>
   <span class='symbol'>:bunny</span>
@@ -960,11 +934,11 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
 </div>
     
       
-      <span id=""></span>
+      <span id="listener_error_limit=-instance_method"></span>
       <div class="method_details ">
   <h3 class="signature " id="listener_error_limit-instance_method">
   
-    - (<tt>Integer</tt>) <strong>listener_error_limit</strong>  <span class="extras">(readonly)</span>
+    - (<tt>Integer</tt>) <strong>listener_error_limit</strong> 
   
 
   
@@ -1007,12 +981,12 @@ down (100)</p>
       <pre class="lines">
 
 
-32
-33
-34</pre>
+34
+35
+36</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 34</span>
 
 <span class='id identifier rubyid_config_accessor'>config_accessor</span> <span class='symbol'>:client_type</span> <span class='kw'>do</span>
   <span class='symbol'>:bunny</span>
@@ -1023,11 +997,11 @@ down (100)</p>
 </div>
     
       
-      <span id=""></span>
+      <span id="log_level=-instance_method"></span>
       <div class="method_details ">
   <h3 class="signature " id="log_level-instance_method">
   
-    - (<tt>Symbol</tt>) <strong>log_level</strong>  <span class="extras">(readonly)</span>
+    - (<tt>Symbol</tt>) <strong>log_level</strong> 
   
 
   
@@ -1068,12 +1042,12 @@ down (100)</p>
       <pre class="lines">
 
 
-32
-33
-34</pre>
+34
+35
+36</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 34</span>
 
 <span class='id identifier rubyid_config_accessor'>config_accessor</span> <span class='symbol'>:client_type</span> <span class='kw'>do</span>
   <span class='symbol'>:bunny</span>
@@ -1084,11 +1058,11 @@ down (100)</p>
 </div>
     
       
-      <span id=""></span>
+      <span id="logger=-instance_method"></span>
       <div class="method_details ">
   <h3 class="signature " id="logger-instance_method">
   
-    - (<tt>Logger</tt>) <strong>logger</strong>  <span class="extras">(readonly)</span>
+    - (<tt>Logger</tt>) <strong>logger</strong> 
   
 
   
@@ -1129,12 +1103,12 @@ down (100)</p>
       <pre class="lines">
 
 
-32
-33
-34</pre>
+34
+35
+36</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 34</span>
 
 <span class='id identifier rubyid_config_accessor'>config_accessor</span> <span class='symbol'>:client_type</span> <span class='kw'>do</span>
   <span class='symbol'>:bunny</span>
@@ -1145,11 +1119,11 @@ down (100)</p>
 </div>
     
       
-      <span id=""></span>
+      <span id="model_watcher_exchange=-instance_method"></span>
       <div class="method_details ">
   <h3 class="signature " id="model_watcher_exchange-instance_method">
   
-    - (<tt>String</tt>) <strong>model_watcher_exchange</strong>  <span class="extras">(readonly)</span>
+    - (<tt>String</tt>) <strong>model_watcher_exchange</strong> 
   
 
   
@@ -1190,12 +1164,12 @@ down (100)</p>
       <pre class="lines">
 
 
-32
-33
-34</pre>
+34
+35
+36</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 34</span>
 
 <span class='id identifier rubyid_config_accessor'>config_accessor</span> <span class='symbol'>:client_type</span> <span class='kw'>do</span>
   <span class='symbol'>:bunny</span>
@@ -1206,11 +1180,11 @@ down (100)</p>
 </div>
     
       
-      <span id=""></span>
+      <span id="model_watcher_schema=-instance_method"></span>
       <div class="method_details ">
   <h3 class="signature " id="model_watcher_schema-instance_method">
   
-    - (<tt>String</tt>) <strong>model_watcher_schema</strong>  <span class="extras">(readonly)</span>
+    - (<tt>String</tt>) <strong>model_watcher_schema</strong> 
   
 
   
@@ -1253,12 +1227,12 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
       <pre class="lines">
 
 
-32
-33
-34</pre>
+34
+35
+36</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 34</span>
 
 <span class='id identifier rubyid_config_accessor'>config_accessor</span> <span class='symbol'>:client_type</span> <span class='kw'>do</span>
   <span class='symbol'>:bunny</span>
@@ -1269,11 +1243,11 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
 </div>
     
       
-      <span id=""></span>
+      <span id="prefetch_count=-instance_method"></span>
       <div class="method_details ">
   <h3 class="signature " id="prefetch_count-instance_method">
   
-    - (<tt>Integer</tt>) <strong>prefetch_count</strong>  <span class="extras">(readonly)</span>
+    - (<tt>Integer</tt>) <strong>prefetch_count</strong> 
   
 
   
@@ -1314,12 +1288,12 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
       <pre class="lines">
 
 
-32
-33
-34</pre>
+34
+35
+36</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 34</span>
 
 <span class='id identifier rubyid_config_accessor'>config_accessor</span> <span class='symbol'>:client_type</span> <span class='kw'>do</span>
   <span class='symbol'>:bunny</span>
@@ -1330,11 +1304,11 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
 </div>
     
       
-      <span id=""></span>
+      <span id="retry_failures=-instance_method"></span>
       <div class="method_details ">
   <h3 class="signature " id="retry_failures-instance_method">
   
-    - (<tt>Boolean</tt>) <strong>retry_failures</strong>  <span class="extras">(readonly)</span>
+    - (<tt>Boolean|nil</tt>) <strong>retry_failures</strong> 
   
 
   
@@ -1343,8 +1317,7 @@ href="Rails.env">Rails.configuration.database_configuration</a>[&#39;database&#3
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns when set, if an exception occurs during message processing, requeue
-it</p>
+<p>When set to nil, the return status from exception handlers is used. (false)</p>
 
 
   </div>
@@ -1357,18 +1330,25 @@ it</p>
     <li>
       
       
-        <span class='type'>(<tt>Boolean</tt>)</span>
+        <span class='type'>(<tt>Boolean|nil</tt>)</span>
       
       
       
         &mdash;
         <div class='inline'>
-<p>when set, if an exception occurs during message processing, requeue it</p>
+<p>whether to requeue a message if an exception occurs during processing.</p>
 </div>
       
     </li>
   
 </ul>
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="Isimud/Client.html#on_exception-instance_method" title="Isimud::Client#on_exception (method)">Isimud::Client#on_exception</a></span></li>
+    
+  </ul>
 
 </div><table class="source_code">
   <tr>
@@ -1376,12 +1356,12 @@ it</p>
       <pre class="lines">
 
 
-32
-33
-34</pre>
+34
+35
+36</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 34</span>
 
 <span class='id identifier rubyid_config_accessor'>config_accessor</span> <span class='symbol'>:client_type</span> <span class='kw'>do</span>
   <span class='symbol'>:bunny</span>
@@ -1392,11 +1372,11 @@ it</p>
 </div>
     
       
-      <span id=""></span>
+      <span id="server=-instance_method"></span>
       <div class="method_details ">
   <h3 class="signature " id="server-instance_method">
   
-    - (<tt>&lt;String, Hash&gt;</tt>) <strong>server</strong>  <span class="extras">(readonly)</span>
+    - (<tt>&lt;String, Hash&gt;</tt>) <strong>server</strong> 
   
 
   
@@ -1405,7 +1385,7 @@ it</p>
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns server connection attributes</p>
+<p>Returns server connection attributes ()</p>
 
 
   </div>
@@ -1424,7 +1404,7 @@ it</p>
       
         &mdash;
         <div class='inline'>
-<p>server connection attributes</p>
+<p>server connection attributes ()</p>
 </div>
       
     </li>
@@ -1437,12 +1417,12 @@ it</p>
       <pre class="lines">
 
 
-32
-33
-34</pre>
+34
+35
+36</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 34</span>
 
 <span class='id identifier rubyid_config_accessor'>config_accessor</span> <span class='symbol'>:client_type</span> <span class='kw'>do</span>
   <span class='symbol'>:bunny</span>
@@ -1503,12 +1483,12 @@ it</p>
       <pre class="lines">
 
 
-65
-66
-67</pre>
+70
+71
+72</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 65</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 70</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_client'>client</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_default_client'>default_client</span> <span class='op'>||=</span> <span class='id identifier rubyid_client_class'>client_class</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_server'>server</span><span class='comma'>,</span> <span class='id identifier rubyid_client_options'>client_options</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
@@ -1533,13 +1513,13 @@ it</p>
       <pre class="lines">
 
 
-58
-59
-60
-61</pre>
+63
+64
+65
+66</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 58</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 63</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_client_class'>client_class</span>
   <span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_client_type'>client_type</span><span class='embexpr_end'>}</span><span class='tstring_content'>_client</span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_classify'>classify</span>
@@ -1576,12 +1556,12 @@ it</p>
       <pre class="lines">
 
 
-70
-71
-72</pre>
+75
+76
+77</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 70</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 75</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_connect'>connect</span>
   <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_connect'>connect</span>
@@ -1630,12 +1610,12 @@ it</p>
       <pre class="lines">
 
 
-75
-76
-77</pre>
+80
+81
+82</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 75</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 80</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_model_watcher_enabled?'>model_watcher_enabled?</span>
   <span class='id identifier rubyid_enable_model_watcher'>enable_model_watcher</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>||</span> <span class='id identifier rubyid_enable_model_watcher'>enable_model_watcher</span>
@@ -1671,12 +1651,12 @@ it</p>
       <pre class="lines">
 
 
-80
-81
-82</pre>
+85
+86
+87</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 80</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud.rb', line 85</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_reconnect'>reconnect</span>
   <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_reconnect'>reconnect</span>
@@ -1691,9 +1671,9 @@ it</p>
 </div>
 
     <div id="footer">
-  Generated on Mon Jan 18 17:07:52 2016 by
+  Generated on Tue Aug 23 17:34:23 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.6 (ruby-2.2.3).
+  0.8.7.6 (ruby-2.3.0).
 </div>
 
   </body>

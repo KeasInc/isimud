@@ -62,6 +62,9 @@
     <iframe id="search_frame"></iframe>
 
     <div id="content"><div id='filecontents'>
+<p><a href="https://badge.fury.io/rb/isimud"><img
+src="https://badge.fury.io/rb/isimud.svg"></a></p>
+
 <h1 id="label-Isimud-3A+AMQP+based+Messaging+and+Event+Processing+Abstraction+Component.">Isimud: AMQP based Messaging and Event Processing Abstraction Component.</h1>
 
 <blockquote>
@@ -72,14 +75,11 @@ in opposite directions.</p>
 <p><em>Source: Wikipedia</em></p>
 </blockquote>
 
-<p>Isimud is a message publishing and consumption gem. It consists of the
-following components:</p>
+<p>Isimud is an AMQP message publishing and consumption gem intended for Rails
+applications. It includes the following components:</p>
 <ul><li>
 <p>A <a href="http://rubybunny.info">Bunny</a> based client interface for
 publishing and receiving messages using AMQP.</p>
-</li><li>
-<p>A test client which mocks most client operations and allows for synchronous
-delivery and processing of messages for unit tests.</p>
 </li><li>
 <p>A Model Watcher mixin for ActiveRecord that automatically sends messages
 whenever an ActiveRecord instance is created, modified, or destroyed.</p>
@@ -89,9 +89,12 @@ with the EventListener for receiving messages.</p>
 </li><li>
 <p>An Event Listener daemon process which manages queues and dispatches
 messages for Event Observers.</p>
+</li><li>
+<p>A test client for mocking message publication, allowing synchronous
+delivery and processing of messages in unit tests.</p>
 </li></ul>
 
-<h2 id="label-Installation">Installation</h2>
+<h1 id="label-Installation">Installation</h1>
 
 <p>Add this line to your application&#39;s Gemfile:</p>
 
@@ -114,18 +117,18 @@ $ rails g isimud:initializer</code></pre>
 
 <p>Customize the AMQP broker settings in the config/isimud.yml</p>
 
-<h2 id="label-Usage">Usage</h2>
+<h1 id="label-Usage">Usage</h1>
 
-<h3 id="label-Connecting+to+an+AMQP+server">Connecting to an AMQP server</h3>
+<h2 id="label-Connecting+to+an+AMQP+Server">Connecting to an AMQP Server</h2>
 
 <p>There are two supported conventions for specifying a RabbitMQ server
 (broker) in the configuration file:</p>
 
-<h4 id="label-Using+a+URL">Using a URL</h4>
+<h3 id="label-Using+a+URL">Using a URL</h3>
 
 <pre class="code ruby"><code class="ruby">server: amqp:port//user_name:password@host/vhost</code></pre>
 
-<h4 id="label-Using+separate+parameters-3A">Using separate parameters:</h4>
+<h3 id="label-Using+Separate+Parameters-3A">Using Separate Parameters:</h3>
 
 <pre class="code ruby"><code class="ruby">server:
     host:  hostname
@@ -150,32 +153,129 @@ exchange in order to prevent loss of messages due to failures.</p>
 <p>Isimud uses <a href="http://rubybunny.info">Bunny</a> to connect to
 RabbitMQ.</p>
 
-<h3 id="label-Message+publication">Message publication</h3>
+<h2 id="label-Message+Publication">Message Publication</h2>
 
-<p>Isimud uses topic based exchanges publish messages. This allows for
-multiple listener workers to operate in parallel to process messages.</p>
+<p>Isimud publish messages to topic based exchanges. Each message is tagged
+with a routing key, allowing for multiple audiences to selectively receive
+messages.</p>
 
-<h3 id="label-Message+binding+and+consumption">Message binding and consumption</h3>
+<h2 id="label-Message+Queues-2C+Bindings-2C+and+Consumption">Message Queues, Bindings, and Consumption</h2>
 
-<p>Isimud uses non-exclusive, durable queues to listen for and consume
-messages. Named queues are automatically created if they do not exist.</p>
+<p>Isimud uses named, non-exclusive, durable queues to consume messages, with
+a configurable pre-fetch amount.</p>
 
-<h2 id="label-Changes">Changes</h2>
+<p>There are two ways that message queues may be declared:</p>
+<ol><li>
+<p>Using EventObserver instances. The EventObserver module allows an
+implementing class to define queues and bindings for each instance.</p>
+</li><li>
+<p>The EventListener automatically establishes and manages queues for
+instances of each implementing class.</p>
+</li><li>
+<p>Each EventListener process maintains its own exclusive queue to
+automatically add or cancel consumers for  EventObserver instances as they
+added, modified, or deleted.</p>
+</li><li>
+<p>Custom standalone queues. You may extend EventListener to declare
+individual queues not associated with a specific object instance.</p>
+</li></ol>
 
-<h3 id="label-1.3.2">1.3.2</h3>
+<p>The EventListener process will automatically create queues on initial
+startup if they do not already exist. This allows for cold startup on a new
+AMQP broker.</p>
+
+<h3 id="label-Message+Delivery+Information+and+Metadata">Message Delivery Information and Metadata</h3>
+
+<p>Each time that a message is retrieved from the queue, the following
+properties are set in the current thread:</p>
+
+<p>| name | contents |  | —- | ——– |  | isimud_queue_name | Name of the queue
+processing the thread |  | isimud_delivery_info | Message delivery
+information (<em>Bunny::DeliveryInfo</em>) |  | isimud_properties | Message
+properties metadata (<em>Bunny::MessageProperties</em>) |</p>
+
+<h3 id="label-Exception+Handling">Exception Handling</h3>
+
+<p>If an uncaught instance of StandardError is raised during message
+processing, all exception handlers added to the client are run in the order
+they were declared (see Client#on_exception). Any exceptions raised by the
+exception handlers themselves are silently ignored.</p>
+
+<p>You can configure the disposition of the message that triggered the
+exception using the configuration attribute Isimud.retry_failures as
+follows:</p>
+
+<p>| Isimud.retry_failures | Behavior | | :——————-: | ——– | | <em>false</em> |
+Never requeue messages (default) | | <em>true</em> | Always requeue
+messages | | <em>nil</em> | Conditionally re-queue messages based on
+exception handler return values |</p>
+
+<p>When conditional re-queueing is enabled, requeue is determined based on the
+return value of all exception handlers, logically AND-ed. If the result is
+truthy, the message is re-queued. If the return value of any handler is
+falsey, the message is not re-queued.</p>
+
+<h1 id="label-Changes">Changes</h1>
+
+<h2 id="label-1.4.0">1.4.0</h2>
+<ul><li>
+<p>Enable conditional re-queuing of messages after an exception is raised (see
+<em>Exception Handling</em> above).</p>
+</li><li>
+<p>Log messages for receipt and ack of messages downgraded to debug level.</p>
+</li><li>
+<p>Force manual_ack mode for all queue subscriptions.</p>
+</li></ul>
+
+<h2 id="label-1.3.8">1.3.8</h2>
+<ul><li>
+<p>In EventListener event thread, rescue all exceptions, not just Bunny ones.</p>
+</li></ul>
+
+<h2 id="label-1.3.7">1.3.7</h2>
+<ul><li>
+<p>Change instance var &#39;status&#39; inside the start event thread</p>
+</li></ul>
+
+<h2 id="label-1.3.6">1.3.6</h2>
+<ul><li>
+<p>Don&#39;t include ModelWatcher attributes in event publish log message</p>
+</li><li>
+<p>Include routing key in ModelWatcher event publish log message</p>
+</li></ul>
+
+<h2 id="label-1.3.5">1.3.5</h2>
+<ul><li>
+<p>Added option to EventObserver#observe_events to recreate bindings for
+observer queues</p>
+</li><li>
+<p>EventListener only create bindings and queues for EventObserver instances
+on initial startup</p>
+</li></ul>
+
+<h2 id="label-1.3.4">1.3.4</h2>
+<ul><li>
+<p>Always recreate bindings for observer queues when EventListener starts the
+event thread.</p>
+</li><li>
+<p>Cleaned up method signature on EventObserver#delete_queue so that a client
+may be passed to it.</p>
+</li></ul>
+
+<h2 id="label-1.3.3">1.3.3</h2>
 <ul><li>
 <p>Fixed handling of exceptions in TestClient</p>
 </li><li>
 <p>Make EventListener#has_observer? public</p>
 </li></ul>
 
-<h3 id="label-1.3.1">1.3.1</h3>
+<h2 id="label-1.3.1">1.3.1</h2>
 <ul><li>
 <p>Add EventObserver#deactivate_observer to trigger queue deletion for an
 observer instance.</p>
 </li></ul>
 
-<h3 id="label-1.3.0">1.3.0</h3>
+<h2 id="label-1.3.0">1.3.0</h2>
 <ul><li>
 <p>Added a new method, EventListener#bind_event_queues() for registering
 custom event handlers. Override  this method instead of bind_queues() to
@@ -187,12 +287,12 @@ collisions caused by processes on different  hosts sharing the same PID.</p>
 <p>Added lots of documentation.</p>
 </li></ul>
 
-<h3 id="label-1.2.1">1.2.1</h3>
+<h2 id="label-1.2.1">1.2.1</h2>
 <ul><li>
 <p>Include attributes in ModelWatcher destroy message</p>
 </li></ul>
 
-<h3 id="label-1.2.0">1.2.0</h3>
+<h2 id="label-1.2.0">1.2.0</h2>
 <ul><li>
 <p>EventObserver#update_queue now always binds current routing keys. This
 ensures that when an enable_listener? changes  state from false to true
@@ -205,19 +305,19 @@ an observer instance on demand.</p>
 for subclasses.</p>
 </li></ul>
 
-<h3 id="label-1.1.0">1.1.0</h3>
+<h2 id="label-1.1.0">1.1.0</h2>
 <ul><li>
 <p>Clients now support multiple exception handlers. Each call to
 Client#on_exception will add a new block to the  exception handlers list</p>
 </li></ul>
 
-<h3 id="label-1.0.2">1.0.2</h3>
+<h2 id="label-1.0.2">1.0.2</h2>
 
-<h4 id="label-Breaking+Changes-3A">Breaking Changes:</h4>
+<h3 id="label-Breaking+Changes-3A">Breaking Changes:</h3>
 <ul><li>
 <p>EventObserver instances are now required to have the persistent attribute
-/exchange_routing_keys/. These are used to  store the current value of
-routing keys assoicated with an instance. The queue associated with an
+<em>exchange_routing_keys</em>. These are used to  store the current value
+of routing keys assoicated with an instance. The queue associated with an
 EventObserver is  now created and updated at the same time the
 EventObserver is updated, rather than relying on the EventListener to 
 create it.</p>
@@ -235,17 +335,14 @@ subscribe to messages.</p>
 <p>Removed Client#rebind.</p>
 </li></ul>
 
-<h4 id="label-Other+Changes-3A">Other Changes:</h4>
+<h3 id="label-Other+Changes-3A">Other Changes:</h3>
 <ul><li>
 <p>TestClient::Queue now responds to bind() and unbind() in the same manner as
 Bunny::Queue.</p>
 </li><li>
 <p>BunnyClient#create_queue now may be called without a block to instantiate
 an AMQP queue without subscribing to messages</p>
-</li></ul>
-
-<h3 id="label-0.6.0+-28broken-29">0.6.0 (broken)</h3>
-<ul><li>
+</li><li>
 <p>Added Client#rebind to change the exchange and routing keys for a durable
 named queue.</p>
 </li><li>
@@ -255,19 +352,19 @@ named queue.</p>
 modified EventObserver instances.</p>
 </li></ul>
 
-<h3 id="label-0.5.2">0.5.2</h3>
+<h2 id="label-0.5.2">0.5.2</h2>
 <ul><li>
 <p>Fixed regexp bug in TestClient affecting message delivery</p>
 </li><li>
 <p>Add more logging for EventObserver binding</p>
 </li></ul>
 
-<h3 id="label-0.5.1">0.5.1</h3>
+<h2 id="label-0.5.1">0.5.1</h2>
 <ul><li>
 <p>Added Event#attributes</p>
 </li></ul>
 
-<h3 id="label-0.5.0">0.5.0</h3>
+<h2 id="label-0.5.0">0.5.0</h2>
 <ul><li>
 <p>Allow EventObserver classes to override the exchange for listening to
 events</p>
@@ -283,7 +380,7 @@ events appropriately when default columns are watched</p>
 <p>Moved requires for Isimud below config attribute declarations</p>
 </li></ul>
 
-<h3 id="label-0.4.10">0.4.10</h3>
+<h2 id="label-0.4.10">0.4.10</h2>
 <ul><li>
 <p>Corrected trap of INT and TERM signals</p>
 </li><li>
@@ -292,12 +389,12 @@ events appropriately when default columns are watched</p>
 <p>Corrected race condition for registering EventObserver classes</p>
 </li></ul>
 
-<h3 id="label-0.4.5">0.4.5</h3>
+<h2 id="label-0.4.5">0.4.5</h2>
 <ul><li>
 <p>Fixed issues with exception handling</p>
 </li></ul>
 
-<h3 id="label-0.4.1">0.4.1</h3>
+<h2 id="label-0.4.1">0.4.1</h2>
 <ul><li>
 <p>Event now accepts an exchange option for publishing</p>
 </li><li>
@@ -306,7 +403,7 @@ events appropriately when default columns are watched</p>
 <p>Cleaned up initializer template</p>
 </li></ul>
 
-<h3 id="label-0.4.0">0.4.0</h3>
+<h2 id="label-0.4.0">0.4.0</h2>
 <ul><li>
 <p>Event logging of published message now set to debug level</p>
 </li><li>
@@ -321,61 +418,61 @@ EventListener to intercept exceptions raised  during message handling by an
 observer.</p>
 </li></ul>
 
-<h3 id="label-0.3.7">0.3.7</h3>
+<h2 id="label-0.3.7">0.3.7</h2>
 <ul><li>
 <p>Added EventObserver mix-in</p>
 </li><li>
 <p>Added accessors for queues and routing_keys to TestClient</p>
 </li></ul>
 
-<h3 id="label-0.3.6">0.3.6</h3>
+<h2 id="label-0.3.6">0.3.6</h2>
 <ul><li>
 <p>Reraise all exceptions in message processing block in BunnyClient#bind.</p>
 </li></ul>
 
-<h3 id="label-0.3.5">0.3.5</h3>
+<h2 id="label-0.3.5">0.3.5</h2>
 <ul><li>
 <p>Fixed deprecation on setting manual ack on Bunny queue subscriptions.</p>
 </li></ul>
 
-<h3 id="label-0.3.4">0.3.4</h3>
+<h2 id="label-0.3.4">0.3.4</h2>
 <ul><li>
 <p>Catch Timeout::Error in ModelWatcher.synchronize</p>
 </li></ul>
 
-<h3 id="label-0.3.1">0.3.1</h3>
+<h2 id="label-0.3.1">0.3.1</h2>
 <ul><li>
 <p>Tuning gargabe collector on ModelWatcher.synchronize</p>
 </li></ul>
 
-<h3 id="label-0.3.0">0.3.0</h3>
+<h2 id="label-0.3.0">0.3.0</h2>
 <ul><li>
 <p>Added rake task for manual synchronization using ModelWatcher</p>
 </li></ul>
 
-<h3 id="label-0.2.17">0.2.17</h3>
+<h2 id="label-0.2.17">0.2.17</h2>
 <ul><li>
 <p>Added guard on null #updated_at instances</p>
 </li><li>
 <p>Added ModelWatcher#isimud_sync for manual synchronization</p>
 </li></ul>
 
-<h3 id="label-0.2.15">0.2.15</h3>
+<h2 id="label-0.2.15">0.2.15</h2>
 <ul><li>
 <p>Changed Event#send to Event#publish, to avoid overloading Ruby.</p>
 </li></ul>
 
-<h3 id="label-0.2.13">0.2.13</h3>
+<h2 id="label-0.2.13">0.2.13</h2>
 <ul><li>
 <p>Add :omit_parameters option to Event#as_json</p>
 </li></ul>
 
-<h3 id="label-0.2.12">0.2.12</h3>
+<h2 id="label-0.2.12">0.2.12</h2>
 <ul><li>
 <p>Demodulize ActiveRecord model name when setting ModelWatcher event type</p>
 </li></ul>
 
-<h3 id="label-0.2.10">0.2.10</h3>
+<h2 id="label-0.2.10">0.2.10</h2>
 <ul><li>
 <p>Added Isimud.retry_failures</p>
 </li><li>
@@ -388,30 +485,30 @@ default</p>
 called</p>
 </li></ul>
 
-<h3 id="label-0.2.4">0.2.4</h3>
+<h2 id="label-0.2.4">0.2.4</h2>
 <ul><li>
 <p>Add Isimud::ModelWatcher#isimud_synchronize? to allow conditional
 synchronization. Override to activate.</p>
 </li></ul>
 
-<h3 id="label-0.2.2">0.2.2</h3>
+<h2 id="label-0.2.2">0.2.2</h2>
 <ul><li>
 <p>Add enable_model_watcher configuration parameter (default is true)</p>
 </li></ul>
 
-<h3 id="label-0.2.0">0.2.0</h3>
+<h2 id="label-0.2.0">0.2.0</h2>
 <ul><li>
 <p>Added Isimud::Event</p>
 </li><li>
 <p>Extracted Isimud::Client#log into Isimud::Logging module</p>
 </li></ul>
 
-<h3 id="label-0.1.4">0.1.4</h3>
+<h2 id="label-0.1.4">0.1.4</h2>
 <ul><li>
 <p>Don&#39;t reject messages when exception is raised in bind block</p>
 </li></ul>
 
-<h3 id="label-0.1.3">0.1.3</h3>
+<h2 id="label-0.1.3">0.1.3</h2>
 <ul><li>
 <p>Upgrade bunny gem requirement to 1.3.x</p>
 </li><li>
@@ -420,26 +517,21 @@ synchronization. Override to activate.</p>
 <p>Added log_level configuration parameter (default is :debug)</p>
 </li></ul>
 
-<h3 id="label-0.1.2">0.1.2</h3>
+<h2 id="label-0.1.2">0.1.2</h2>
 <ul><li>
 <p>Reject message with requeue when an exception is raised during processing</p>
 </li></ul>
 
-<h3 id="label-0.1.1">0.1.1</h3>
+<h2 id="label-0.1.1">0.1.1</h2>
 <ul><li>
 <p>Enable channel confirmations for message publication</p>
 </li></ul>
 
-<h3 id="label-0.1.0">0.1.0</h3>
+<h2 id="label-0.1.0">0.1.0</h2>
 <ul><li>
 <p>ModelWatcher mix-in for ActiveRecord, sends events on instance changes</p>
 </li><li>
 <p>Initializer generator for Rails</p>
-</li></ul>
-
-<h3 id="label-0.0.8+-28first+working+version-29">0.0.8 (first working version)</h3>
-<ul><li>
-<p>Don&#39;t clear the queues when reconnecting TestClient</p>
 </li></ul>
 
 <h2 id="label-Contributing">Contributing</h2>
@@ -460,9 +552,9 @@ feature&#39;</code>)</p>
 </div></div>
 
     <div id="footer">
-  Generated on Mon Jan 18 17:07:52 2016 by
+  Generated on Wed Aug 24 18:59:44 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.6 (ruby-2.2.3).
+  0.8.7.6 (ruby-2.3.0).
 </div>
 
   </body>

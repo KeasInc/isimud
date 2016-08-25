@@ -1,11 +1,11 @@
 module Isimud
 
-  # Interface for a messaging client that is suitable for testing. No network connections are involved.
-  # Note that all message deliveries are handled in a synchronous manner. When a message is published to the
-  # client, each declared queue is examined and, if the message's routing key matches any of the patterns bound to the
-  # queue, the queue's block is called with the message. Any uncaught exceptions raised within a message processing
-  # block will cause any declared exception handlers to be run. However, the message will not be re-placed onto the
-  # queue should this occur.
+  # Interface for a messaging client that is suitable for testing. No network connections are used.
+  # All message deliveries are handled in a synchronous manner. When a message is published to the client, each declared
+  # queue is examined and, if the message's routing key matches any of the patterns bound to the queue, the queue's
+  # block is called with the message. Any uncaught exceptions raised within a message processing
+  # block will cause any declared exception handlers to be run. However, the message will not be re-queued should this
+  # occur.
   class TestClient < Isimud::Client
     attr_accessor :queues
 
@@ -14,11 +14,11 @@ module Isimud
       attr_reader :name, :bindings, :client
       attr_accessor :proc
 
-      def initialize(client, name, proc = Proc.new{ |_| } )
-        @client = client
-        @name         = name
-        @bindings     = Hash.new{ |hash, key| hash[key] = Set.new }
-        @proc         = proc
+      def initialize(client, name, proc = Proc.new { |_|})
+        @client   = client
+        @name     = name
+        @bindings = Hash.new { |hash, key| hash[key] = Set.new }
+        @proc     = proc
       end
 
       def bind(exchange, opts = {})
@@ -44,7 +44,7 @@ module Isimud
       end
 
       def make_regexp(key)
-        Regexp.new(key.gsub(/\./, "\\.").gsub(/\*/, '.*'))
+        Regexp.new(key.gsub(/\./, "\\.").gsub(/\*/, '[^.]*').gsub(/#/, '.*'))
       end
 
       def has_matching_key?(exchange, route)
