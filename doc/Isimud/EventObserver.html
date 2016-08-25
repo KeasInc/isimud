@@ -260,7 +260,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#observe_events-instance_method" title="#observe_events (instance method)">- (Object) <strong>observe_events</strong>(client) </a>
+      <a href="#observe_events-instance_method" title="#observe_events (instance method)">- (Object) <strong>observe_events</strong>(client, refresh_bindings = true) </a>
     
 
     
@@ -379,13 +379,13 @@ when an observer is to be made active without an update.</p>
       <pre class="lines">
 
 
-76
-77
-78
-79</pre>
+80
+81
+82
+83</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/event_observer.rb', line 76</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/event_observer.rb', line 80</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_activate_observer'>activate_observer</span><span class='lparen'>(</span><span class='id identifier rubyid_client'>client</span> <span class='op'>=</span> <span class='id identifier rubyid_isimud_client'>isimud_client</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_create_queue'>create_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_client'>client</span><span class='rparen'>)</span>
@@ -426,13 +426,13 @@ corresponding event consumers.</p>
       <pre class="lines">
 
 
-84
-85
-86
-87</pre>
+88
+89
+90
+91</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/event_observer.rb', line 84</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/event_observer.rb', line 88</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_deactivate_observer'>deactivate_observer</span><span class='lparen'>(</span><span class='id identifier rubyid_client'>client</span> <span class='op'>=</span> <span class='id identifier rubyid_isimud_client'>isimud_client</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_delete_queue'>delete_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_client'>client</span><span class='rparen'>)</span>
@@ -513,12 +513,12 @@ in your subclass.</p>
       <pre class="lines">
 
 
-65
-66
-67</pre>
+69
+70
+71</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/event_observer.rb', line 65</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/event_observer.rb', line 69</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_event_queue_name'>event_queue_name</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_event_queue_name'>event_queue_name</span><span class='lparen'>(</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
@@ -584,12 +584,12 @@ in your subclass.</p>
       <pre class="lines">
 
 
-69
-70
-71</pre>
+73
+74
+75</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/event_observer.rb', line 69</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/event_observer.rb', line 73</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_isimud_client'>isimud_client</span>
   <span class='const'>Isimud</span><span class='period'>.</span><span class='id identifier rubyid_client'>client</span>
@@ -602,7 +602,7 @@ in your subclass.</p>
       <div class="method_details ">
   <h3 class="signature " id="observe_events-instance_method">
   
-    - (<tt>Object</tt>) <strong>observe_events</strong>(client) 
+    - (<tt>Object</tt>) <strong>observe_events</strong>(client, refresh_bindings = true) 
   
 
   
@@ -613,13 +613,78 @@ in your subclass.</p>
     
 <p>Create or attach to a queue on the specified exchange. When an event
 message that matches the observer&#39;s routing keys is received, parse the
-event and call handle_event on same. Returns the consumer for the observer</p>
+event and call handle_event on same.</p>
 
 
   </div>
 </div>
 <div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
   
+    <li>
+      
+        <span class='name'>client</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Client.html" title="Isimud::Client (class)">Isimud::Client</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>client instance</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>refresh_bindings</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>true</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>when set, refresh bindings on queue (true)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        
+        <div class='inline'>
+<p>queue or consumer object</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="BunnyClient.html#subscribe-instance_method" title="Isimud::BunnyClient#subscribe (method)">BunnyClient#subscribe</a></span></li>
+    
+      <li><span class='object_link'><a href="TestClient.html#subscribe-instance_method" title="Isimud::TestClient#subscribe (method)">TestClient#subscribe</a></span></li>
+    
+  </ul>
 
 </div><table class="source_code">
   <tr>
@@ -627,21 +692,21 @@ event and call handle_event on same. Returns the consumer for the observer</p>
       <pre class="lines">
 
 
-56
-57
-58
-59
 60
 61
 62
-63</pre>
+63
+64
+65
+66
+67</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/isimud/event_observer.rb', line 56</span>
+      <pre class="code"><span class="info file"># File 'lib/isimud/event_observer.rb', line 60</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_observe_events'>observe_events</span><span class='lparen'>(</span><span class='id identifier rubyid_client'>client</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_observe_events'>observe_events</span><span class='lparen'>(</span><span class='id identifier rubyid_client'>client</span><span class='comma'>,</span> <span class='id identifier rubyid_refresh_bindings'>refresh_bindings</span> <span class='op'>=</span> <span class='kw'>true</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_enable_listener?'>enable_listener?</span>
-  <span class='id identifier rubyid_queue'>queue</span> <span class='op'>=</span> <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_kind_of?'>kind_of?</span><span class='lparen'>(</span><span class='const'>Isimud</span><span class='op'>::</span><span class='const'>TestClient</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_create_queue'>create_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_client'>client</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_find_queue'>find_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_event_queue_name'>event_queue_name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_queue'>queue</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_refresh_bindings'>refresh_bindings</span> <span class='op'>||</span> <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_kind_of?'>kind_of?</span><span class='lparen'>(</span><span class='const'>Isimud</span><span class='op'>::</span><span class='const'>TestClient</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_create_queue'>create_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_client'>client</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_find_queue'>find_queue</span><span class='lparen'>(</span><span class='id identifier rubyid_event_queue_name'>event_queue_name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_subscribe'>subscribe</span><span class='lparen'>(</span><span class='id identifier rubyid_queue'>queue</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_message'>message</span><span class='op'>|</span>
     <span class='id identifier rubyid_event'>event</span> <span class='op'>=</span> <span class='const'>Event</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_message'>message</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_handle_event'>handle_event</span><span class='lparen'>(</span><span class='id identifier rubyid_event'>event</span><span class='rparen'>)</span>
@@ -740,9 +805,9 @@ want to specify an alternative exchange.</p>
 </div>
 
     <div id="footer">
-  Generated on Mon Jan 18 17:07:52 2016 by
+  Generated on Tue Aug 23 17:34:23 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.6 (ruby-2.2.3).
+  0.8.7.6 (ruby-2.3.0).
 </div>
 
   </body>
