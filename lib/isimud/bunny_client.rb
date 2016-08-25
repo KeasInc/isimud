@@ -141,10 +141,13 @@ module Isimud
     # @param [String] exchange AMQP exchange name
     # @param [String] routing_key message routing key. This should always be in the form of words separated by dots
     #   e.g. "user.goal.complete"
+    # @param [String] payload message payload
+    # @param [Hash] options additional message options
+    # @see Bunny::Exchange#publish
     # @see http://rubybunny.info/articles/exchanges.html
-    def publish(exchange, routing_key, payload)
+    def publish(exchange, routing_key, payload, options = {})
       log "Isimud::BunnyClient#publish: exchange=#{exchange} routing_key=#{routing_key}", :debug
-      channel.topic(exchange, durable: true).publish(payload, routing_key: routing_key, persistent: true)
+      channel.topic(exchange, durable: true).publish(payload, options.merge(routing_key: routing_key, persistent: true))
     end
 
     # Close and reopen the AMQP connection

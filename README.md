@@ -120,6 +120,14 @@ the message is not re-queued.
 
 # Changes
 
+## 1.4.2
+
+* BunnyClient#publish now accepts additional metadata options
+* Isimud::Event changes:
+  * Added #timestamp property
+  * Added #message_id for generating unique message IDs
+  * message_id is now added to metadata when publishing 
+
 ## 1.4.1
 
 * Enable conditional re-queuing of messages after an exception is raised (see *Exception Handling* above).
