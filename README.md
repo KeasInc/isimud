@@ -134,6 +134,12 @@ the message is not re-queued.
 * Log messages for receipt and ack of messages downgraded to debug level.
 * Force manual_ack mode for all queue subscriptions. 
 
+## 1.3.9
+
+* EventListener changes:
+  * start_event_thread, dump exception backtrace to log
+  * set log level to info or higher for all event thread messages
+
 ## 1.3.8
 
 * In EventListener event thread, rescue all exceptions, not just Bunny ones.
