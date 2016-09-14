@@ -84,8 +84,8 @@ module Isimud
       @events_exchange     = options[:events_exchange]
       @models_exchange     = options[:models_exchange]
       @name                = options[:name]
-      @observer_mutex      = Mutex.new
-      @error_counter_mutex = Mutex.new
+      @observer_mutex      = Thread::Mutex.new
+      @error_counter_mutex = Thread::Mutex.new
       @status              = STATUS_INITIALIZE
     end
 
@@ -171,16 +171,16 @@ module Isimud
 
     def start_event_thread
       Thread.new do
-        log 'EventListener: starting event_thread'
+        log 'EventListener: starting event_thread', :info
         until shutdown? do
           begin
             bind_queues
-            log 'EventListener: event_thread finished'
+            log 'EventListener: event_thread bind_queues finished', :info
             @status = STATUS_RUNNING
             Thread.stop
           rescue => e
+            log "EventListener: error in event thread: #{e.message}\n  #{e.backtrace.join("\n  ")}", :warn
             count_error(e)
-            log 'EventListener: resetting queues', :warn
             @observer_queue = nil
             client.reset
           end
@@ -201,7 +201,7 @@ module Isimud
     end
 
     def start_error_counter_thread
-      log 'EventListener: starting error counter'
+      log 'EventListener: starting error counter', :info
       @error_count = 0
       Thread.new do
         while true
