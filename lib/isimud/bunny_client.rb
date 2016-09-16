@@ -18,7 +18,8 @@ module Isimud
     def initialize(_url = nil, _bunny_options = {})
       log "Isimud::BunnyClient.initialize: options = #{_bunny_options.inspect}"
       @url           = _url || DEFAULT_URL
-      @bunny_options = _bunny_options
+      @url.symbolize_keys! if @url.respond_to?(:symbolize_keys!)
+      @bunny_options = _bunny_options.symbolize_keys
     end
 
     # Convenience method that finds or creates a named queue, binds to an exchange, and subscribes to messages.
@@ -68,18 +69,18 @@ module Isimud
       queue.subscribe(options.merge(manual_ack: true)) do |delivery_info, properties, payload|
         current_channel = channel
         begin
-          log "Isimud: queue #{queue.name} received #{delivery_info.delivery_tag} routing_key: #{delivery_info.routing_key}", :debug
+          log "Isimud: queue #{queue.name} received #{properties[:message_id]} routing_key: #{delivery_info.routing_key}", :debug
           Thread.current['isimud_queue_name']    = queue.name
           Thread.current['isimud_delivery_info'] = delivery_info
           Thread.current['isimud_properties']    = properties
           block.call(payload)
-          log "Isimud: queue #{queue.name} finished with #{delivery_info.delivery_tag}, acknowledging", :debug
+          log "Isimud: queue #{queue.name} finished with #{properties[:message_id]}, acknowledging", :debug
           current_channel.ack(delivery_info.delivery_tag)
         rescue => e
-          log("Isimud: queue #{queue.name} error processing #{delivery_info.delivery_tag} payload #{payload.inspect}: #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}", :warn)
+          log("Isimud: queue #{queue.name} error processing #{properties[:message_id]} payload #{payload.inspect}: #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}", :warn)
           retry_status  = run_exception_handlers(e)
-          log "Isimud: rejecting #{delivery_info.delivery_tag} requeue=#{retry_status}", :warn
-          current_channel.reject(delivery_info.delivery_tag, retry_status)
+          log "Isimud: rejecting #{properties[:message_id]} requeue=#{retry_status}", :warn
+          current_channel.open? && current_channel.reject(delivery_info.delivery_tag, retry_status)
         end
       end
     end

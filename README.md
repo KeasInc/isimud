@@ -93,11 +93,11 @@ for cold startup on a new AMQP broker.
 
 Each time that a message is retrieved from the queue, the following properties are set in the current thread:
 
- | name | contents |
- | ---- | -------- |
- | isimud_queue_name | Name of the queue processing the thread |
- | isimud_delivery_info | Message delivery information (*Bunny::DeliveryInfo*) |
- | isimud_properties | Message properties metadata (*Bunny::MessageProperties*) |
+| name | contents |
+| ---- | -------- |
+| isimud_queue_name | Name of the queue processing the thread |
+| isimud_delivery_info | Message delivery information (*Bunny::DeliveryInfo*) |
+| isimud_properties | Message properties metadata (*Bunny::MessageProperties*) |
  
 ### Exception Handling
 
@@ -119,6 +119,11 @@ logically AND-ed. If the result is truthy, the message is re-queued. If the retu
 the message is not re-queued.
 
 # Changes
+
+## 1.4.3
+
+* When an exception is raised during message processing, check status of channel before calling reject()
+* Symbolize keys in options when initializing BunnyClient
 
 ## 1.4.2
 

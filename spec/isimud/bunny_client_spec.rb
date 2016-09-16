@@ -1,14 +1,24 @@
 require 'spec_helper'
 
 describe Isimud::BunnyClient do
-  let!(:exchange_name) { 'isimud_test' }
-  let!(:url) { 'amqp://guest:guest@localhost' }
-  let!(:client) { Isimud::BunnyClient.new(url) }
-  let!(:connection) { client.connection }
+  let(:exchange_name) { 'isimud_test' }
+  let(:url) { 'amqp://guest:guest@localhost' }
+  let(:client) { Isimud::BunnyClient.new(url) }
+  let(:connection) { client.connection }
 
   describe '#initialize' do
-    it 'sets the broker URL' do
-      expect(client.url).to eq(url)
+    context 'with a string URL' do
+      it 'sets the broker URL' do
+        expect(client.url).to eq(url)
+      end
+    end
+
+    context 'with a server specified as a hash' do
+      let(:options) { {host: 'foo@example.com', port: 15671, user: 'user', password: 'secret'} }
+      let(:url) { options.stringify_keys }
+      it 'symbolizes the keys and passes the hash' do
+        expect(client.url).to eql(options)
+      end
     end
   end
 
@@ -113,6 +123,7 @@ describe Isimud::BunnyClient do
 
   describe '#connected?' do
     it 'is true for an open session' do
+      channel = client.connect
       expect(client).to be_connected
     end
 
