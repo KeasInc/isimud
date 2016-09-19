@@ -119,7 +119,7 @@ module Isimud
 
     def publish
       data = self.serialize
-      log "Event#publish: #{self.inspect}"
+      log "Event#publish: exchange #{exchange} message_id=#{message_id}"
       Isimud.client.publish(exchange, routing_key, data, message_id: message_id)
     end
   end

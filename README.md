@@ -96,8 +96,8 @@ Each time that a message is retrieved from the queue, the following properties a
 | name | contents |
 | ---- | -------- |
 | isimud_queue_name | Name of the queue processing the thread |
-| isimud_delivery_info | Message delivery information (*Bunny::DeliveryInfo*) |
-| isimud_properties | Message properties metadata (*Bunny::MessageProperties*) |
+| isimud_delivery_info | Message delivery information  *(Bunny::DeliveryInfo)*  |
+| isimud_properties | Message properties metadata *(Bunny::MessageProperties)* |
  
 ### Exception Handling
 
