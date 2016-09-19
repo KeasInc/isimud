@@ -28,4 +28,3 @@ run! "gem push #{built_gem_path}"
 
 puts 'Testing install'.cyan
 run! "gem install #{gem_name} -v #{Isimud::VERSION} -P MediumSecurity"
-Contact GitHub API Training Shop Blog About
