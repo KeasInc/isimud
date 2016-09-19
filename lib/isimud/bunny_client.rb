@@ -93,8 +93,8 @@ module Isimud
       @connection = nil
     end
 
-    def publish(exchange, routing_key, payload)
-      channel.topic(exchange, durable: true).publish(payload, routing_key: routing_key, persistent: true)
+    def publish(exchange, routing_key, payload, options = {})
+      channel.topic(exchange, durable: true).publish(payload, options.merge(routing_key: routing_key, persistent: true))
     end
 
     def reconnect

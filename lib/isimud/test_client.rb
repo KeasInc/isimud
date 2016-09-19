@@ -79,7 +79,7 @@ module Isimud
       queue
     end
 
-    def publish(exchange, routing_key, payload)
+    def publish(exchange, routing_key, payload, _options = {})
       log "Isimud::TestClient: Delivering message key: #{routing_key} payload: #{payload}"
       call_queues = queues.values.select { |queue| queue.has_matching_key?(routing_key) }
       call_queues.each do |queue|

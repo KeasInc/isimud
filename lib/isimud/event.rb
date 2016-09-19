@@ -4,6 +4,7 @@ module Isimud
   class Event
     include Isimud::Logging
     attr_accessor :type, :action, :user_id, :occurred_at, :eventful_type, :eventful_id, :attributes, :parameters
+    attr_reader :timestamp
     attr_writer :exchange
 
     DEFAULT_TYPE = :model
@@ -37,6 +38,7 @@ module Isimud
                          else
                            Time.now.utc
                          end
+      @timestamp       = Time.now
 
       eventful_object = options.delete(:eventful)
 
@@ -66,6 +68,13 @@ module Isimud
     def routing_key
       [type.to_s, eventful_type, eventful_id, action].compact.join('.')
     end
+
+    # Message ID, which is generated from the exchange, routing_key, user_id, and timestamp. This is practically
+    # guaranteed to be unique across all publishers.
+    def message_id
+      [exchange, routing_key, user_id, timestamp.to_i, timestamp.nsec].join(':')
+    end
+
 
     # Return hash of data to be serialized to JSON
     # @option options [Boolean] :omit_parameters when set, do not include attributes or parameters in data
@@ -106,7 +115,7 @@ module Isimud
     def publish
       data = self.serialize
       log "Event#publish: #{self.inspect}"
-      Isimud.client.publish(exchange, routing_key, data)
+      Isimud.client.publish(exchange, routing_key, data, message_id: message_id)
     end
   end
 end

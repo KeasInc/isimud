@@ -33,7 +33,7 @@ module Isimud
       @exception_handler = block
     end
 
-    def publish(exchange, routing_key, payload)
+    def publish(exchange, routing_key, payload, options = {})
     end
 
     def reconnect
