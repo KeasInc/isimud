@@ -20,6 +20,7 @@ module Isimud
       @url = _url || DEFAULT_URL
       @url.symbolize_keys! if @url.respond_to?(:symbolize_keys!)
       @bunny_options = _bunny_options.symbolize_keys
+      @bunny_options[:logger] = Isimud.logger
     end
 
     # Convenience method that finds or creates a named queue, binds to an exchange, and subscribes to messages.
