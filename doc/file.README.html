@@ -191,8 +191,8 @@ properties are set in the current thread:</p>
 
 <p>| name | contents | | —- | ——– | | isimud_queue_name | Name of the queue
 processing the thread | | isimud_delivery_info | Message delivery
-information (<em>Bunny::DeliveryInfo</em>) | | isimud_properties | Message
-properties metadata (<em>Bunny::MessageProperties</em>) |</p>
+information <em>(Bunny::DeliveryInfo)</em> | | isimud_properties | Message
+properties metadata <em>(Bunny::MessageProperties)</em> |</p>
 
 <h3 id="label-Exception+Handling">Exception Handling</h3>
 
@@ -216,6 +216,11 @@ truthy, the message is re-queued. If the return value of any handler is
 falsey, the message is not re-queued.</p>
 
 <h1 id="label-Changes">Changes</h1>
+
+<h2 id="label-1.4.4">1.4.4</h2>
+<ul><li>
+<p>Check if current channel is open before sending message ack</p>
+</li></ul>
 
 <h2 id="label-1.4.3">1.4.3</h2>
 <ul><li>
@@ -582,7 +587,7 @@ feature&#39;</code>)</p>
 </div></div>
 
     <div id="footer">
-  Generated on Fri Sep 16 16:32:31 2016 by
+  Generated on Tue Sep 20 11:31:59 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.7.6 (ruby-2.3.0).
 </div>
