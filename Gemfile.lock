@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    isimud (1.4.5)
+    isimud (1.4.6)
       activerecord (>= 4.1.4)
       activesupport (>= 4.1.4)
       bunny (>= 1.6.0)

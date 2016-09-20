@@ -68,7 +68,7 @@ module Isimud
     # @yieldparam [String] payload message text
     def subscribe(queue, options = {}, &block)
       queue.subscribe(options.merge(manual_ack: true)) do |delivery_info, properties, payload|
-        current_channel = channel
+        current_channel = delivery_info.channel
         begin
           log "Isimud: queue #{queue.name} received #{properties[:message_id]} routing_key: #{delivery_info.routing_key}", :debug
           Thread.current['isimud_queue_name']    = queue.name

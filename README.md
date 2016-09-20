@@ -120,12 +120,10 @@ the message is not re-queued.
 
 # Changes
 
-## 1.4.5
+## 1.4.6
 
+* When consuming messages, use the channel setting from the delivery_info
 * Explicitly set Bunny logger to the Isimud logger 
-
-## 1.4.4
-
 * Check if current channel is open before sending message ack 
 
 ## 1.4.3
