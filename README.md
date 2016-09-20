@@ -120,6 +120,10 @@ the message is not re-queued.
 
 # Changes
 
+## 1.4.4
+
+* Check if current channel is open before sending message ack 
+
 ## 1.4.3
 
 * When an exception is raised during message processing, check status of channel before calling reject()

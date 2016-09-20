@@ -17,7 +17,7 @@ module Isimud
     # @see Bunny.new for connection options
     def initialize(_url = nil, _bunny_options = {})
       log "Isimud::BunnyClient.initialize: options = #{_bunny_options.inspect}"
-      @url           = _url || DEFAULT_URL
+      @url = _url || DEFAULT_URL
       @url.symbolize_keys! if @url.respond_to?(:symbolize_keys!)
       @bunny_options = _bunny_options.symbolize_keys
     end
@@ -74,11 +74,15 @@ module Isimud
           Thread.current['isimud_delivery_info'] = delivery_info
           Thread.current['isimud_properties']    = properties
           block.call(payload)
-          log "Isimud: queue #{queue.name} finished with #{properties[:message_id]}, acknowledging", :debug
-          current_channel.ack(delivery_info.delivery_tag)
+          if current_channel.open?
+            log "Isimud: queue #{queue.name} finished with #{properties[:message_id]}, acknowledging", :debug
+            current_channel.ack(delivery_info.delivery_tag)
+          else
+            log "Isimud: queue #{queue.name} unable to acknowledge #{properties[:message_id]}", :warn
+          end
         rescue => e
           log("Isimud: queue #{queue.name} error processing #{properties[:message_id]} payload #{payload.inspect}: #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}", :warn)
-          retry_status  = run_exception_handlers(e)
+          retry_status = run_exception_handlers(e)
           log "Isimud: rejecting #{properties[:message_id]} requeue=#{retry_status}", :warn
           current_channel.open? && current_channel.reject(delivery_info.delivery_tag, retry_status)
         end
