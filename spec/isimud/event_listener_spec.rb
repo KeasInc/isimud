@@ -1,9 +1,14 @@
 require 'spec_helper'
 
 describe Isimud::EventListener do
-  let!(:company) { Company.create(name: 'Google', active: true) }
+  before do
+    @company = Company.create(name: 'Google', active: true)
+    @listener = Isimud::EventListener.new(name: 'all_ears', error_limit: 5, exchange: 'test-listener')
+  end
+
+  let!(:company) { @company }
   let!(:inactive_company) { Company.create(name: 'Radio Shack', active: false) }
-  let!(:listener) { Isimud::EventListener.new(name: 'all_ears', error_limit: 5, exchange: 'test-listener') }
+  let!(:listener) { @listener }
 
   after(:each) do
     Isimud.client.reset
@@ -75,13 +80,9 @@ describe Isimud::EventListener do
 
       context 'handling observer update messages' do
         it 'reloads the observer and processes events accordingly' do
+          expect(listener).to receive(:unregister_observer).with('Company', company.id).and_call_original
+          expect(listener).to receive(:register_observer).with an_instance_of(Company)
           company.update_attributes!(points_per_user: 2)
-          expect(listener).to have_observer(company)
-          expect {
-            User.create!(company: company, first_name: 'Larry', last_name: 'Page')
-            company.reload
-          }.to change(company, :user_count).by(1)
-          expect(company.total_points).to eql(company.user_count * 2)
         end
       end
 

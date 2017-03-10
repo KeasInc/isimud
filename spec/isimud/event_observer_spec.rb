@@ -57,14 +57,9 @@ describe Isimud::EventObserver do
       end
 
       it 'creates the queue' do
-        expect(@client).to receive(:find_queue).with(@user.event_queue_name).and_call_original
-        @user.update_attributes(deactivated: false)
-      end
-
-      it 'binds the routing keys' do
-        @user.exchange_routing_keys.each do |k|
-          expect(@queue).to receive(:bind).with(@exchange, routing_key: k).and_call_original
-        end
+        expect(@client).to receive(:create_queue).with("combustion.user.#{@user.id}",
+                                                       @exchange,
+                                                       routing_keys: keys)
         @user.update_attributes(deactivated: false)
       end
     end
@@ -75,22 +70,16 @@ describe Isimud::EventObserver do
         @queue = @client.find_queue(@user.event_queue_name)
       end
 
-      it 'binds new keys' do
-        @user.exchange_routing_keys.each do |k|
-          expect(@queue).to receive(:bind).with(@exchange, routing_key: k).and_call_original
-        end
-        expect(@queue).to receive(:bind).with(@exchange, routing_key: 'some_other_value').and_call_original
+      it 'deletes and recreates the queue' do
+        new_keys = keys << 'some_other_value'
+        expect(@client).to receive(:delete_queue).with(@user.event_queue_name)
+        expect(@client).to receive(:create_queue).with("combustion.user.#{@user.id}",
+                                                       @exchange,
+                                                       routing_keys: new_keys)
         @user.transaction do
           @user.keys << 'some_other_value'
           @user.save!
         end
-      end
-
-      it 'removes old keys' do
-        expect(@queue).to receive(:unbind).with(@exchange, routing_key: 'a.b.c')
-        expect(@queue).not_to receive(:unbind).with(@exchange, routing_key: 'd.*.f')
-        @user.keys.delete('a.b.c')
-        @user.save!
       end
     end
   end

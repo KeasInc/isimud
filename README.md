@@ -86,7 +86,7 @@ for each instance.
 2. Custom standalone queues. You may extend EventListener to declare individual queues not associated with a specific
 object instance.
 
-The EventListener process will automatically create queues on initial startup if they do not already exist. This allows
+The EventListener process will automatically create and bind queues on startup if they do not already exist. This allows
 for cold startup on a new AMQP broker.
 
 ### Message Delivery Information and Metadata
@@ -119,6 +119,13 @@ logically AND-ed. If the result is truthy, the message is re-queued. If the retu
 the message is not re-queued.
 
 # Changes
+
+## 1.4.7
+
+* Simplify the AMQP queue lifecycle for EventObserver instances when they are updated.
+  * Any previously existing queue for the instance is deleted on the broker.
+  * When an EventListener process receives the EventObserver update message, it always recreates and rebinds the 
+    queue for the instance.
 
 ## 1.4.6
 

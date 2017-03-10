@@ -53,13 +53,12 @@ module Isimud
     # Create or attach to a queue on the specified exchange. When an event message that matches the observer's routing keys
     # is received, parse the event and call handle_event on same.
     # @param [Isimud::Client] client client instance
-    # @param [Boolean] refresh_bindings when set, refresh bindings on queue (true)
     # @return queue or consumer object
     # @see BunnyClient#subscribe
     # @see TestClient#subscribe
-    def observe_events(client, refresh_bindings = true)
+    def observe_events(client)
       return unless enable_listener?
-      queue = (refresh_bindings || client.kind_of?(Isimud::TestClient)) ? create_queue(client) : client.find_queue(event_queue_name)
+      queue = create_queue(client)
       client.subscribe(queue) do |message|
         event = Event.parse(message)
         handle_event(event)
@@ -99,18 +98,8 @@ module Isimud
     end
 
     def update_queue
-      if enable_listener?
-        routing_key_changes = previous_changes[:exchange_routing_keys]
-        prev_keys    = routing_key_changes.try(:[], 0) || []
-        current_keys = routing_key_changes.try(:[], 1) || exchange_routing_keys
-        queue        = isimud_client.find_queue(event_queue_name)
-        exchange     = observed_exchange || Isimud.events_exchange
-        (prev_keys - current_keys).each { |key| queue.unbind(exchange, routing_key: key) }
-        log "Isimud::EventObserver: binding queue #{event_queue_name} on exchange #{exchange} with bindings [#{current_keys.join(',')}]"
-        (current_keys).each { |key| queue.bind(exchange, routing_key: key) }
-      else
-        isimud_client.delete_queue(event_queue_name)
-      end
+      delete_queue
+      create_queue if enable_listener? && exchange_routing_keys.any?
     end
 
     def delete_queue(client = isimud_client)

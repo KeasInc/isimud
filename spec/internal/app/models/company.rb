@@ -22,11 +22,18 @@ class Company < ActiveRecord::Base
   end
 
   def handle_event(event)
+    Rails.logger.info "Company#handle_event: id=#{id} event=#{event.inspect}"
     user = User.find(event.parameters[:id])
     return unless user.company_id == id
-    raise "unexpected action: #{event.action}" unless ['create','destroy' ].include?(event.action.to_s)
-    self.user_count = User.where(company: self).count
-    self.total_points = user_count * points_per_user
+    case event.action
+      when :create
+        Rails.logger.info "recording new user for company #{id}"
+        self.user_count += 1
+        self.total_points += points_per_user
+      when :destroy
+        self.user_count -= 1
+        self.total_points -= points_per_user
+    end
     save!
   end
 end

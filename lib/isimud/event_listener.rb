@@ -121,6 +121,11 @@ module Isimud
       @observers.has_key?(observer_key_for(observer.class, observer.id))
     end
 
+    # @private
+    def find_observer(klass, id)
+      @observers[observer_key_for(klass, id)]
+    end
+
     private
 
     def test_env?
@@ -242,7 +247,7 @@ module Isimud
     def register_observer(observer)
       @observer_mutex.synchronize do
         log "EventListener: registering observer #{observer.class} #{observer.id}"
-        @observers[observer_key_for(observer.class, observer.id)] = observer.observe_events(client, initializing?)
+        @observers[observer_key_for(observer.class, observer.id)] = observer.observe_events(client)
       end
     end
 

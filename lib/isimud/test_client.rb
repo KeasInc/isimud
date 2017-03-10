@@ -28,7 +28,6 @@ module Isimud
       end
 
       def cancel
-        @proc = nil
       end
 
       def delete(opts = {})
@@ -81,6 +80,7 @@ module Isimud
     end
 
     def delete_queue(queue_name)
+      log "Isimud::TestClient: deleting queue #{queue_name}"
       queues.delete(queue_name)
     end
 
@@ -89,13 +89,13 @@ module Isimud
       subscribe(queue, &block)
     end
 
-    def find_queue(queue_name, options = {})
+    def find_queue(queue_name, _options = {})
       queues[queue_name] ||= Queue.new(self, queue_name)
     end
 
     def create_queue(queue_name, exchange_name, options = {})
       keys = options[:routing_keys] || []
-      log "Isimud::TestClient: Binding queue #{queue_name} for keys #{keys.inspect}"
+      log "Isimud::TestClient: Binding queue #{queue_name} on exchange #{exchange_name} for keys #{keys.inspect}"
       queue = find_queue(queue_name)
       keys.each do |k|
         queue.bind(exchange_name, routing_key: k)
@@ -103,7 +103,8 @@ module Isimud
       queue
     end
 
-    def subscribe(queue, options = {}, &block)
+    def subscribe(queue, _options = {}, &block)
+      log "Isimud::TestClient: subscribing to events on queue #{queue.name}"
       queue.proc = block
       queue
     end
